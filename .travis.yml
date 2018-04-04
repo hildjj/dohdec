@@ -4,14 +4,12 @@ node_js:
 - "8"
 - "9"
 install:
-- npm install
-- npm install coveralls
-- ls node_modules
-- ls -l node_modules/dns-packet
+- yarn install
+- yarn add coveralls
 script:
 - npm run coverage
 after_success:
-- npm run coveralls
+- nyc report --reporter=text-lcov | coveralls
 # cache:
 #   directories:
 #     - node_modules
