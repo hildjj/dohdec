@@ -4,8 +4,7 @@ node_js:
 - "8"
 - "9"
 install:
-- npm install --verbose
-- npm i hildjj/dns-packet#local34 --verbose
+- npm install
 - npm install coveralls
 - ls node_modules
 - ls -l node_modules/dns-packet
