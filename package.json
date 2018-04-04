@@ -22,7 +22,7 @@
     "dohdec": "./bin/dohdec"
   },
   "dependencies": {
-    "dns-packet": "hildjj/dns-packet.git#local34",
+    "dns-packet": "mafintosh/dns-packet",
     "node-fetch": "^2.1.2",
     "yargs": "^11.0.0"
   },
