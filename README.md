@@ -53,3 +53,4 @@ await lookup('ietf.org', {
 
 [MPL-2.0](https://www.mozilla.org/en-US/MPL/2.0/)
 
+[![Build Status](https://travis-ci.org/hildjj/dohdec.svg?branch=master)](https://travis-ci.org/hildjj/dohdec)
