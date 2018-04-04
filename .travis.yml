@@ -6,6 +6,8 @@ node_js:
 install:
 - npm install --verbose
 - npm install coveralls
+- ls node_modules
+- ls -l node_modules/dns-packet
 script:
 - npm run coverage
 after_success:
