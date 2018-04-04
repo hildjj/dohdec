@@ -4,12 +4,12 @@ node_js:
 - "8"
 - "9"
 install:
-- npm install
+- npm install --verbose
 - npm install coveralls
 script:
 - npm run coverage
 after_success:
 - npm run coveralls
-cache:
-  directories:
-    - node_modules
+# cache:
+#   directories:
+#     - node_modules
