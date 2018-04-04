@@ -1,0 +1,79 @@
+#!/usr/bin/env node
+'use strict'
+const util = require('util')
+const doh = require('../index')
+const argv = require('yargs')
+  .version(doh.version)
+  .usage('$0 <name> [rrtype]', 'Look up DNS name using DNS-over-HTTPS (DoH)', yargs => {
+    yargs.positional('name', {
+      desc: 'The name to look up',
+      type: 'string',
+      required: true
+    })
+    yargs.positional('rrtype', {
+      desc: 'Resource Record type to look up',
+      default: 'A',
+      type: 'string'
+    })
+  })
+  .alias('h', 'help')
+  .options({
+    dns: {
+      desc: 'Use DNS format instead of JSON',
+      alias: 'd',
+      boolean: true
+    },
+    get: {
+      desc: 'Force http GET for DNS-format lookups',
+      alias: 'g',
+      boolean: true
+    },
+    'no-decode': {
+      alias: 'n',
+      desc: 'Do not decode JSON or DNS wire format',
+      boolean: true
+    },
+    dnssec: {
+      alias: 's',
+      desc: 'Request DNSsec records',
+      boolean: true
+    },
+    url: {
+      desc: 'The URL of the DoH service',
+      alias: 'u',
+      default: doh.url,
+      string: true,
+      requiresArg: true
+    },
+    verbose: {
+      desc: 'Print debug info',
+      alias: 'v',
+      boolean: true
+    }
+  })
+  .argv
+
+if (argv.verbose) {
+  require('request').debug = true
+}
+
+doh(argv.name, {
+  rrtype: argv.rrtype,
+  json: !argv.dns,
+  preferPost: !argv.get,
+  decode: !argv.noDecode,
+  dnssec: argv.dnssec,
+  url: argv.url
+}).then(resp => {
+  if (argv.noDecode) {
+    process.stdout.write(resp)
+  } else {
+    console.log(util.inspect(resp, {
+      color: true,
+      depth: null
+    }))
+  }
+}, er => {
+  console.error(er.message ? er.message : er)
+  process.exit(1)
+})

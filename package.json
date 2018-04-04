@@ -1,0 +1,39 @@
+{
+  "name": "dohdec",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "lint": "standard *.js test/*.js",
+    "pretest": "npm run lint",
+    "test": "ava",
+    "coverage": "nyc npm test",
+    "postcoverage": "nyc report -r html"
+  },
+  "keywords": [
+    "doh",
+    "dns-over-https",
+    "dns",
+    "dnssec"
+  ],
+  "author": "Joe Hildebrand <joe-github@cursive.net>",
+  "license": "MPL-2.0",
+  "bin": {
+    "dohdec": "./bin/dohdec"
+  },
+  "dependencies": {
+    "dns-packet": "github:hildjj/dns-packet#local34",
+    "node-fetch": "^2.1.2",
+    "yargs": "^11.0.0"
+  },
+  "devDependencies": {
+    "ava": "^0.25.0",
+    "nyc": "^11.6.0",
+    "standard": "^11.0.1"
+  },
+  "ava": {
+    "files": [
+      "test/*.ava.js"
+    ]
+  }
+}

@@ -1,0 +1,9 @@
+node_modules/
+.nyc_output/
+coverage/
+tmp/
+.vscode/
+npm-debug.log
+.travis.yml
+test/
+*.tgz
