@@ -23,14 +23,15 @@
     "dohdec": "./bin/dohdec"
   },
   "dependencies": {
-    "dns-packet": "^4.2.0",
-    "node-fetch": "^2.1.2",
-    "yargs": "^11.0.0"
+    "dns-packet": "^5.1.2",
+    "node-fetch": "^2.3.0",
+    "yargs": "^12.0.5"
   },
   "devDependencies": {
-    "ava": "^0.25.0",
-    "nyc": "^11.6.0",
-    "standard": "^11.0.1"
+    "ava": "^1.2.0",
+    "nock": "^10.0.6",
+    "nyc": "^13.1.0",
+    "standard": "^12.0.1"
   },
   "ava": {
     "files": [
