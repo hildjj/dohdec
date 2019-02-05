@@ -36,7 +36,7 @@ function base64urlEncode (buf) {
 
 async function getDNS (url, body) {
   body = base64urlEncode(body)
-  const r = await fetch(`${url}?ct=${WF_DNS}&dns=${body}`, {
+  const r = await fetch(`${url}?dns=${body}`, {
     headers: {
       'Accept': WF_DNS,
       'User-Agent': USER_AGENT
@@ -74,9 +74,10 @@ async function requestDNS (opts) {
 
 async function getJSON (opts) {
   const r = await fetch(
-    `${opts.url}?ct=${WF_JSON}&name=${opts.name}&type=${opts.rrtype}`, {
+    `${opts.url}?name=${opts.name}&type=${opts.rrtype}`, {
       headers: {
-        'User-Agent': USER_AGENT
+        'User-Agent': USER_AGENT,
+        'Accept': WF_JSON
       }
     })
   return opts.decode ? r.json() : r.text()

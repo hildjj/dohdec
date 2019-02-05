@@ -14,7 +14,8 @@
     "doh",
     "dns-over-https",
     "dns",
-    "dnssec"
+    "dnssec",
+    "rfc8484"
   ],
   "author": "Joe Hildebrand <joe-github@cursive.net>",
   "license": "MPL-2.0",

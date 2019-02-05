@@ -1,6 +1,6 @@
 # dohdec
 
-Retrieve and decode DNS records using [DNS-over-HTTPS](https://tools.ietf.org/html/draft-ietf-doh-dns-over-https) (DOH)
+Retrieve and decode DNS records using [DNS-over-HTTPS](https://tools.ietf.org/html/rfc8484) (DOH)
 
 
 ## Install
