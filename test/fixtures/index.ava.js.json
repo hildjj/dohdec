@@ -1,0 +1,244 @@
+[
+    {
+        "scope": "https://cloudflare-dns.com:443",
+        "method": "POST",
+        "path": "/dns-query",
+        "body": "0000012000010000000000010469657466036f726700000100010000291000000080000000",
+        "status": 200,
+        "response": "000081a000010002000000010469657466036f72670000010001c00c00010001000004670004041fc62cc00c002e000100000467011c00010502000007085e3439355c52f8189e040469657466036f7267003070a9c8df42a40c090c518068c0096886dac05cf880b892d34be4785f0884b5ac17909188e741a4246a5f34a70ef8ca19f5c4df3cea2103894679da1a8f83efdcd1a27b3d04fa1c4ee3a7a4dcd5bc2b923a48ea7bd61f8c281b4d1dae69fcb1023c72f66a70eed4b2607a72b6c029892ae0e106b02cc01211bf3944b39448dbf0f6f8c94ec7968852b9267addf926ad84c7933a268eb00ae31343e7d3b3fc219d7c4147a425f6c331cca15b33c69c1bd10e0d438f7669f5fcb47ef760cafd5fd975d40113a6d82df9d7be8e2314c982b42b9a7ed3ba7cf469a694ef8508876b38f1505a071d9905691ef2f203edb244dd2c3d1f09e0114d176300934257c93c00002905ac000080000000",
+        "rawHeaders": [
+            "Date",
+            "Tue, 05 Feb 2019 00:00:30 GMT",
+            "Content-Type",
+            "application/dns-udpwireformat",
+            "Content-Length",
+            "349",
+            "Connection",
+            "close",
+            "Access-Control-Allow-Origin",
+            "*",
+            "cache-control",
+            "max-age=1127",
+            "Expect-CT",
+            "max-age=604800, report-uri=\"https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct\"",
+            "Vary",
+            "Accept-Encoding",
+            "Server",
+            "cloudflare",
+            "CF-RAY",
+            "4a4118defa6cc7bf-DEN"
+        ],
+        "responseIsBinary": true
+    },
+    {
+        "scope": "https://cloudflare-dns.com:443",
+        "method": "GET",
+        "path": "/dns-query?dns=AAABAAABAAAAAAABBGlldGYDb3JnAAAcAAEAACkQAAAAAAAAAA",
+        "body": "",
+        "status": 200,
+        "response": "000081a000010001000000010469657466036f726700001c0001c00c001c00010000047f00102001190030010011000000000000002c00002905ac000000000000",
+        "rawHeaders": [
+            "Date",
+            "Tue, 05 Feb 2019 00:00:30 GMT",
+            "Content-Type",
+            "application/dns-udpwireformat",
+            "Content-Length",
+            "65",
+            "Connection",
+            "close",
+            "Access-Control-Allow-Origin",
+            "*",
+            "cache-control",
+            "max-age=1151",
+            "Expect-CT",
+            "max-age=604800, report-uri=\"https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct\"",
+            "Vary",
+            "Accept-Encoding",
+            "Server",
+            "cloudflare",
+            "CF-RAY",
+            "4a4118df08a7c7d7-DEN"
+        ],
+        "responseIsBinary": true
+    },
+    {
+        "scope": "https://cloudflare-dns.com:443",
+        "method": "GET",
+        "path": "/dns-query?name=ietf.org&type=A",
+        "body": "",
+        "status": 200,
+        "response": {
+            "Status": 0,
+            "TC": false,
+            "RD": true,
+            "RA": true,
+            "AD": true,
+            "CD": false,
+            "Question": [
+                {
+                    "name": "ietf.org.",
+                    "type": 1
+                }
+            ],
+            "Answer": [
+                {
+                    "name": "ietf.org.",
+                    "type": 1,
+                    "TTL": 1127,
+                    "data": "4.31.198.44"
+                }
+            ]
+        },
+        "rawHeaders": [
+            "Date",
+            "Tue, 05 Feb 2019 00:00:30 GMT",
+            "Content-Type",
+            "application/dns-json",
+            "Content-Length",
+            "198",
+            "Connection",
+            "close",
+            "Access-Control-Allow-Origin",
+            "*",
+            "cache-control",
+            "max-age=1127",
+            "Expect-CT",
+            "max-age=604800, report-uri=\"https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct\"",
+            "Vary",
+            "Accept-Encoding",
+            "Server",
+            "cloudflare",
+            "CF-RAY",
+            "4a4118df0c7bc7b3-DEN"
+        ]
+    },
+    {
+        "scope": "https://cloudflare-dns.com:443",
+        "method": "POST",
+        "path": "/dns-query",
+        "body": "\u0000\u0000\u0001\u0000\u0000\u0001\u0000\u0000\u0000\u0000\u0000\u0001\u0004ietf\u0003org\u0000\u0000\u0001\u0000\u0001\u0000\u0000)\u0010\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+        "status": 200,
+        "response": "000081a000010001000000010469657466036f72670000010001c00c00010001000004670004041fc62c00002905ac000000000000",
+        "rawHeaders": [
+            "Date",
+            "Tue, 05 Feb 2019 00:00:30 GMT",
+            "Content-Type",
+            "application/dns-udpwireformat",
+            "Content-Length",
+            "53",
+            "Connection",
+            "close",
+            "Access-Control-Allow-Origin",
+            "*",
+            "cache-control",
+            "max-age=1127",
+            "Expect-CT",
+            "max-age=604800, report-uri=\"https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct\"",
+            "Vary",
+            "Accept-Encoding",
+            "Server",
+            "cloudflare",
+            "CF-RAY",
+            "4a4118df4cd8c7b3-DEN"
+        ],
+        "responseIsBinary": true
+    },
+    {
+        "scope": "https://cloudflare-dns.com:443",
+        "method": "GET",
+        "path": "/dns-query?name=ietf.org&type=MX",
+        "body": "",
+        "status": 200,
+        "response": {
+            "Status": 0,
+            "TC": false,
+            "RD": true,
+            "RA": true,
+            "AD": true,
+            "CD": false,
+            "Question": [
+                {
+                    "name": "ietf.org.",
+                    "type": 15
+                }
+            ],
+            "Answer": [
+                {
+                    "name": "ietf.org.",
+                    "type": 15,
+                    "TTL": 1516,
+                    "data": "0 mail.ietf.org."
+                }
+            ]
+        },
+        "rawHeaders": [
+            "Date",
+            "Tue, 05 Feb 2019 00:00:30 GMT",
+            "Content-Type",
+            "application/dns-json",
+            "Content-Length",
+            "205",
+            "Connection",
+            "close",
+            "Access-Control-Allow-Origin",
+            "*",
+            "cache-control",
+            "max-age=1516",
+            "Expect-CT",
+            "max-age=604800, report-uri=\"https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct\"",
+            "Vary",
+            "Accept-Encoding",
+            "Server",
+            "cloudflare",
+            "CF-RAY",
+            "4a4118df88e04ff9-DEN"
+        ]
+    },
+    {
+        "scope": "https://dns.google.com:443",
+        "method": "GET",
+        "path": "/resolve?name=ietf.org&type=A",
+        "body": "",
+        "status": 200,
+        "response": [
+            "1f",
+            "8b",
+            "08",
+            "00",
+            "00",
+            "00",
+            "00",
+            "00",
+            "02",
+            "ff",
+            "ab",
+            "560a2e492c292d56b25230d0510a7106d2698939c5a93a4a412e407649512988e908673a22449d5d108a034b538b4b32f3f394aca215aa95f212735381724a99a925697af945e97a4a3a4a2595052031c3da58a02179c5e5a94584d5021d14e203649899e928a524962482d499e8191bea195a5ae8999828d5c6d602000fa1b181c0000000"
+        ],
+        "rawHeaders": [
+            "Strict-Transport-Security",
+            "max-age=31536000; includeSubDomains; preload",
+            "Date",
+            "Tue, 05 Feb 2019 00:00:30 GMT",
+            "Expires",
+            "Tue, 05 Feb 2019 00:00:30 GMT",
+            "Cache-Control",
+            "private, max-age=66",
+            "Content-Type",
+            "application/x-javascript; charset=UTF-8",
+            "Content-Encoding",
+            "gzip",
+            "Server",
+            "HTTP server (unknown)",
+            "X-XSS-Protection",
+            "1; mode=block",
+            "X-Frame-Options",
+            "SAMEORIGIN",
+            "Alt-Svc",
+            "quic=\":443\"; ma=2592000; v=\"44,43,39\"",
+            "Connection",
+            "close",
+            "Transfer-Encoding",
+            "chunked"
+        ]
+    }
+]

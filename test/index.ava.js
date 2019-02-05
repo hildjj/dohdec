@@ -1,7 +1,30 @@
 'use strict'
 
 const test = require('ava')
+const nock = require('nock')
 const lookup = require('../')
+const path = require('path')
+const process = require('process')
+
+test.before(async t => {
+  nock.back.fixtures = path.join(__dirname, 'fixtures')
+  if (!process.env.NOCK_BACK_MODE) {
+    nock.back.setMode('lockdown')
+  }
+  const title = escape(path.basename(__filename))
+  const { nockDone, context } = await nock.back(`${title}.json`)
+  if (context.scopes.length === 0) {
+    // set the NOCK_BACK_MODE variable to "record" when needed
+    console.error(`WARNING: Nock recording needed for "${title}".
+Set NOCK_BACK_MODE=record`)
+  }
+  t.context.nockDone = nockDone
+})
+
+test.after(t => {
+  t.context.nockDone()
+  t.truthy(nock.isDone())
+})
 
 test('dns put', async t => {
   const r = await lookup('ietf.org', {
