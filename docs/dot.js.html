@@ -161,6 +161,7 @@ Received: "${digest}"`))
     if (!b) {
       return
     }
+    this.emit('receive', b)
     this.nof.write(b)
     if (this.size === -1) {
       if (this.nof.length &lt; 2) {
@@ -234,15 +235,16 @@ Received: "${digest}"`))
     })
     await this._connect()
     opts.id = await this._id()
-    const dns = DNSutils.makePacket(opts)
 
     return new Promise((resolve, reject) => {
+      const pkt = DNSutils.makePacket(opts)
       this.pending[opts.id] = { resolve, reject, opts }
 
-      const pkt = packet.encode(dns)
       const sz = Buffer.allocUnsafe(2)
       sz.writeUInt16BE(pkt.length)
+      this.emit('send', sz)
       this.socket.write(sz)
+      this.emit('send', pkt)
       this.socket.write(pkt)
     })
   }
