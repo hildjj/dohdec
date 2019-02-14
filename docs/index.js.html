@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>index.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DNSoverTLS.html">DNSoverTLS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverTLS.html#.hashCert">hashCert</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverTLS.html#lookup">lookup</a></span></li><li class="nav-heading">Events</li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:certificate">certificate</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:connect">connect</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:disconnect">disconnect</a></span></li><li class="nav-heading"><a href="global.html">Globals</a></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#lookup">lookup</a></span></li>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">index.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict'
+
+const qs = require('querystring')
+const fetch = require('node-fetch')
+const packet = require('dns-packet')
+const punycode = require('punycode')
+const pkg = require('../package.json')
+
+const WF_DNS = 'application/dns-udpwireformat'
+const WF_JSON = 'application/dns-json'
+const CLOUDFLARE_API = 'https://cloudflare-dns.com/dns-query'
+const USER_AGENT = `${pkg.name} v${pkg.version}`
+
+async function postDNS (url, body) {
+  const r = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': WF_DNS,
+      'Accept': WF_DNS,
+      'User-Agent': USER_AGENT
+    },
+    body
+  })
+  return r.buffer()
+}
+
+function base64urlEncode (buf) {
+  const s = buf.toString('base64')
+  return s.replace(/[=+/]/g, c => {
+    switch (c) {
+      case '=': return ''
+      case '+': return '-'
+      case '/': return '_'
+    }
+  })
+}
+
+async function getDNS (url, body) {
+  body = base64urlEncode(body)
+  const r = await fetch(`${url}?dns=${body}`, {
+    headers: {
+      'Accept': WF_DNS,
+      'User-Agent': USER_AGENT
+    }
+  })
+  return r.buffer()
+}
+
+async function requestDNS (opts) {
+  const dns = {
+    type: 'query',
+    id: 0, // by spec, for cacheability
+    flags: packet.RECURSION_DESIRED,
+    questions: [{
+      type: opts.rrtype,
+      class: 'IN',
+      name: opts.name
+    }],
+    additionals: [{
+      name: '.',
+      type: 'OPT',
+      udpPayloadSize: 4096,
+      flags: 0
+    }]
+  }
+  if (opts.dnssec) {
+    dns.flags |= packet.AUTHENTIC_DATA
+    dns.additionals[0].flags |= packet.DNSSEC_OK
+  }
+  const pkt = packet.encode(dns)
+  const method = opts.preferPost ? postDNS : getDNS
+  const response = await method(opts.url, pkt)
+  return opts.decode ? packet.decode(response) : response
+}
+
+async function getJSON (opts) {
+  const r = await fetch(
+    `${opts.url}?name=${opts.name}&amp;type=${opts.rrtype}`, {
+      headers: {
+        'User-Agent': USER_AGENT,
+        'Accept': WF_JSON
+      }
+    })
+  return opts.decode ? r.json() : r.text()
+}
+
+/**
+ * Look up a DNS entry using DNS-over-HTTPS (DoH).
+ *
+ * @param {Object|String} name - The DNS name to look up, or opts if this is an object.
+ * @param {Object|String} [opts={}] - Options for the request.  If a string
+ *   is given, it will be used as the rrtype.
+ * @param {String} [opts.name] - The DNS name to look up.
+ * @param {String} [opts.rrtype='A'] The Resource Record type to retrive
+ * @param {Boolean} [opts.json=true] Retrieve a JSON response.  If false,
+ *   retrieve using DNS format.
+ * @param {Boolean} [opts.decode=true] Decode the response, either into JSON
+ *   or an object representing the DNS format result.
+ * @param {Boolean} [opts.preferPost=true] For DNS format requests, should
+ *   the HTTP POST verb be used?  If false, uses GET.
+ * @param {Boolean} [opts.dnssec=false] Request DNSSec records.  Currently
+ *   requires `json: false`
+ * @param {String} [opts.url=CLOUDFLARE_API] What DoH endpoint should be used?
+ * @returns {Promise&lt;Object|Buffer>} result
+ */
+function lookup (name, opts = {}) {
+  if (typeof name === 'object') {
+    opts = name
+    name = undefined
+  } else if (typeof opts === 'string') {
+    opts = {
+      name,
+      rrtype: opts
+    }
+    name = undefined
+  }
+  opts = Object.assign({
+    rrtype: 'A',
+    json: true,
+    decode: true,
+    preferPost: true,
+    url: lookup.url,
+    dnssec: false
+  }, opts)
+  opts.name = punycode.toASCII(opts.name || name)
+  opts.rrtype = opts.rrtype.toUpperCase()
+  return opts.json ? getJSON(opts) : requestDNS(opts)
+}
+
+lookup.version = pkg.version
+lookup.url = CLOUDFLARE_API
+lookup.DNSoverTLS = require('./dot')
+module.exports = lookup
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

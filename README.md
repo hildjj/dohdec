@@ -12,22 +12,26 @@ npm i -S dohdec
 ## Command Line Usage
 
 ```
-dohdec <name> [rrtype]
+dohdec [name] [rrtype]
 
 Look up DNS name using DNS-over-HTTPS (DoH)
 
 Positionals:
-  name    The name to look up                                           [string]
+  name    The name to look up.  If not specified, use a readline loop to look up
+          multiple names.                                               [string]
   rrtype  Resource Record type to look up                [string] [default: "A"]
 
 Options:
   --version        Show version number                                 [boolean]
   --dns, -d        Use DNS format instead of JSON                      [boolean]
+  --full, -f       Full response, not just answers                     [boolean]
   --get, -g        Force http GET for DNS-format lookups               [boolean]
   --no-decode, -n  Do not decode JSON or DNS wire format               [boolean]
   --dnssec, -s     Request DNSsec records                              [boolean]
   --url, -u        The URL of the DoH service
                       [string] [default: "https://cloudflare-dns.com/dns-query"]
+  --tls, -t        Use DNS-over-TLS instead of DNS-over-HTTPS          [boolean]
+  --tlsServer      Connect to this DNS-over-TLS server      [default: "1.1.1.1"]
   --verbose, -v    Print debug info                                    [boolean]
   -h, --help       Show help                                           [boolean]
 ```
@@ -35,18 +39,18 @@ Options:
 ## API Usage
 
 ```js
-const lookup = require('dohdec')
+const { DNSoverHTTP, DNSoverTLS } = require('dohdec')
 
-await lookup('ietf.org', 'AAAA') // JSON result from CloudFlare
-await lookup('ietf.org', {
+const doh = new DNSoverHTTP()
+await doh.lookup('ietf.org', 'AAAA') // JSON result from CloudFlare
+await doh.lookup('ietf.org', {
   rrtype: 'MX',
   json: false,       // Use DNS wire format
   decode: false,     // do not decode results
-  preferPost: false, // use GET instead of POST for DNS wire format
   dnssec: true,      // request DNS records
-  url: 'https://dns.google.com/resolve'
 })
-
+const dot = new DNSoverTLS({host: '1.1.1.1'})
+await dot.lookup('ietf.org')
 ```
 
 ## License

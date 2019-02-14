@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Home - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DNSoverHTTPS.html">DNSoverHTTPS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#getDNS">getDNS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#getJSON">getJSON</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#lookup">lookup</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DNSoverTLS.html">DNSoverTLS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverTLS.html#.hashCert">hashCert</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverTLS.html#lookup">lookup</a></span></li><li class="nav-heading">Events</li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:certificate">certificate</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:connect">connect</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:disconnect">disconnect</a></span></li>
+</nav>
+
+<div id="main">
+    
+
+    
+
+
+
+    
+
+
+
+
+
+
+
+
+
+    
+
+
+    <section class="readme">
+        <article><h1>dohdec</h1><p>Retrieve and decode DNS records using <a href="https://tools.ietf.org/html/rfc8484">DNS-over-HTTPS</a> (DOH)</p>
+<h2>Install</h2><pre class="prettyprint source lang-bash"><code>npm i -S dohdec</code></pre><h2>Command Line Usage</h2><pre class="prettyprint source"><code>dohdec [name] [rrtype]
+
+Look up DNS name using DNS-over-HTTPS (DoH)
+
+Positionals:
+  name    The name to look up.  If not specified, use a readline loop to look up
+          multiple names.                                               [string]
+  rrtype  Resource Record type to look up                [string] [default: &quot;A&quot;]
+
+Options:
+  --version        Show version number                                 [boolean]
+  --dns, -d        Use DNS format instead of JSON                      [boolean]
+  --full, -f       Full response, not just answers                     [boolean]
+  --get, -g        Force http GET for DNS-format lookups               [boolean]
+  --no-decode, -n  Do not decode JSON or DNS wire format               [boolean]
+  --dnssec, -s     Request DNSsec records                              [boolean]
+  --url, -u        The URL of the DoH service
+                      [string] [default: &quot;https://cloudflare-dns.com/dns-query&quot;]
+  --tls, -t        Use DNS-over-TLS instead of DNS-over-HTTPS          [boolean]
+  --tlsServer      Connect to this DNS-over-TLS server      [default: &quot;1.1.1.1&quot;]
+  --verbose, -v    Print debug info                                    [boolean]
+  -h, --help       Show help                                           [boolean]</code></pre><h2>API Usage</h2><pre class="prettyprint source lang-js"><code>const { DNSoverHTTP, DNSoverTLS } = require('dohdec')
+
+const doh = new DNSoverHTTP()
+await doh.lookup('ietf.org', 'AAAA') // JSON result from CloudFlare
+await doh.lookup('ietf.org', {
+  rrtype: 'MX',
+  json: false,       // Use DNS wire format
+  decode: false,     // do not decode results
+  dnssec: true,      // request DNS records
+})
+const dot = new DNSoverTLS({host: '1.1.1.1'})
+await dot.lookup('ietf.org')</code></pre><h2>License</h2><p><a href="https://www.mozilla.org/en-US/MPL/2.0/">MPL-2.0</a></p>
+<p><a href="https://travis-ci.org/hildjj/dohdec"><img src="https://travis-ci.org/hildjj/dohdec.svg?branch=master" alt="Build Status"></a>
+<a href="https://coveralls.io/github/hildjj/dohdec?branch=master"><img src="https://coveralls.io/repos/github/hildjj/dohdec/badge.svg?branch=master" alt="Coverage Status"></a></p></article>
+    </section>
+
+
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

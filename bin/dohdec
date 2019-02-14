@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 'use strict'
+const { DNSoverHTTPS, DNSoverTLS } = require('../lib/index')
 const util = require('util')
-const doh = require('../index')
+
 const argv = require('yargs')
-  .version(doh.version)
-  .usage('$0 <name> [rrtype]', 'Look up DNS name using DNS-over-HTTPS (DoH)', yargs => {
+  .version(DNSoverHTTPS.version)
+  .usage('$0 [name] [rrtype]', 'Look up DNS name using DNS-over-HTTPS (DoH)', yargs => {
     yargs.positional('name', {
-      desc: 'The name to look up',
-      type: 'string',
-      required: true
+      desc: 'The name to look up.  If not specified, use a readline loop to look up multiple names.',
+      type: 'string'
     })
     yargs.positional('rrtype', {
       desc: 'Resource Record type to look up',
@@ -21,6 +21,11 @@ const argv = require('yargs')
     dns: {
       desc: 'Use DNS format instead of JSON',
       alias: 'd',
+      boolean: true
+    },
+    full: {
+      desc: 'Full response, not just answers',
+      alias: 'f',
       boolean: true
     },
     get: {
@@ -41,9 +46,24 @@ const argv = require('yargs')
     url: {
       desc: 'The URL of the DoH service',
       alias: 'u',
-      default: doh.url,
+      default: DNSoverHTTPS.url,
       string: true,
       requiresArg: true
+    },
+    tls: {
+      desc: 'Use DNS-over-TLS instead of DNS-over-HTTPS',
+      alias: 't',
+      boolean: true
+    },
+    tlsServer: {
+      desc: 'Connect to this DNS-over-TLS server',
+      alias: 'i',
+      default: DNSoverTLS.server
+    },
+    tlsPort: {
+      desc: 'Connect to this TCP port for DNS-over-TLS',
+      alias: 'p',
+      default: 853
     },
     verbose: {
       desc: 'Print debug info',
@@ -53,27 +73,112 @@ const argv = require('yargs')
   })
   .argv
 
-if (argv.verbose) {
-  require('request').debug = true
-}
-
-doh(argv.name, {
-  rrtype: argv.rrtype,
-  json: !argv.dns,
-  preferPost: !argv.get,
-  decode: !argv.noDecode,
-  dnssec: argv.dnssec,
-  url: argv.url
-}).then(resp => {
+async function get (over, name, rrtype) {
+  let opts = {
+    name,
+    rrtype,
+    json: !argv.dns,
+    decode: !argv.noDecode,
+    dnssec: argv.dnssec
+  }
+  let resp = await over.lookup(opts)
   if (argv.noDecode) {
     process.stdout.write(resp)
+    if (!argv.dns) {
+      process.stdout.write('\n')
+    }
   } else {
-    console.log(util.inspect(resp, {
-      color: true,
-      depth: null
-    }))
+    if (argv.full) {
+      resp = util.inspect(resp, {
+        depth: Infinity,
+        colors: process.stdout.isTTY
+      })
+    } else {
+      if (resp.hasOwnProperty('rcode')) {
+        if (resp.rcode !== 'NOERROR') {
+          console.log(resp.rcode)
+          return
+        }
+      } else if (resp.hasOwnProperty('Status')) {
+        if (resp.Status !== 0) {
+          console.log(`Error: ${resp.Status}`)
+          return
+        }
+      }
+
+      resp = resp.answers || resp.Answer || resp
+    }
+    console.log(resp)
   }
-}, er => {
-  console.error(er.message ? er.message : er)
-  process.exit(1)
-})
+}
+
+;(() => {
+  if (argv.verbose) {
+    // HACK: i'm not proud of this.
+    // Restart with NODE_DEBUG=http
+    if (!argv.tls &&
+      (!process.env.NODE_DEBUG || (process.env.NODE_DEBUG.indexOf('http') >= 0))) {
+      const newArgs = process.argv
+        .filter(a => (a !== '-v') && (a !== '--verbose'))
+        .map(a => a.replace(/^-([^-]*)v/, '-$1')) // dohdec -tvs
+      const { fork } = require('child_process')
+      process.env.NODE_DEBUG = 'http'
+      const cp = fork(__filename, newArgs.slice(2), {
+        env: process.env,
+        stdio: [0, 1, 2, 'ipc']
+      })
+      cp.on('exit', code => process.exit(code))
+      return
+    }
+  }
+  const over = argv.tls ? new DNSoverTLS({
+    host: argv.tlsServer,
+    port: argv.tlsPort
+  }) : new DNSoverHTTPS({
+    url: argv.url,
+    preferPost: !argv.get
+  })
+  if (argv.tls && argv.verbose) {
+    over.on('connect', (opts) => console.log('CONNECT', opts))
+    over.on('disconnect', () => console.log('DISCONNECT'))
+    over.on('certificate', (cert) => console.log({ cert }))
+    over.on('send', b => console.log('send:', b.toString('hex')))
+    over.on('receive', b => console.log('recv:', b.toString('hex')))
+  }
+
+  if (!argv.name) {
+    const readline = require('readline')
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+      prompt: 'domain (rrtype)> '
+    })
+    rl.on('line', async line => {
+      if (line.length === 0) {
+        return
+      }
+      try {
+        await get(over, ...line.split(/\s+/))
+      } catch (e) {
+        console.log(e.message || e)
+        process.exit(1)
+      }
+      rl.prompt()
+    })
+    rl.on('close', () => {
+      if (typeof over.close === 'function') {
+        over.close()
+      }
+    })
+    rl.prompt()
+  } else {
+    get(over, argv.name, argv.rrtype).then(() => {
+      if (typeof over.close === 'function') {
+        over.close()
+      }
+    }, er => {
+      console.error(er.message ? er.message : er)
+      process.exit(1)
+    })
+  }
+})()

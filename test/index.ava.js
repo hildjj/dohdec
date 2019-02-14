@@ -2,7 +2,7 @@
 
 const test = require('ava')
 const nock = require('nock')
-const lookup = require('../')
+const lookup = require('../lib/index')
 const path = require('path')
 const process = require('process')
 
