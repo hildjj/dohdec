@@ -1,7 +1,7 @@
 {
   "name": "dohdec",
   "version": "1.1.0",
-  "description": "",
+  "description": "DNS over HTTPS and DNS over TLS",
   "main": "./lib/index.js",
   "scripts": {
     "lint": "standard bin/* lib/*.js test/*.js",
@@ -15,8 +15,10 @@
   "keywords": [
     "doh",
     "dns-over-https",
+    "dns-over-tls",
     "dns",
     "dnssec",
+    "rfc7858",
     "rfc8484"
   ],
   "author": "Joe Hildebrand <joe-github@cursive.net>",

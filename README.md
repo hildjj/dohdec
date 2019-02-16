@@ -1,6 +1,6 @@
 # dohdec
 
-Retrieve and decode DNS records using [DNS-over-HTTPS](https://tools.ietf.org/html/rfc8484) (DOH)
+Retrieve and decode DNS records using [DNS-over-HTTPS](https://tools.ietf.org/html/rfc8484) (DoH) or [DNS-over-TLS](https://tools.ietf.org/html/rfc7858) (DoT).
 
 
 ## Install
@@ -53,6 +53,8 @@ await doh.lookup('ietf.org', {
 const dot = new DNSoverTLS({host: '1.1.1.1'})
 await dot.lookup('ietf.org')
 ```
+
+Full documents [here](https://hildjj.github.io/dohdec/)
 
 ## License
 
