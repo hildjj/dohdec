@@ -31,7 +31,8 @@ Options:
   --url, -u        The URL of the DoH service
                       [string] [default: "https://cloudflare-dns.com/dns-query"]
   --tls, -t        Use DNS-over-TLS instead of DNS-over-HTTPS          [boolean]
-  --tlsServer      Connect to this DNS-over-TLS server      [default: "1.1.1.1"]
+  --tlsServer, -i  Connect to this DNS-over-TLS server      [default: "1.1.1.1"]
+  --tlsPort, -p    Connect to this TCP port for DNS-over-TLS      [default: 853]
   --verbose, -v    Print debug info                                    [boolean]
   -h, --help       Show help                                           [boolean]
 ```
