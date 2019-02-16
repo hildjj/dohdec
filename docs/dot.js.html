@@ -131,6 +131,7 @@ Received: "${digest}"`))
           }
         } else {
           reject(this.socket.authorizationError)
+          this.close()
         }
       })
       this.nof = new NoFilter()
