@@ -24,7 +24,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DNSoverHTTPS.html">DNSoverHTTPS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#getDNS">getDNS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#getJSON">getJSON</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#lookup">lookup</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DNSoverTLS.html">DNSoverTLS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverTLS.html#.hashCert">hashCert</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverTLS.html#lookup">lookup</a></span></li><li class="nav-heading">Events</li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:certificate">certificate</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:connect">connect</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:disconnect">disconnect</a></span></li>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DNSoverHTTPS.html">DNSoverHTTPS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#getDNS">getDNS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#getJSON">getJSON</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#lookup">lookup</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DNSoverTLS.html">DNSoverTLS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverTLS.html#.hashCert">hashCert</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverTLS.html#lookup">lookup</a></span></li><li class="nav-heading">Events</li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:certificate">certificate</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:connect">connect</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:disconnect">disconnect</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:receive">receive</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:send">send</a></span></li>
 </nav>
 
 <div id="main">
@@ -110,7 +110,9 @@ class DNSoverTLS extends EventEmitter {
        */
       this.emit('connect', this.opts)
       this.socket = tls.connect(this.opts, () => {
+        // either we're authorized, or rejectUnauthorized was false
         const cert = this.socket.getPeerCertificate()
+        cert.hash = DNSoverTLS.hashCert(cert, this.opts.hashAlg)
 
         /**
          * Fired on connection when the server sends a certificate
@@ -121,35 +123,46 @@ class DNSoverTLS extends EventEmitter {
          */
         this.emit('certificate', cert)
         if (this.socket.authorized) {
-          const digest = DNSoverTLS.hashCert(cert, this.opts.hashAlg)
-          if (this.opts.hash &amp;&amp; (this.opts.hash !== digest)) {
+          if (this.opts.hash &amp;&amp; (this.opts.hash !== cert.hash)) {
             reject(new Error(`Invalid cert hash for ${this.opts.host}:${this.opts.port}.
 Expected: "${this.opts.hash}"
-Received: "${digest}"`))
+Received: "${cert.hash}"`))
+            this.close()
           } else {
             resolve()
           }
         } else {
-          reject(this.socket.authorizationError)
-          this.close()
+          // allow unauthorized cert if it's pinned
+          if (this.opts.hash === cert.hash) {
+            resolve()
+          } else {
+            reject(new Error(this.socket.authorizationError))
+            this.close()
+          }
         }
       })
       this.nof = new NoFilter()
       this.socket.on('data', this._data.bind(this))
       this.socket.on('error', reject)
-      this.socket.on('end', () => {
-        for (const { reject, opts } of Object.values(this.pending)) {
-          reject(new Error(`Timeout looking up "${opts.name}":${opts.rrtype}`))
-        }
-        this._reset()
-        /**
-         * Server disconnected.  All pending requests will have failed.
-         *
-         * @event DNSoverTLS#disconnect
-         */
-        this.emit('disconnect')
-      })
+      this.socket.on('end', this._disconnected.bind(this))
     })
+  }
+
+  /**
+   * Server socket was disconnected.  Clean up any pending requests
+   * @private
+   */
+  _disconnected () {
+    for (const { reject, opts } of Object.values(this.pending)) {
+      reject(new Error(`Timeout looking up "${opts.name}":${opts.rrtype}`))
+    }
+    this._reset()
+    /**
+     * Server disconnected.  All pending requests will have failed.
+     *
+     * @event DNSoverTLS#disconnect
+     */
+    this.emit('disconnect')
   }
 
   /**
@@ -162,6 +175,12 @@ Received: "${digest}"`))
     if (!b) {
       return
     }
+    /**
+     * A buffer of data has been received from the server.  Useful for
+     * verbose logging, e.g.
+     *
+     * @event DNSoverTLS#receive
+     */
     this.emit('receive', b)
     this.nof.write(b)
     if (this.size === -1) {
@@ -235,7 +254,7 @@ Received: "${digest}"`))
       decode: true
     })
     await this._connect()
-    opts.id = await this._id()
+    opts.id = opts.id || await this._id()
 
     return new Promise((resolve, reject) => {
       const pkt = DNSutils.makePacket(opts)
@@ -243,10 +262,16 @@ Received: "${digest}"`))
 
       const sz = Buffer.allocUnsafe(2)
       sz.writeUInt16BE(pkt.length)
-      this.emit('send', sz)
+      /**
+       * A buffer of data has been received from the server.  Useful for
+       * verbose logging, e.g.
+       *
+       * @event DNSoverTLS#send
+       */
       this.socket.write(sz)
-      this.emit('send', pkt)
+      this.emit('send', sz)
       this.socket.write(pkt)
+      this.emit('send', pkt)
     })
   }
   close () {

@@ -24,7 +24,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DNSoverHTTPS.html">DNSoverHTTPS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#getDNS">getDNS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#getJSON">getJSON</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#lookup">lookup</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DNSoverTLS.html">DNSoverTLS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverTLS.html#.hashCert">hashCert</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverTLS.html#lookup">lookup</a></span></li><li class="nav-heading">Events</li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:certificate">certificate</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:connect">connect</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:disconnect">disconnect</a></span></li>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DNSoverHTTPS.html">DNSoverHTTPS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#getDNS">getDNS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#getJSON">getJSON</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#lookup">lookup</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DNSoverTLS.html">DNSoverTLS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverTLS.html#.hashCert">hashCert</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverTLS.html#lookup">lookup</a></span></li><li class="nav-heading">Events</li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:certificate">certificate</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:connect">connect</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:disconnect">disconnect</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:receive">receive</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:send">send</a></span></li>
 </nav>
 
 <div id="main">
@@ -48,7 +48,7 @@
 
 
     <section class="readme">
-        <article><h1>dohdec</h1><p>Retrieve and decode DNS records using <a href="https://tools.ietf.org/html/rfc8484">DNS-over-HTTPS</a> (DOH)</p>
+        <article><h1>dohdec</h1><p>Retrieve and decode DNS records using <a href="https://tools.ietf.org/html/rfc8484">DNS-over-HTTPS</a> (DoH) or <a href="https://tools.ietf.org/html/rfc7858">DNS-over-TLS</a> (DoT).</p>
 <h2>Install</h2><pre class="prettyprint source lang-bash"><code>npm i -S dohdec</code></pre><h2>Command Line Usage</h2><pre class="prettyprint source"><code>dohdec [name] [rrtype]
 
 Look up DNS name using DNS-over-HTTPS (DoH)
@@ -68,7 +68,8 @@ Options:
   --url, -u        The URL of the DoH service
                       [string] [default: &quot;https://cloudflare-dns.com/dns-query&quot;]
   --tls, -t        Use DNS-over-TLS instead of DNS-over-HTTPS          [boolean]
-  --tlsServer      Connect to this DNS-over-TLS server      [default: &quot;1.1.1.1&quot;]
+  --tlsServer, -i  Connect to this DNS-over-TLS server      [default: &quot;1.1.1.1&quot;]
+  --tlsPort, -p    Connect to this TCP port for DNS-over-TLS      [default: 853]
   --verbose, -v    Print debug info                                    [boolean]
   -h, --help       Show help                                           [boolean]</code></pre><h2>API Usage</h2><pre class="prettyprint source lang-js"><code>const { DNSoverHTTP, DNSoverTLS } = require('dohdec')
 
@@ -81,7 +82,8 @@ await doh.lookup('ietf.org', {
   dnssec: true,      // request DNS records
 })
 const dot = new DNSoverTLS({host: '1.1.1.1'})
-await dot.lookup('ietf.org')</code></pre><h2>License</h2><p><a href="https://www.mozilla.org/en-US/MPL/2.0/">MPL-2.0</a></p>
+await dot.lookup('ietf.org')</code></pre><p>Full documents <a href="https://hildjj.github.io/dohdec/">here</a></p>
+<h2>License</h2><p><a href="https://www.mozilla.org/en-US/MPL/2.0/">MPL-2.0</a></p>
 <p><a href="https://travis-ci.org/hildjj/dohdec"><img src="https://travis-ci.org/hildjj/dohdec.svg?branch=master" alt="Build Status"></a>
 <a href="https://coveralls.io/github/hildjj/dohdec?branch=master"><img src="https://coveralls.io/repos/github/hildjj/dohdec/badge.svg?branch=master" alt="Coverage Status"></a></p></article>
     </section>
