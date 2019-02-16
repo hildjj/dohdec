@@ -7,7 +7,10 @@
     "lint": "standard bin/* lib/*.js test/*.js",
     "test": "ava",
     "coverage": "nyc -r html npm test",
-    "doc": "jsdoc -c .jsdoc.conf"
+    "doc": "jsdoc -c .jsdoc.conf",
+    "precheck": "npm run lint && npm run test",
+    "check": "npm pack --dry-run",
+    "release": "npm version patch && git push --follow-tags && npm publish"
   },
   "keywords": [
     "doh",
