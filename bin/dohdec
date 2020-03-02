@@ -99,12 +99,12 @@ async function get (over, name, rrtype) {
     }
   } else {
     if (!argv.full) {
-      if (resp.hasOwnProperty('rcode')) {
+      if (Object.prototype.hasOwnProperty.call(resp, 'rcode')) {
         if (resp.rcode !== 'NOERROR') {
           console.log(resp.rcode)
           return
         }
-      } else if (resp.hasOwnProperty('Status')) {
+      } else if (Object.prototype.hasOwnProperty.call(resp, 'Status')) {
         if (resp.Status !== 0) {
           console.log(`Error: ${resp.Status}`)
           return

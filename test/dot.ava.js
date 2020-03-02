@@ -70,7 +70,7 @@ test('bad cert', async t => {
     hash = c.hash
   })
   let wait = null
-  let prom = new Promise((resolve, reject) => { wait = { resolve, reject } })
+  const prom = new Promise((resolve, reject) => { wait = { resolve, reject } })
   dot.once('disconnect', () => {
     // second try, now with hash.
     dot.opts.hash = hash
@@ -95,6 +95,7 @@ class MockedTLS extends DNSoverTLS {
       }
     })
   }
+
   respond (req) {
     const resp = {
       id: this.opts.badid || req.id,
@@ -106,7 +107,8 @@ class MockedTLS extends DNSoverTLS {
         type: req.questions[0].type,
         ttl: 1,
         class: req.questions[0].class,
-        data: '1.2.3.4' }]
+        data: '1.2.3.4'
+      }]
     }
     const rbuf = packet.encode(resp)
     const rbufsz = Buffer.alloc(2)

@@ -9,3 +9,4 @@ test/
 *.tgz
 docs/
 .jsdoc.conf
+.editorconfig
