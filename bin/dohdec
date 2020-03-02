@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 'use strict'
 const { DNSoverHTTPS, DNSoverTLS } = require('../lib/index')
+const DNSutils = require('../lib/dnsUtils')
 const util = require('util')
 
 const argv = require('yargs')
@@ -22,6 +23,11 @@ const argv = require('yargs')
       desc: 'Use DNS format instead of JSON',
       alias: 'd',
       boolean: true
+    },
+    ecs: {
+      desc: 'Use this many bits for EDNS Client Subnet (ECS)',
+      alias: 'e',
+      number: true
     },
     full: {
       desc: 'Full response, not just answers',
@@ -69,12 +75,16 @@ const argv = require('yargs')
       desc: 'Print debug info',
       alias: 'v',
       boolean: true
+    },
+    INTERNAL_VERBOSE: {
+      boolean: true,
+      hidden: true
     }
   })
   .argv
 
 async function get (over, name, rrtype) {
-  let opts = {
+  const opts = {
     name,
     rrtype,
     json: !argv.dns,
@@ -88,12 +98,7 @@ async function get (over, name, rrtype) {
       process.stdout.write('\n')
     }
   } else {
-    if (argv.full) {
-      resp = util.inspect(resp, {
-        depth: Infinity,
-        colors: process.stdout.isTTY
-      })
-    } else {
+    if (!argv.full) {
       if (resp.hasOwnProperty('rcode')) {
         if (resp.rcode !== 'NOERROR') {
           console.log(resp.rcode)
@@ -105,22 +110,25 @@ async function get (over, name, rrtype) {
           return
         }
       }
-
       resp = resp.answers || resp.Answer || resp
     }
-    console.log(resp)
+    console.log(util.inspect(DNSutils.buffersToB64(resp), {
+      depth: Infinity,
+      colors: process.stdout.isTTY
+    }))
   }
 }
 
 ;(() => {
   if (argv.verbose) {
     // HACK: i'm not proud of this.
-    // Restart with NODE_DEBUG=http
+    // Restart with NODE_DEBUG=http and --INTERNAL_VERBOSE
     if (!argv.tls &&
       (!process.env.NODE_DEBUG || (process.env.NODE_DEBUG.indexOf('http') >= 0))) {
       const newArgs = process.argv
         .filter(a => (a !== '-v') && (a !== '--verbose'))
         .map(a => a.replace(/^-([^-]*)v/, '-$1')) // dohdec -tvs
+      newArgs.splice(2, 0, '--INTERNAL_VERBOSE')
       const { fork } = require('child_process')
       process.env.NODE_DEBUG = 'http'
       const cp = fork(__filename, newArgs.slice(2), {
@@ -131,20 +139,16 @@ async function get (over, name, rrtype) {
       return
     }
   }
+
   const over = argv.tls ? new DNSoverTLS({
     host: argv.tlsServer,
-    port: argv.tlsPort
+    port: argv.tlsPort,
+    verbose: argv.verbose
   }) : new DNSoverHTTPS({
     url: argv.url,
-    preferPost: !argv.get
+    preferPost: !argv.get,
+    verbose: argv.INTERNAL_VERBOSE
   })
-  if (argv.tls && argv.verbose) {
-    over.on('connect', (opts) => console.log('CONNECT', opts))
-    over.on('disconnect', () => console.log('DISCONNECT'))
-    over.on('certificate', (cert) => console.log({ cert }))
-    over.on('send', b => console.log('send:', b.toString('hex')))
-    over.on('receive', b => console.log('recv:', b.toString('hex')))
-  }
 
   if (!argv.name) {
     const readline = require('readline')

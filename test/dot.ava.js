@@ -76,8 +76,8 @@ test('bad cert', async t => {
     dot.opts.hash = hash
     dot.lookup('ietf.org').then(wait.resolve, wait.reject)
   })
-  await t.throwsAsync(dot.lookup('ietf.org'), 'UNABLE_TO_VERIFY_LEAF_SIGNATURE')
-  await t.throwsAsync(prom, 'Timeout looking up "ietf.org":A')
+  await t.throwsAsync(dot.lookup('ietf.org'), null, 'UNABLE_TO_VERIFY_LEAF_SIGNATURE')
+  await t.throwsAsync(prom, null, 'Timeout looking up "ietf.org":A')
 })
 
 class MockedTLS extends DNSoverTLS {
