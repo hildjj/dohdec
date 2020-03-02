@@ -11,7 +11,7 @@ npm i -S dohdec
 
 ## Command Line Usage
 
-```
+```txt
 dohdec [name] [rrtype]
 
 Look up DNS name using DNS-over-HTTPS (DoH)
@@ -24,6 +24,7 @@ Positionals:
 Options:
   --version        Show version number                                 [boolean]
   --dns, -d        Use DNS format instead of JSON                      [boolean]
+  --ecs, -e        Use this many bits for EDNS Client Subnet (ECS)      [number]
   --full, -f       Full response, not just answers                     [boolean]
   --get, -g        Force http GET for DNS-format lookups               [boolean]
   --no-decode, -n  Do not decode JSON or DNS wire format               [boolean]
