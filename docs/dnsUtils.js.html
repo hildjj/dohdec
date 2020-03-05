@@ -41,21 +41,40 @@
         <article>
             <pre class="prettyprint source linenums"><code>'use strict'
 
+const util = require('util')
 const packet = require('dns-packet')
 const punycode = require('punycode/') // "/" at end to avoid deprecated internal version
 
-function printableString (buf) {
+const CIRCULAR_MARK = Symbol('CIRCULAR_REFERENCE_MARK')
+
+// extracted from node source
+function stylizeWithColor (str, styleType) {
+  const style = util.inspect.styles[styleType]
+  if (style !== undefined) {
+    const color = util.inspect.colors[style]
+    return `\u001b[${color[0]}m${str}\u001b[${color[1]}m`
+  }
+  return str
+}
+
+function styleStream (stream, str, styleType) {
+  stream.write(stream.isTTY ? stylizeWithColor(str, styleType) : str)
+}
+
+function printableString (stream, buf) {
   // Intent: each byte that is "printable" takes up one grapheme, and everything
   // else is replaced with '.'
 
-  return buf.map(x => {
+  for (const x of buf) {
     if ((x &lt; 0x20) ||
         ((x > 0x7e) &amp;&amp; (x &lt; 0xa1)) ||
         (x === 0xad)) {
-      return 0x2e // "."
+      stream.write('.')
+    } else {
+      styleStream(stream, String.fromCharCode(x), 'string')
     }
-    return x
-  }).toString('binary')
+  }
+  return buf.length
 }
 
 class DNSutils {
@@ -137,49 +156,64 @@ class DNSutils {
   }
 
   static hexDump (buf, stream = process.stdout) {
-    let offset = 0
-    for (const byte of buf.slice(0, buf.length)) {
-      // 00000000  7b 0a 20 20 22 6e 61 6d  65 22 3a 20 22 64 6f 68  |{.  "name": "doh|
-      if ((offset % 16) === 0) {
-        if (offset !== 0) {
-          stream.write(`  |${printableString(buf.slice(offset - 16, offset))}|`)
-          stream.write('\n')
+    if (buf.length > 0) {
+      let offset = 0
+      for (const byte of buf.slice(0, buf.length)) {
+        // 00000000  7b 0a 20 20 22 6e 61 6d  65 22 3a 20 22 64 6f 68  |{.  "name": "doh|
+        if ((offset % 16) === 0) {
+          if (offset !== 0) {
+            stream.write('  |')
+            printableString(stream, buf.slice(offset - 16, offset))
+            stream.write('|\n')
+          }
+          styleStream(stream, offset.toString(16).padStart(8, '0'), 'undefined')
         }
-        stream.write(offset.toString(16).padStart(8, '0'))
-      }
-      if ((offset % 8) === 0) {
+        if ((offset % 8) === 0) {
+          stream.write(' ')
+        }
         stream.write(' ')
+        stream.write(byte.toString(16).padStart(2, '0'))
+        offset++
       }
-      stream.write(' ')
-      stream.write(byte.toString(16).padStart(2, '0'))
-      offset++
-    }
-    const left = offset % 16
-    if (left !== 0) {
-      let undone = 3 * (16 - left)
-      if (left &lt; 8) {
-        undone++
+      let left = offset % 16
+      if (left !== 0) {
+        let undone = 3 * (16 - left)
+        if (left &lt;= 8) {
+          undone++
+        }
+        stream.write(' '.padStart(undone, ' '))
+      } else {
+        left = 16
       }
-      stream.write(' '.padStart(undone, ' '))
+      const start = offset > 16 ? offset - left : 0
+      stream.write('  |')
+      printableString(stream, buf.slice(start, offset))
+      stream.write('|\n')
     }
-    stream.write(`  |${printableString(buf.slice(offset - 16, offset))}|`)
-
+    styleStream(stream, buf.length.toString(16).padStart(8, '0'), 'undefined')
     stream.write('\n')
   }
 
   static buffersToB64 (o) {
     if (o &amp;&amp; (typeof o === 'object')) {
+      if (o[CIRCULAR_MARK]) {
+        return '[Circular reference]'
+      }
+      o[CIRCULAR_MARK] = true
+      let ret = null
       if (Buffer.isBuffer(o)) {
-        return o.toString('base64')
+        ret = o.toString('base64')
+      } else if (Array.isArray(o)) {
+        ret = o.map(v => this.buffersToB64(v))
+      } else {
+        ret = Object.entries(o).reduce((prev, [k, v]) => {
+          prev[k] = this.buffersToB64(v)
+          return prev
+        }, {})
       }
-      if (Array.isArray(o)) {
-        return o.map(v => this.buffersToB64(v))
-      }
-      // strip Symbols
-      return Object.entries(o).reduce((prev, [k, v]) => {
-        prev[k] = this.buffersToB64(v)
-        return prev
-      }, {})
+      delete o[CIRCULAR_MARK]
+      delete ret[CIRCULAR_MARK]
+      return ret
     }
     return o
   }
