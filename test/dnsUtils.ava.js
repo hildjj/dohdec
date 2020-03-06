@@ -92,10 +92,13 @@ test('buffersToB64', t => {
     e: null
   }
   a.c = a
-  t.deepEqual(DNSutils.buffersToB64(a), {
+  const d = DNSutils.buffersToB64(a)
+  t.deepEqual(d, {
     b: 'AAA=',
     d: ['AAA='],
     e: null,
     c: '[Circular reference]'
   })
+  t.is(Object.getOwnPropertySymbols(a).length, 0)
+  t.is(Object.getOwnPropertySymbols(d).length, 0)
 })
