@@ -24,9 +24,6 @@
   "author": "Joe Hildebrand <joe-github@cursive.net>",
   "license": "MPL-2.0",
   "repository": "github:hildjj/dohdec",
-  "bin": {
-    "dohdec": "./bin/dohdec"
-  },
   "dependencies": {
     "dns-packet": "^5.2.1",
     "node-fetch": "^2.6.0",
