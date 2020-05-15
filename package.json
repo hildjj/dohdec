@@ -1,6 +1,6 @@
 {
   "name": "dohdec",
-  "version": "2.1.0",
+  "version": "102.1.0",
   "description": "DNS over HTTPS and DNS over TLS",
   "main": "./lib/index.js",
   "scripts": {
@@ -24,15 +24,11 @@
   "author": "Joe Hildebrand <joe-github@cursive.net>",
   "license": "MPL-2.0",
   "repository": "github:hildjj/dohdec",
-  "bin": {
-    "dohdec": "./bin/dohdec"
-  },
   "dependencies": {
     "dns-packet": "^5.2.1",
     "node-fetch": "^2.6.0",
     "nofilter": "^1.0.3",
-    "punycode": "^2.1.1",
-    "yargs": "^15.1.0"
+    "punycode": "^2.1.1"
   },
   "devDependencies": {
     "ava": "^3.5.0",
