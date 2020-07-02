@@ -1,0 +1,34 @@
+name: Latest
+
+
+
+
+
+on:
+  push:
+    tags:
+      - vl/*
+
+
+
+
+
+jobs:
+
+  tagging:
+    name: Latest
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+          registry-url: https://registry.npmjs.org/
+
+      - run: npm dist-tag add $(jq -r '.name + "@" + .version' package.json) latest
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+
