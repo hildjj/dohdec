@@ -140,15 +140,17 @@ async function get (over, name, rrtype) {
     }
   }
 
-  const over = argv.tls ? new DNSoverTLS({
-    host: argv.tlsServer,
-    port: argv.tlsPort,
-    verbose: argv.verbose
-  }) : new DNSoverHTTPS({
-    url: argv.url,
-    preferPost: !argv.get,
-    verbose: argv.INTERNAL_VERBOSE
-  })
+  const over = argv.tls
+    ? new DNSoverTLS({
+        host: argv.tlsServer,
+        port: argv.tlsPort,
+        verbose: argv.verbose
+      })
+    : new DNSoverHTTPS({
+      url: argv.url,
+      preferPost: !argv.get,
+      verbose: argv.INTERNAL_VERBOSE
+    })
 
   if (!argv.name) {
     const readline = require('readline')
