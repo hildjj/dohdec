@@ -32,10 +32,10 @@
     "node-fetch": "^2.6.1",
     "nofilter": "^1.0.4",
     "punycode": "^2.1.1",
-    "yargs": "^16.1.1"
+    "yargs": "^16.2.0"
   },
   "devDependencies": {
-    "ava": "^3.13.0",
+    "ava": "^3.14.0",
     "jsdoc": "^3.6.6",
     "minami": "^1.2.3",
     "nock": "^13.0.5",
