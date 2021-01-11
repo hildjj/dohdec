@@ -19,6 +19,11 @@ const argv = require('yargs')
   })
   .alias('h', 'help')
   .options({
+    contentType: {
+      desc: 'MIME type for POST',
+      alias: 'c',
+      default: 'application/dns-message'
+    },
     dns: {
       desc: 'Use DNS format instead of JSON',
       alias: 'd',
@@ -149,7 +154,8 @@ async function get (over, name, rrtype) {
     : new DNSoverHTTPS({
       url: argv.url,
       preferPost: !argv.get,
-      verbose: argv.INTERNAL_VERBOSE
+      verbose: argv.INTERNAL_VERBOSE,
+      contentType: argv.contentType
     })
 
   if (!argv.name) {
