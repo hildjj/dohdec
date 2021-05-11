@@ -13,6 +13,44 @@ test('makePacket', t => {
   t.is(dns.questions[0].name, 'foo')
 })
 
+test('makePacket - subnet', t => {
+  const subnet = '1.1.1.1'
+  const pkt = DNSutils.makePacket({ name: 'foo', subnet })
+  const dns = packet.decode(pkt)
+  const additionals = dns.additionals[0]
+  const options = additionals.options[0]
+  t.is(additionals.type, 'OPT')
+  t.is(options.type, 'CLIENT_SUBNET')
+  t.is(options.ip, subnet.slice(0, -1).concat('0')) // 1.1.1.0
+  t.is(options.sourcePrefixLength, 24)
+})
+
+test('makePacket - subnet & ecs = 0', t => {
+  const subnet = '1.1.1.1'
+  const ecs = 0
+  const pkt = DNSutils.makePacket({ name: 'foo', subnet, ecs })
+  const dns = packet.decode(pkt)
+  const additionals = dns.additionals[0]
+  const options = additionals.options[0]
+  t.is(additionals.type, 'OPT')
+  t.is(options.type, 'CLIENT_SUBNET')
+  t.is(options.ip, '0.0.0.0')
+  t.is(options.sourcePrefixLength, ecs)
+})
+
+test('makePacket - subnet & ecs = 16', t => {
+  const subnet = '1.1.1.1'
+  const ecs = 16
+  const pkt = DNSutils.makePacket({ name: 'foo', subnet, ecs })
+  const dns = packet.decode(pkt)
+  const additionals = dns.additionals[0]
+  const options = additionals.options[0]
+  t.is(additionals.type, 'OPT')
+  t.is(options.type, 'CLIENT_SUBNET')
+  t.is(options.ip, subnet.slice(0, -3).concat('0.0')) // 1.1.0.0
+  t.is(options.sourcePrefixLength, ecs)
+})
+
 test('normalizeArgs', t => {
   t.deepEqual(DNSutils.normalizeArgs('foo', 'mx'), {
     name: 'foo',

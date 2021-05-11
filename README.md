@@ -24,6 +24,7 @@ Positionals:
 Options:
   --version        Show version number                                 [boolean]
   --dns, -d        Use DNS format instead of JSON                      [boolean]
+  --subnet, -b     Use this IP address for EDNS Client Subnet (ECS)     [string]
   --ecs, -e        Use this many bits for EDNS Client Subnet (ECS)      [number]
   --full, -f       Full response, not just answers                     [boolean]
   --get, -g        Force http GET for DNS-format lookups               [boolean]
