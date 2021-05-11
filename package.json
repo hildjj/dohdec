@@ -30,15 +30,15 @@
   "dependencies": {
     "dns-packet": "^5.2.1",
     "node-fetch": "^2.6.1",
-    "nofilter": "^1.0.4",
+    "nofilter": "^2.0.3",
     "punycode": "^2.1.1",
-    "yargs": "^16.2.0"
+    "yargs": "^17.0.1"
   },
   "devDependencies": {
-    "ava": "^3.14.0",
+    "ava": "^3.15.0",
     "jsdoc": "^3.6.6",
     "minami": "^1.2.3",
-    "nock": "^13.0.5",
+    "nock": "^13.0.11",
     "nyc": "^15.1.0",
     "standard": "^16.0.3"
   },
