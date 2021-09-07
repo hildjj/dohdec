@@ -32,6 +32,12 @@ test('normalizeArgs', t => {
     name: 'xn--espaa-rta.icom.museum',
     rrtype: 'A'
   })
+  t.deepEqual(DNSutils.normalizeArgs('名がドメイン.com', undefined, {
+    rrtype: 'A'
+  }), {
+    name: 'xn--v8jxj3d1dzdz08w.com',
+    rrtype: 'A'
+  })
 })
 
 test('base64urlEncode', t => {

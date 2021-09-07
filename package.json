@@ -31,7 +31,6 @@
     "dns-packet": "^5.2.1",
     "node-fetch": "^2.6.1",
     "nofilter": "^2.0.3",
-    "punycode": "^2.1.1",
     "yargs": "^17.0.1"
   },
   "devDependencies": {
