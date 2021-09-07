@@ -27,8 +27,7 @@
   "dependencies": {
     "dns-packet": "^5.2.1",
     "node-fetch": "^2.6.1",
-    "nofilter": "^1.0.4",
-    "punycode": "^2.1.1"
+    "nofilter": "^2.0.3"
   },
   "devDependencies": {
     "ava": "^3.14.0",
