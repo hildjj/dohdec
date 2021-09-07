@@ -10,3 +10,6 @@ test/
 docs/
 .jsdoc.conf
 .editorconfig
+.gitattributes
+.ncurc.json
+.github/
