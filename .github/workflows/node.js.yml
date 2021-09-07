@@ -1,0 +1,41 @@
+---
+name: Tests
+
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+
+    strategy:
+      matrix:
+        node-version: [12, 14, 16]
+        platform: [ubuntu-latest]
+
+    runs-on: ${{ matrix.platform }}
+
+    env:
+      OS: ${{ matrix.os }}
+      NODE: ${{ matrix.node-version }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm install
+      - run: npm run lint
+      - run: npm run coverage
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          files: coverage/lcov.info
+          env_vars: OS,NODE
+          name: codecov-umbrella
+          fail_ci_if_error: true
+          verbose: true
+
