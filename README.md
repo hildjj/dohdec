@@ -1,3 +1,17 @@
+```
+This is forked version from https://github.com/hildjj/dohdec
+
+By mostly removing CLI related code & dependencies for programming using only.
+All credit to the original author.
+
+
+
+
+Below is original README:
+```
+
+
+
 # dohdec
 
 Retrieve and decode DNS records using [DNS-over-HTTPS](https://tools.ietf.org/html/rfc8484) (DoH) or [DNS-over-TLS](https://tools.ietf.org/html/rfc7858) (DoT).
