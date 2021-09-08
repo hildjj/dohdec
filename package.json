@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "standard bin/* lib/*.js test/*.js",
     "test": "ava",
-    "coverage": "nyc -r html npm test",
+    "coverage": "nyc -r lcov npm test",
     "doc": "jsdoc -c .jsdoc.conf",
     "precheck": "npm run lint && npm run test",
     "check": "npm pack --dry-run",
@@ -43,7 +43,7 @@
     ]
   },
   "engines": {
-    "node": ">=8"
+    "node": ">=12.19"
   },
   "standard": {
     "ignore": [
