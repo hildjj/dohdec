@@ -63,4 +63,4 @@ Full documents [here](https://hildjj.github.io/dohdec/)
 [MPL-2.0](https://www.mozilla.org/en-US/MPL/2.0/)
 
 [![Tests](https://github.com/hildjj/dohdec/actions/workflows/node.js.yml/badge.svg)](https://github.com/hildjj/dohdec/actions/workflows/node.js.yml)
-[![codecov](https://codecov.io/gh/hildjj/dohdec/branch/master/graph/badge.svg?token=qYy1UyK9S5)](https://codecov.io/gh/hildjj/dohdec)
+[![codecov](https://codecov.io/gh/hildjj/dohdec/branch/main/graph/badge.svg?token=qYy1UyK9S5)](https://codecov.io/gh/hildjj/dohdec)
