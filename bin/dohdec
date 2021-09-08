@@ -29,6 +29,11 @@ const argv = require('yargs')
       alias: 'd',
       boolean: true
     },
+    subnet: {
+      desc: 'Use this IP address for EDNS Client Subnet (ECS)',
+      alias: 'b',
+      string: true
+    },
     ecs: {
       desc: 'Use this many bits for EDNS Client Subnet (ECS)',
       alias: 'e',
@@ -94,6 +99,8 @@ async function get (over, name, rrtype) {
     rrtype,
     json: !argv.dns,
     decode: !argv.noDecode,
+    subnet: argv.subnet,
+    ecs: argv.ecs,
     dnssec: argv.dnssec
   }
   let resp = await over.lookup(opts)
