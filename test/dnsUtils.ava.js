@@ -2,8 +2,9 @@
 
 const stream = require('stream')
 const test = require('ava')
-const DNSutils = require('../lib/dnsUtils')
 const packet = require('dns-packet')
+const DNSutils = require('../lib/dnsUtils')
+const {Buf} = require('./utils')
 
 test('makePacket', t => {
   const pkt = DNSutils.makePacket({ name: 'foo' })
@@ -83,16 +84,12 @@ test('base64urlEncode', t => {
 })
 
 test('hexDump', t => {
-  const s = new stream.Transform({
-    encoding: 'utf8',
-    transform (chunk, enc, cb) {
-      cb(null, chunk)
-    }
-  })
+  const verboseStream = new Buf({encoding: 'utf8'})
+  const du = new DNSutils({verbose: true, verboseStream})
   for (const sz of [0, 1, 4, 8, 12, 16, 24, 32]) {
-    DNSutils.hexDump(Buffer.alloc(sz), s)
+    du.hexDump(Buffer.alloc(sz))
   }
-  t.is(s.read(), `\
+  t.is(verboseStream.read(), `\
 00000000
 00000000  00                                                |.|
 00000001
@@ -111,14 +108,10 @@ test('hexDump', t => {
 00000010  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
 00000020
 `)
-  const tt = new stream.Transform({
-    transform (chunk, enc, cb) {
-      cb(null, chunk)
-    }
-  })
-  tt.isTTY = true
-  DNSutils.hexDump(Buffer.from('666f6f7fa2adae'), tt)
-  t.deepEqual(tt.read(), Buffer.from(
+  du.verboseStream = new Buf()
+  du.verboseStream.isTTY = true
+  du.hexDump(Buffer.from('666f6f7fa2adae'))
+  t.deepEqual(du.verboseStream.read(), Buffer.from(
     '1b5b39306d30303030303030301b5b33396d2020333620333620333620363620' +
     '3336203636203337203636202036312033322036312036342036312036352020' +
     '2020202020207c1b5b33326d361b5b33396d1b5b33326d361b5b33396d1b5b33' +
@@ -145,4 +138,19 @@ test('buffersToB64', t => {
   })
   t.is(Object.getOwnPropertySymbols(a).length, 0)
   t.is(Object.getOwnPropertySymbols(d).length, 0)
+})
+
+test('ecs', t => {
+  const du = new DNSutils()
+  t.falsy(du._verbose)
+  let pkt = DNSutils.makePacket({
+    name: 'ietf.org',
+    subnet: 'fe80::fffb:fffc:fffd:fffe'
+  })
+  t.truthy(Buffer.isBuffer(pkt))
+  pkt = DNSutils.makePacket({
+    name: 'ietf.org',
+    ecs: 12
+  })
+  t.truthy(Buffer.isBuffer(pkt))
 })

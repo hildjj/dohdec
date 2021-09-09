@@ -1,10 +1,11 @@
 'use strict'
 
+const path = require('path')
+const process = require('process')
 const test = require('ava')
 const nock = require('nock')
 const { DNSoverHTTPS } = require('../')
-const path = require('path')
-const process = require('process')
+const {Buf} = require('./utils')
 
 test.before(async t => {
   nock.back.fixtures = path.join(__dirname, 'fixtures')
@@ -41,8 +42,11 @@ test('dns put', async t => {
 })
 
 test('dns get', async t => {
+  const verboseStream = new Buf({encoding: 'utf8'})
   const doh = new DNSoverHTTPS({
-    preferPost: false
+    preferPost: false,
+    verbose: true,
+    verboseStream
   })
   const r = await doh.lookup('ietf.org', {
     json: false,
@@ -51,6 +55,10 @@ test('dns get', async t => {
   t.truthy(r)
   t.is(r.answers[0].name, 'ietf.org')
   t.truthy(r.answers[0].type, 'AAAA')
+
+  const vres = verboseStream.read()
+  t.is(typeof vres, 'string')
+  t.truthy(vres.length > 0)
 })
 
 test('json get', async t => {
@@ -85,7 +93,8 @@ test('no decode', async t => {
 })
 
 test('getJSON', async t => {
-  const doh = new DNSoverHTTPS()
+  const verboseStream = new Buf()
+  const doh = new DNSoverHTTPS({verbose: true, verboseStream})
   const r = await doh.getJSON({ name: 'ietf.org' })
   t.is(typeof r, 'object')
 })
