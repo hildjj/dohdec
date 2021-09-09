@@ -1,10 +1,12 @@
 'use strict'
 
-const test = require('ava')
-const nock = require('nock')
-const { DNSoverHTTPS } = require('../')
+const {Buffer} = require('buffer')
 const path = require('path')
 const process = require('process')
+const test = require('ava')
+const nock = require('nock')
+const {DNSoverHTTPS} = require('../')
+const {Buf} = require('./utils')
 
 test.before(async t => {
   nock.back.fixtures = path.join(__dirname, 'fixtures')
@@ -14,7 +16,7 @@ test.before(async t => {
   const title = escape(path.basename(__filename))
   const { nockDone, context } = await nock.back(`${title}.json`)
   if (context.scopes.length === 0) {
-    // set the NOCK_BACK_MODE variable to "record" when needed
+    // Set the NOCK_BACK_MODE variable to "record" when needed
     if (process.env.NOCK_BACK_MODE !== 'record') {
       console.error(`WARNING: Nock recording needed for "${title}".
 Set NOCK_BACK_MODE=record`)
@@ -32,7 +34,7 @@ test('dns put', async t => {
   const doh = new DNSoverHTTPS()
   const r = await doh.lookup('ietf.org', {
     json: false,
-    dnssec: true
+    dnssec: true,
   })
   t.truthy(r)
   t.is(r.answers[0].name, 'ietf.org')
@@ -41,16 +43,23 @@ test('dns put', async t => {
 })
 
 test('dns get', async t => {
+  const verboseStream = new Buf({encoding: 'utf8'})
   const doh = new DNSoverHTTPS({
-    preferPost: false
+    preferPost: false,
+    verbose: true,
+    verboseStream,
   })
   const r = await doh.lookup('ietf.org', {
     json: false,
-    rrtype: 'AAAA'
+    rrtype: 'AAAA',
   })
   t.truthy(r)
   t.is(r.answers[0].name, 'ietf.org')
   t.truthy(r.answers[0].type, 'AAAA')
+
+  const vres = verboseStream.read()
+  t.is(typeof vres, 'string')
+  t.truthy(vres.length > 0)
 })
 
 test('json get', async t => {
@@ -70,22 +79,23 @@ test('no decode', async t => {
   const doh = new DNSoverHTTPS()
   let r = await doh.lookup('ietf.org', {
     json: false,
-    decode: false
+    decode: false,
   })
   t.truthy(Buffer.isBuffer(r))
 
   const dohGoog = new DNSoverHTTPS({
-    url: 'https://dns.google.com/resolve'
+    url: 'https://dns.google.com/resolve',
   })
   r = await dohGoog.lookup('ietf.org', {
     json: true,
-    decode: false
+    decode: false,
   })
   t.is(typeof r, 'string')
 })
 
 test('getJSON', async t => {
-  const doh = new DNSoverHTTPS()
+  const verboseStream = new Buf()
+  const doh = new DNSoverHTTPS({verbose: true, verboseStream})
   const r = await doh.getJSON({ name: 'ietf.org' })
   t.is(typeof r, 'object')
 })
