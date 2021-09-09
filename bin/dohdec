@@ -1,17 +1,19 @@
 #!/usr/bin/env node
+/* eslint-disable comma-dangle */
 'use strict'
 const { DNSoverHTTPS, DNSoverTLS } = require('../lib/index')
 const DNSutils = require('../lib/dnsUtils')
 const util = require('util')
+const yargs = require('yargs/yargs')
 
-const argv = require('yargs')
+const argv = yargs()
   .version(DNSoverHTTPS.version)
-  .usage('$0 [name] [rrtype]', 'Look up DNS name using DNS-over-HTTPS (DoH)', yargs => {
-    yargs.positional('name', {
+  .usage('$0 [name] [rrtype]', 'Look up DNS name using DNS-over-HTTPS (DoH)', y => {
+    y.positional('name', {
       desc: 'The name to look up.  If not specified, use a readline loop to look up multiple names.',
       type: 'string'
     })
-    yargs.positional('rrtype', {
+    y.positional('rrtype', {
       desc: 'Resource Record type to look up',
       default: 'A',
       type: 'string'
@@ -91,9 +93,9 @@ const argv = require('yargs')
       hidden: true
     }
   })
-  .argv
+  .parse(process.argv.slice(2))
 
-async function get (over, name, rrtype) {
+async function get(over, name, rrtype) {
   const opts = {
     name,
     rrtype,
@@ -131,7 +133,7 @@ async function get (over, name, rrtype) {
   }
 }
 
-;(() => {
+(() => {
   if (argv.verbose) {
     // HACK: i'm not proud of this.
     // Restart with NODE_DEBUG=http and --INTERNAL_VERBOSE
@@ -139,7 +141,7 @@ async function get (over, name, rrtype) {
       (!process.env.NODE_DEBUG || (process.env.NODE_DEBUG.indexOf('http') >= 0))) {
       const newArgs = process.argv
         .filter(a => (a !== '-v') && (a !== '--verbose'))
-        .map(a => a.replace(/^-([^-]*)v/, '-$1')) // dohdec -tvs
+        .map(a => a.replace(/^-(?<opt>[^-]*)v/, '-$<opt>')) // If run as "dohdec -tvs"
       newArgs.splice(2, 0, '--INTERNAL_VERBOSE')
       const { fork } = require('child_process')
       process.env.NODE_DEBUG = 'http'
@@ -152,20 +154,29 @@ async function get (over, name, rrtype) {
     }
   }
 
-  const over = argv.tls
-    ? new DNSoverTLS({
-        host: argv.tlsServer,
-        port: argv.tlsPort,
-        verbose: argv.verbose
-      })
-    : new DNSoverHTTPS({
+  const over = argv.tls ?
+    new DNSoverTLS({
+      host: argv.tlsServer,
+      port: argv.tlsPort,
+      verbose: argv.verbose
+    }) :
+    new DNSoverHTTPS({
       url: argv.url,
       preferPost: !argv.get,
       verbose: argv.INTERNAL_VERBOSE,
       contentType: argv.contentType
     })
 
-  if (!argv.name) {
+  if (argv.name) {
+    get(over, argv.name, argv.rrtype).then(() => {
+      if (typeof over.close === 'function') {
+        over.close()
+      }
+    }, er => {
+      console.error(er.message ? er.message : er)
+      process.exit(1)
+    })
+  } else {
     const readline = require('readline')
     const rl = readline.createInterface({
       input: process.stdin,
@@ -190,14 +201,5 @@ async function get (over, name, rrtype) {
       }
     })
     rl.prompt()
-  } else {
-    get(over, argv.name, argv.rrtype).then(() => {
-      if (typeof over.close === 'function') {
-        over.close()
-      }
-    }, er => {
-      console.error(er.message ? er.message : er)
-      process.exit(1)
-    })
   }
 })()

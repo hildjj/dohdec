@@ -1,10 +1,11 @@
 'use strict'
 
+const {Buffer} = require('buffer')
 const path = require('path')
 const process = require('process')
 const test = require('ava')
 const nock = require('nock')
-const { DNSoverHTTPS } = require('../')
+const {DNSoverHTTPS} = require('../')
 const {Buf} = require('./utils')
 
 test.before(async t => {
@@ -15,7 +16,7 @@ test.before(async t => {
   const title = escape(path.basename(__filename))
   const { nockDone, context } = await nock.back(`${title}.json`)
   if (context.scopes.length === 0) {
-    // set the NOCK_BACK_MODE variable to "record" when needed
+    // Set the NOCK_BACK_MODE variable to "record" when needed
     if (process.env.NOCK_BACK_MODE !== 'record') {
       console.error(`WARNING: Nock recording needed for "${title}".
 Set NOCK_BACK_MODE=record`)
@@ -33,7 +34,7 @@ test('dns put', async t => {
   const doh = new DNSoverHTTPS()
   const r = await doh.lookup('ietf.org', {
     json: false,
-    dnssec: true
+    dnssec: true,
   })
   t.truthy(r)
   t.is(r.answers[0].name, 'ietf.org')
@@ -46,11 +47,11 @@ test('dns get', async t => {
   const doh = new DNSoverHTTPS({
     preferPost: false,
     verbose: true,
-    verboseStream
+    verboseStream,
   })
   const r = await doh.lookup('ietf.org', {
     json: false,
-    rrtype: 'AAAA'
+    rrtype: 'AAAA',
   })
   t.truthy(r)
   t.is(r.answers[0].name, 'ietf.org')
@@ -78,16 +79,16 @@ test('no decode', async t => {
   const doh = new DNSoverHTTPS()
   let r = await doh.lookup('ietf.org', {
     json: false,
-    decode: false
+    decode: false,
   })
   t.truthy(Buffer.isBuffer(r))
 
   const dohGoog = new DNSoverHTTPS({
-    url: 'https://dns.google.com/resolve'
+    url: 'https://dns.google.com/resolve',
   })
   r = await dohGoog.lookup('ietf.org', {
     json: true,
-    decode: false
+    decode: false,
   })
   t.is(typeof r, 'string')
 })

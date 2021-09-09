@@ -4,7 +4,7 @@
   "description": "DNS over HTTPS and DNS over TLS",
   "main": "./lib/index.js",
   "scripts": {
-    "lint": "standard bin/* lib/*.js test/*.js",
+    "lint": "eslint . --ext js bin/*",
     "test": "ava",
     "coverage": "nyc -r lcov npm test",
     "doc": "jsdoc -c .jsdoc.conf",
@@ -34,12 +34,16 @@
     "yargs": "^17.1.1"
   },
   "devDependencies": {
+    "@cto.af/eslint-config": "^0.0.8",
     "ava": "^3.15.0",
+    "eslint": "^7.32.0",
+    "eslint-plugin-ava": "^12.0.0",
+    "eslint-plugin-jsdoc": "^36.1.0",
+    "eslint-plugin-node": "^11.1.0",
     "jsdoc": "^3.6.7",
     "minami": "^1.2.3",
     "nock": "^13.1.3",
-    "nyc": "^15.1.0",
-    "standard": "^16.0.3"
+    "nyc": "^15.1.0"
   },
   "ava": {
     "files": [
@@ -48,10 +52,5 @@
   },
   "engines": {
     "node": ">=12.19"
-  },
-  "standard": {
-    "ignore": [
-      "/docs/**"
-    ]
   }
 }

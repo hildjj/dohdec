@@ -1,6 +1,6 @@
 'use strict'
 
-const stream = require('stream')
+const {Buffer} = require('buffer')
 const test = require('ava')
 const packet = require('dns-packet')
 const DNSutils = require('../lib/dnsUtils')
@@ -18,8 +18,8 @@ test('makePacket - subnet', t => {
   const subnet = '1.1.1.1'
   const pkt = DNSutils.makePacket({ name: 'foo', subnet })
   const dns = packet.decode(pkt)
-  const additionals = dns.additionals[0]
-  const options = additionals.options[0]
+  const [additionals] = dns.additionals
+  const [options] = additionals.options
   t.is(additionals.type, 'OPT')
   t.is(options.type, 'CLIENT_SUBNET')
   t.is(options.ip, subnet.slice(0, -1).concat('0')) // 1.1.1.0
@@ -31,8 +31,8 @@ test('makePacket - subnet & ecs = 0', t => {
   const ecs = 0
   const pkt = DNSutils.makePacket({ name: 'foo', subnet, ecs })
   const dns = packet.decode(pkt)
-  const additionals = dns.additionals[0]
-  const options = additionals.options[0]
+  const [additionals] = dns.additionals
+  const [options] = additionals.options
   t.is(additionals.type, 'OPT')
   t.is(options.type, 'CLIENT_SUBNET')
   t.is(options.ip, '0.0.0.0')
@@ -44,8 +44,8 @@ test('makePacket - subnet & ecs = 16', t => {
   const ecs = 16
   const pkt = DNSutils.makePacket({ name: 'foo', subnet, ecs })
   const dns = packet.decode(pkt)
-  const additionals = dns.additionals[0]
-  const options = additionals.options[0]
+  const [additionals] = dns.additionals
+  const [options] = additionals.options
   t.is(additionals.type, 'OPT')
   t.is(options.type, 'CLIENT_SUBNET')
   t.is(options.ip, subnet.slice(0, -3).concat('0.0')) // 1.1.0.0
@@ -55,27 +55,27 @@ test('makePacket - subnet & ecs = 16', t => {
 test('normalizeArgs', t => {
   t.deepEqual(DNSutils.normalizeArgs('foo', 'mx'), {
     name: 'foo',
-    rrtype: 'MX'
+    rrtype: 'MX',
   })
   t.deepEqual(DNSutils.normalizeArgs('foo', { rrtype: 'mx' }, {}), {
     name: 'foo',
-    rrtype: 'MX'
+    rrtype: 'MX',
   })
   t.deepEqual(DNSutils.normalizeArgs({ name: 'foo', rrtype: 'mx' }, {}), {
     name: 'foo',
-    rrtype: 'MX'
+    rrtype: 'MX',
   })
   t.deepEqual(DNSutils.normalizeArgs('españa.icom.museum', undefined, {
-    rrtype: 'A'
+    rrtype: 'A',
   }), {
     name: 'xn--espaa-rta.icom.museum',
-    rrtype: 'A'
+    rrtype: 'A',
   })
   t.deepEqual(DNSutils.normalizeArgs('名がドメイン.com', undefined, {
-    rrtype: 'A'
+    rrtype: 'A',
   }), {
     name: 'xn--v8jxj3d1dzdz08w.com',
-    rrtype: 'A'
+    rrtype: 'A',
   })
 })
 
@@ -119,14 +119,15 @@ test('hexDump', t => {
     '33326d661b5b33396d1b5b33326d371b5b33396d1b5b33326d661b5b33396d1b' +
     '5b33326d611b5b33396d1b5b33326d321b5b33396d1b5b33326d611b5b33396d' +
     '1b5b33326d641b5b33396d1b5b33326d611b5b33396d1b5b33326d651b5b3339' +
-    '6d7c0a1b5b39306d30303030303030651b5b33396d0a', 'hex'))
+    '6d7c0a1b5b39306d30303030303030651b5b33396d0a', 'hex'
+  ))
 })
 
 test('buffersToB64', t => {
   const a = {
     b: Buffer.alloc(2),
     d: [Buffer.alloc(2)],
-    e: null
+    e: null,
   }
   a.c = a
   const d = DNSutils.buffersToB64(a)
@@ -134,7 +135,7 @@ test('buffersToB64', t => {
     b: 'AAA=',
     d: ['AAA='],
     e: null,
-    c: '[Circular reference]'
+    c: '[Circular reference]',
   })
   t.is(Object.getOwnPropertySymbols(a).length, 0)
   t.is(Object.getOwnPropertySymbols(d).length, 0)
@@ -145,12 +146,12 @@ test('ecs', t => {
   t.falsy(du._verbose)
   let pkt = DNSutils.makePacket({
     name: 'ietf.org',
-    subnet: 'fe80::fffb:fffc:fffd:fffe'
+    subnet: 'fe80::fffb:fffc:fffd:fffe',
   })
   t.truthy(Buffer.isBuffer(pkt))
   pkt = DNSutils.makePacket({
     name: 'ietf.org',
-    ecs: 12
+    ecs: 12,
   })
   t.truthy(Buffer.isBuffer(pkt))
 })
