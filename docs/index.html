@@ -24,7 +24,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DNSoverHTTPS.html">DNSoverHTTPS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#getDNS">getDNS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#getJSON">getJSON</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#lookup">lookup</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DNSoverTLS.html">DNSoverTLS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverTLS.html#.hashCert">hashCert</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverTLS.html#close">close</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverTLS.html#lookup">lookup</a></span></li><li class="nav-heading">Events</li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:certificate">certificate</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:connect">connect</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:disconnect">disconnect</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:receive">receive</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:send">send</a></span></li>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DNSoverHTTPS.html">DNSoverHTTPS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#getDNS">getDNS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#getJSON">getJSON</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#lookup">lookup</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DNSoverTLS.html">DNSoverTLS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverTLS.html#.hashCert">hashCert</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverTLS.html#close">close</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverTLS.html#lookup">lookup</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DNSutils_DNSutils.html">DNSutils</a></span></li><li class="nav-heading">Events</li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:certificate">certificate</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:connect">connect</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:disconnect">disconnect</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:receive">receive</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:send">send</a></span></li><li class="nav-heading"><a href="global.html">Globals</a></li>
 </nav>
 
 <div id="main">
@@ -66,6 +66,7 @@ Positionals:
 Options:
   --version        Show version number                                 [boolean]
   --dns, -d        Use DNS format instead of JSON                      [boolean]
+  --subnet, -b     Use this IP address for EDNS Client Subnet (ECS)     [string]
   --ecs, -e        Use this many bits for EDNS Client Subnet (ECS)      [number]
   --full, -f       Full response, not just answers                     [boolean]
   --get, -g        Force http GET for DNS-format lookups               [boolean]
@@ -96,8 +97,8 @@ await dot.lookup('ietf.org')
 <p>Full documents <a href="https://hildjj.github.io/dohdec/">here</a></p>
 <h2>License</h2>
 <p><a href="https://www.mozilla.org/en-US/MPL/2.0/">MPL-2.0</a></p>
-<p><a href="https://travis-ci.org/hildjj/dohdec"><img src="https://travis-ci.org/hildjj/dohdec.svg?branch=master" alt="Build Status"></a>
-<a href="https://coveralls.io/github/hildjj/dohdec?branch=master"><img src="https://coveralls.io/repos/github/hildjj/dohdec/badge.svg?branch=master" alt="Coverage Status"></a></p></article>
+<p><a href="https://github.com/hildjj/dohdec/actions/workflows/node.js.yml"><img src="https://github.com/hildjj/dohdec/actions/workflows/node.js.yml/badge.svg" alt="Tests"></a>
+<a href="https://codecov.io/gh/hildjj/dohdec"><img src="https://codecov.io/gh/hildjj/dohdec/branch/main/graph/badge.svg?token=qYy1UyK9S5" alt="codecov"></a></p></article>
     </section>
 
 
@@ -110,7 +111,7 @@ await dot.lookup('ietf.org')
 <br class="clear">
 
 <footer>
-    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> using the Minami theme.
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.7</a> using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>

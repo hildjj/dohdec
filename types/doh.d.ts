@@ -52,6 +52,11 @@ export class DNSoverHTTPS extends DNSutils {
         contentType: string;
     };
     /**
+     * @private
+     * @ignore
+     */
+    private _checkServerIdentity;
+    /**
      * Get a DNS-format response.
      *
      * @param {DOH_LookupOptions} opts Options for the request.
@@ -84,9 +89,9 @@ export class DNSoverHTTPS extends DNSutils {
     lookup(name: object | DOH_LookupOptions, opts?: string | DOH_LookupOptions): Promise<Buffer | string | object>;
 }
 export namespace DNSoverHTTPS {
-    export const version: any;
-    export { USER_AGENT as userAgent };
-    export { CLOUDFLARE_API as url };
+    const version: string;
+    const userAgent: string;
+    const defaultURL: string;
 }
 export default DNSoverHTTPS;
 /**
@@ -131,5 +136,3 @@ export type DOH_LookupOptions = {
 import DNSutils from "./dnsUtils.js";
 import packet from "dns-packet";
 import { Writable } from "stream";
-declare const USER_AGENT: string;
-declare const CLOUDFLARE_API: "https://cloudflare-dns.com/dns-query";

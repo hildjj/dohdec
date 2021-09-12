@@ -24,7 +24,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DNSoverHTTPS.html">DNSoverHTTPS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#getDNS">getDNS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#getJSON">getJSON</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#lookup">lookup</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DNSoverTLS.html">DNSoverTLS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverTLS.html#.hashCert">hashCert</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverTLS.html#close">close</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverTLS.html#lookup">lookup</a></span></li><li class="nav-heading">Events</li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:certificate">certificate</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:connect">connect</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:disconnect">disconnect</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:receive">receive</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:send">send</a></span></li>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DNSoverHTTPS.html">DNSoverHTTPS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#getDNS">getDNS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#getJSON">getJSON</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#lookup">lookup</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DNSoverTLS.html">DNSoverTLS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverTLS.html#.hashCert">hashCert</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverTLS.html#close">close</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverTLS.html#lookup">lookup</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DNSutils_DNSutils.html">DNSutils</a></span></li><li class="nav-heading">Events</li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:certificate">certificate</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:connect">connect</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:disconnect">disconnect</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:receive">receive</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:send">send</a></span></li><li class="nav-heading"><a href="global.html">Globals</a></li>
 </nav>
 
 <div id="main">
@@ -39,19 +39,49 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>'use strict'
-
-const crypto = require('crypto')
-const tls = require('tls')
-const util = require('util')
-const EventEmitter = require('events')
-const packet = require('dns-packet')
-const NoFilter = require('nofilter')
-const DNSutils = require('./dnsUtils')
+            <pre class="prettyprint source linenums"><code>import {Buffer} from 'buffer'
+import {default as DNSutils} from './dnsUtils.js'
+import NoFilter from 'nofilter'
+import {Writable} from 'stream'
+import crypto from 'crypto'
+import packet from 'dns-packet'
+import tls from 'tls'
+import util from 'util'
 
 const randomBytes = util.promisify(crypto.randomBytes)
 
 const DEFAULT_SERVER = '1.1.1.1'
+
+/**
+ * Options for doing DOT lookups.
+ *
+ * @typedef {object} DOT_LookupOptions
+ * @property {string} [name] The DNS name to look up.
+ * @property {packet.RecordType} [rrtype='A'] The Resource Record type
+ *   to retrive.
+ * @property {number} [id] 2-byte ID for the DNS packet.  Defaults to random.
+ * @property {boolean} [decode=true] Decode the response, either into JSON
+ *   or an object representing the DNS format result.
+ * @property {boolean} [dnssec=false] Request DNSSec records.  Currently
+ *   requires `json: false`.
+ */
+
+/**
+ * @callback pendingResolve
+ * @param {Buffer|object} results The results of the DNS query.
+ */
+
+/**
+ * @callback pendingError
+ * @param {Error} error The error that occurred.
+ */
+
+/**
+ * @typedef {object} Pending
+ * @property {pendingResolve} resolve Callback for success.
+ * @property {pendingError} reject Callback for error.
+ * @property {DOT_LookupOptions} opts The original options for the request.
+ */
 
 /**
  * A class that manages a connection to a DNS-over-TLS server.  The first time
@@ -59,99 +89,118 @@ const DEFAULT_SERVER = '1.1.1.1'
  * If that connection is timed out by the server, a new connection will be
  * created as needed.
  *
- * If you want to do certificate pinning, make sure that the `hash` and `hashAlg`
- * options are set correctly to a hash of the DER-encoded certificate that
- * the server will offer.
+ * If you want to do certificate pinning, make sure that the `hash` and
+ * `hashAlg` options are set correctly to a hash of the DER-encoded
+ * certificate that the server will offer.
  */
-class DNSoverTLS extends EventEmitter {
+export class DNSoverTLS extends DNSutils {
   /**
-   * Construct a new DNSoverTLS
+   * Construct a new DNSoverTLS.
    *
-   * @param {Object} opts - Options
-   * @param {String} [opts.host='1.1.1.1'] - Server to connect to
-   * @param {Number} [opts.port=853] - TCP port number for server
-   * @param {String} [opts.hash] - Hex-encoded hash of the DER-encoded cert
+   * @param {object} opts Options.
+   * @param {string} [opts.host='1.1.1.1'] Server to connect to.
+   * @param {number} [opts.port=853] TCP port number for server.
+   * @param {string} [opts.hash] Hex-encoded hash of the DER-encoded cert
    *   expected from the server.  If not specified, no pinning checks are
    *   performed.
-   * @param {String} [opts.hashAlg='sha256'] - Hash algorithm for cert pinning
-   * @param {Boolean} [opts.rejectUnauthorized=true] - Should the server
+   * @param {string} [opts.hashAlg='sha256'] Hash algorithm for cert pinning.
+   * @param {boolean} [opts.rejectUnauthorized=true] Should the server
    *   certificate even be checked using the normal TLS approach?
-   * @param {Boolean} [opts.verbose=false] - Print bytes sent and received
+   * @param {boolean} [opts.verbose=false] Print bytes sent and received.
+   * @param {Writable} [opts.verboseStream=process.stderr] Where to write
+   *   verbose output.
    */
-  constructor (opts = {}) {
-    super()
-    this.opts = Object.assign({
+  constructor(opts = {}) {
+    const {
+      verbose,
+      verboseStream,
+      ...rest
+    } = opts
+
+    super({verbose, verboseStream})
+    this.opts = {
       host: DNSoverTLS.server,
       port: 853,
       hashAlg: 'sha256',
       rejectUnauthorized: true,
-      verbose: false
-    }, opts)
+      ...rest,
+    }
+    this.verbose('DNSoverTLS options:', this.opts)
     this._reset()
   }
 
-  _reset () {
-    this.socket = null
-    this.pending = {}
-    this.nof = null
+  _reset() {
     this.size = -1
+
+    /** @type {tls.TLSSocket} */
+    this.socket = null
+
+    /** @type {Object.&lt;number, Pending>} */ // eslint-disable-line jsdoc/check-types, max-len
+    this.pending = {}
+
+    /** @type {NoFilter} */
+    this.nof = null
+
+    /** @type {Buffer[]} */
     this.bufs = []
   }
 
-  _connect () {
+  /**
+   * @returns {Promise&lt;void>}
+   * @private
+   */
+  _connect() {
     return new Promise((resolve, reject) => {
       if (this.socket) {
-        return resolve()
+        resolve()
+        return
       }
 
       /**
-       * Fired right before connection is attempted
+       * Fired right before connection is attempted.
        *
        * @event DNSoverTLS#connect
-       * @property {Object} cert - [lookup]{@link DNSoverTLS#lookup} options
+       * @property {object} cert [lookup]{@link DNSoverTLS#lookup} options.
        */
       this.emit('connect', this.opts)
-      if (this.opts.verbose) {
-        console.log('CONNECT:', this.opts)
-      }
+      this.verbose('CONNECT:', this.opts)
 
       this.socket = tls.connect(this.opts, () => {
-        // either we're authorized, or rejectUnauthorized was false
-        const cert = this.socket.getPeerCertificate(true)
-        cert.hash = DNSoverTLS.hashCert(cert, this.opts.hashAlg)
+        // Either we're authorized, or rejectUnauthorized was false
+        const cert = /** @type {crypto.X509Certificate} */ (
+          /** @type {any} */ (this.socket.getPeerCertificate(true))
+        )
+        const hash = DNSoverTLS.hashCert(cert, this.opts.hashAlg)
 
+        /* eslint-disable max-len */
         /**
-         * Fired on connection when the server sends a certificate
+         * Fired on connection when the server sends a certificate.
          *
          * @event DNSoverTLS#certificate
-         * @property {Certificate} cert - [crypto.Certificate]{@link https://nodejs.org/api/crypto.html#crypto_class_certificate}
-         *   from the server
+         * @property {crypto.Certificate} cert
+         *   A [crypto.Certificate]{@link https://nodejs.org/api/crypto.html#crypto_class_certificate}
+         *   from the server.
          */
         this.emit('certificate', cert)
-        if (this.opts.verbose) {
-          console.log('CERTIFICATE:', util.inspect(DNSutils.buffersToB64(cert), {
-            depth: Infinity,
-            colors: process.stdout.isTTY,
-            sorted: true
-          }))
-        }
+        /* eslint-enable max-len */
+
+        this.verbose('CERTIFICATE:', DNSutils.buffersToB64(cert))
+
         if (this.socket.authorized) {
-          if (this.opts.hash &amp;&amp; (this.opts.hash !== cert.hash)) {
+          if (this.opts.hash &amp;&amp; (this.opts.hash !== hash)) {
             reject(new Error(`Invalid cert hash for ${this.opts.host}:${this.opts.port}.
 Expected: "${this.opts.hash}"
-Received: "${cert.hash}"`))
+Received: "${hash}"`))
             this.close()
           } else {
             resolve()
           }
+        } else if (this.opts.hash === hash) {
+          // Allow unauthorized cert if it's pinned
+          resolve()
         } else {
-          // allow unauthorized cert if it's pinned
-          if (this.opts.hash === cert.hash) {
-            resolve()
-          } else {
-            reject(new Error(this.socket.authorizationError))
-            this.close()
-          }
+          reject(new Error(this.socket.authorizationError.toString()))
+          this.close()
         }
       })
       this.nof = new NoFilter()
@@ -162,35 +211,32 @@ Received: "${cert.hash}"`))
   }
 
   /**
-   * Server socket was disconnected.  Clean up any pending requests
+   * Server socket was disconnected.  Clean up any pending requests.
+   *
    * @private
    */
-  _disconnected () {
+  _disconnected() {
     for (const { reject, opts } of Object.values(this.pending)) {
       reject(new Error(`Timeout looking up "${opts.name}":${opts.rrtype}`))
     }
     this._reset()
+
     /**
      * Server disconnected.  All pending requests will have failed.
      *
      * @event DNSoverTLS#disconnect
      */
     this.emit('disconnect')
-    if (this.opts.verbose) {
-      console.log('DISCONNECT')
-    }
+    this.verbose('DISCONNECT')
   }
 
   /**
    * Parse data if enough is available.
    *
+   * @param {Buffer} b Data read from socket.
    * @private
-   * @param {Buffer} b - data read from socket
    */
-  _data (b) {
-    if (!b) {
-      return
-    }
+  _data(b) {
     /**
      * A buffer of data has been received from the server.  Useful for
      * verbose logging, e.g.
@@ -199,38 +245,44 @@ Received: "${cert.hash}"`))
      */
     this.emit('receive', b)
     this.nof.write(b)
-    if (this.size === -1) {
-      if (this.nof.length &lt; 2) {
+
+    // There might be multiple results in one read.
+    while (this.nof.length > 0) {
+      // No size read yet
+      if (this.size === -1) {
+        if (this.nof.length &lt; 2) {
+          return
+        }
+
+        this.size = this.nof.readUInt16BE()
+      }
+      if (this.nof.length &lt; this.size) {
         return
       }
+      const buf = this.nof.read(this.size)
+      this.verbose('RECV:')
+      this.hexDump(buf)
 
-      this.size = this.nof.readUInt16BE()
+      this.size = -1
+      const pkt = packet.decode(buf)
+      const pend = this.pending[pkt.id]
+      if (!pend) {
+        // Something bad happened, like an injection attack or a corrupted
+        // result. Abandon everything pending.
+        this.close()
+        return
+      }
+      pend.resolve(pend.opts.decode ? pkt : buf)
     }
-    if (this.nof.length &lt; this.size) {
-      return
-    }
-    const buf = this.nof.read(this.size)
-    if (this.opts.verbose) {
-      console.log('RECV:')
-      DNSutils.hexDump(buf)
-    }
-
-    this.size = -1
-    const pkt = packet.decode(buf)
-    const pend = this.pending[pkt.id]
-    if (!pend) {
-      // something bad happened.  abandon everything pending.
-      return this.close()
-    }
-    pend.resolve(pend.opts.decode ? pkt : buf)
-    return this._data() // any more?
   }
 
   /**
    * Generate a currently-unused random ID.
+   *
+   * @returns {Promise&lt;number>} A random 2-byte ID number.
    * @private
    */
-  async _id () {
+  async _id() {
     let id = null
     do {
       id = (await randomBytes(2)).readUInt16BE()
@@ -240,10 +292,13 @@ Received: "${cert.hash}"`))
 
   /**
    * Hash a certificate using the given algorithm.
-   * @param {Buffer|crypto.Certificate} cert - the cert to hash
-   * @param {String} [hashAlg="sha256"] - the hash algorithm to use
+   *
+   * @param {Buffer|crypto.X509Certificate} cert The cert to hash.
+   * @param {string} [hashAlg="sha256"] The hash algorithm to use.
+   * @returns {string} Hex string.
+   * @throws {Error} Unknown certificate type.
    */
-  static hashCert (cert, hashAlg = 'sha256') {
+  static hashCert(cert, hashAlg = 'sha256') {
     const hash = crypto.createHash(hashAlg)
     if (Buffer.isBuffer(cert)) {
       hash.update(cert)
@@ -259,30 +314,38 @@ Received: "${cert.hash}"`))
   /**
    * Look up a name in the DNS, over TLS.
    *
-   * @param {Object|String} name - The DNS name to look up, or opts if this is an object.
-   * @param {Object|String} [opts={}] - Options for the request.  If a string
-   *   is given, it will be used as the rrtype.
-   * @param {String} [opts.name] - The DNS name to look up.
-   * @param {String} [opts.rrtype='A'] The Resource Record type to retrive
-   * @param {Boolean} [opts.decode=true] Decode the response, into
-   *   an object representing the DNS format result.
-   * @param {Boolean} [opts.dnssec=false] Request DNSSec records.
+   * @param {DOT_LookupOptions|string} name The DNS name to look up, or opts
+   *   if this is an object.
+   * @param {DOT_LookupOptions|string} [opts={}] Options for the request.  If
+   *   a string is given, it will be used as the rrtype.
+   * @returns {Promise&lt;packet.Packet|Buffer>} Response.
    */
-  async lookup (name, opts = {}) {
-    opts = DNSutils.normalizeArgs(name, opts, {
+  async lookup(name, opts = {}) {
+    const nopts = DNSutils.normalizeArgs(name, opts, {
       rrtype: 'A',
       dnsssec: false,
-      decode: true
+      decode: true,
     })
+    this.verbose('DNSoverTLS.lookup options:', nopts)
+
     await this._connect()
-    opts.id = opts.id || await this._id()
+    if (!nopts.id) {
+      // eslint-disable-next-line require-atomic-updates
+      nopts.id = await this._id()
+    }
 
     return new Promise((resolve, reject) => {
-      const pkt = DNSutils.makePacket(opts)
-      this.pending[opts.id] = { resolve, reject, opts }
+      const pkt = DNSutils.makePacket(nopts)
+
+      this.verbose('REQUEST:')
+      this.hexDump(pkt)
+      this.verbose(packet.decode(pkt))
+
+      this.pending[nopts.id] = { resolve, reject, opts: nopts }
 
       const sz = Buffer.allocUnsafe(2)
       sz.writeUInt16BE(pkt.length)
+
       /**
        * A buffer of data has been received from the server.  Useful for
        * verbose logging, e.g.
@@ -291,37 +354,52 @@ Received: "${cert.hash}"`))
        */
       this.socket.write(sz)
       this.emit('send', sz)
-      if (this.opts.verbose) {
-        console.log('SIZE:')
-        DNSutils.hexDump(sz)
-      }
+      this.verbose('SIZE:')
+      this.verbose(sz)
 
       this.socket.write(pkt)
       this.emit('send', pkt)
-      if (this.opts.verbose) {
-        console.log('REQUEST:')
-        DNSutils.hexDump(pkt)
-      }
+      this.verbose('REQUEST:')
+      this.hexDump(pkt)
     })
   }
 
   /**
-   * Close the socket
+   * Reject all pending requests, for example, on close.
    *
-   * @returns Promise - Resolved on socket close
+   * @param {Error} er The error to reject with.
+   * @private
    */
-  close () {
+  _rejectPending(er) {
+    for (const pend of Object.values(this.pending)) {
+      pend.reject(er)
+    }
+    this.pending = {}
+  }
+
+  /**
+   * Close the socket.
+   *
+   * @returns {Promise&lt;void>} Resolved on socket close.
+   */
+  close() {
+    const er = new Error('Socket closed')
     return new Promise((resolve, reject) => {
-      if (!this.socket) {
-        resolve()
+      if (this.socket) {
+        this.socket.end(null, () => {
+          this._rejectPending(er)
+          resolve()
+        })
       } else {
-        this.socket.end(null, resolve)
+        this._rejectPending(er)
+        resolve()
       }
     })
   }
 }
 DNSoverTLS.server = DEFAULT_SERVER
-module.exports = DNSoverTLS
+
+export default DNSoverTLS
 </code></pre>
         </article>
     </section>
@@ -334,7 +412,7 @@ module.exports = DNSoverTLS
 <br class="clear">
 
 <footer>
-    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> using the Minami theme.
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.7</a> using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>
