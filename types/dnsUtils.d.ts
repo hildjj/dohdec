@@ -1,6 +1,5 @@
 /// <reference types="node" />
-export = DNSutils;
-declare class DNSutils extends EventEmitter {
+export class DNSutils extends EventEmitter {
     /**
      * Encode a DNS query packet to a buffer.
      *
@@ -143,7 +142,8 @@ declare class DNSutils extends EventEmitter {
      */
     hexDump(buf: Buffer): void;
 }
-import EventEmitter = require("events");
+export default DNSutils;
+import EventEmitter from "events";
 import { Writable } from "stream";
 import { Buffer } from "buffer";
-import packet = require("dns-packet");
+import packet from "dns-packet";

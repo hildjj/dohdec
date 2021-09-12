@@ -1,10 +1,9 @@
-'use strict'
 
-const {Buffer} = require('buffer')
-const test = require('ava')
-const {DNSoverTLS} = require('../')
-const NoFilter = require('nofilter')
-const packet = require('dns-packet')
+import {Buffer} from 'buffer'
+import {DNSoverTLS} from '../lib/dot.js'
+import NoFilter from 'nofilter'
+import packet from 'dns-packet'
+import test from 'ava'
 
 // NOTE: no network mocks for these yet.  Possible approach: write a quick
 // and dirty server

@@ -1,8 +1,6 @@
-'use strict'
+import {Transform} from 'stream'
 
-const {Transform} = require('stream')
-
-class Buf extends Transform {
+export class Buf extends Transform {
   constructor(opts = {}) {
     const { errorToThrow, ...others } = opts
     super(others)
@@ -22,5 +20,3 @@ class Buf extends Transform {
     return new Buf().end(str)
   }
 }
-
-exports.Buf = Buf

@@ -1,10 +1,8 @@
-'use strict'
-
-const {Buffer} = require('buffer')
-const test = require('ava')
-const packet = require('dns-packet')
-const DNSutils = require('../lib/dnsUtils')
-const {Buf} = require('./utils')
+import {Buf} from './utils.js'
+import {Buffer} from 'buffer'
+import DNSutils from '../lib/dnsUtils.js'
+import packet from 'dns-packet'
+import test from 'ava'
 
 test('makePacket', t => {
   const pkt = DNSutils.makePacket({ name: 'foo' })

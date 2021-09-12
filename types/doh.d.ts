@@ -1,4 +1,3 @@
-export = DNSoverHTTPS;
 /**
  * Options for doing DOH lookups.
  *
@@ -21,7 +20,7 @@ export = DNSoverHTTPS;
  * Request DNS information over HTTPS.  The [lookup]{@link DNSoverHTTPS#lookup}
  * function provides the easiest-to-use defaults.
  */
-declare class DNSoverHTTPS extends DNSutils {
+export class DNSoverHTTPS extends DNSutils {
     /**
      * Create a DNSoverHTTPS instance.
      *
@@ -84,14 +83,16 @@ declare class DNSoverHTTPS extends DNSutils {
      */
     lookup(name: object | DOH_LookupOptions, opts?: string | DOH_LookupOptions): Promise<Buffer | string | object>;
 }
-declare namespace DNSoverHTTPS {
-    export { version, USER_AGENT as userAgent, CLOUDFLARE_API as url, DOH_LookupOptions };
+export namespace DNSoverHTTPS {
+    export const version: any;
+    export { USER_AGENT as userAgent };
+    export { CLOUDFLARE_API as url };
 }
-import DNSutils = require("./dnsUtils");
+export default DNSoverHTTPS;
 /**
  * Options for doing DOH lookups.
  */
-type DOH_LookupOptions = {
+export type DOH_LookupOptions = {
     /**
      * The DNS name to look up.
      */
@@ -127,7 +128,8 @@ type DOH_LookupOptions = {
      */
     url?: string;
 };
-import packet = require("dns-packet");
+import DNSutils from "./dnsUtils.js";
+import packet from "dns-packet";
 import { Writable } from "stream";
 declare const USER_AGENT: string;
 declare const CLOUDFLARE_API: "https://cloudflare-dns.com/dns-query";

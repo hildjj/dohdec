@@ -3,8 +3,10 @@
   "version": "3.1.0",
   "description": "DNS over HTTPS and DNS over TLS",
   "main": "./lib/index.js",
+  "types": "types/index.d.ts",
+  "type": "module",
   "scripts": {
-    "lint": "eslint . --ext js bin/*",
+    "lint": "eslint . --ext js",
     "test": "ava",
     "coverage": "nyc -r lcov npm test",
     "doc": "jsdoc -c .jsdoc.conf",
@@ -25,11 +27,11 @@
   "license": "MPL-2.0",
   "repository": "github:hildjj/dohdec",
   "bin": {
-    "dohdec": "bin/dohdec"
+    "dohdec": "bin/dohdec.js"
   },
   "dependencies": {
     "dns-packet": "^5.3.0",
-    "node-fetch": "^2.6.2",
+    "node-fetch": "^3.0.0",
     "nofilter": "^3.0.3",
     "yargs": "^17.1.1"
   },
@@ -46,12 +48,7 @@
     "minami": "^1.2.3",
     "nock": "^13.1.3",
     "nyc": "^15.1.0",
-    "typescript": "^4.4.2"
-  },
-  "ava": {
-    "files": [
-      "test/*.ava.js"
-    ]
+    "typescript": "^4.4.3"
   },
   "engines": {
     "node": "^12.20.0 || ^14.13.1 || >=16.0.0"

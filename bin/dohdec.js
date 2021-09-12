@@ -1,22 +1,24 @@
 #!/usr/bin/env node
-/* eslint-disable comma-dangle */
-'use strict'
-const { DNSoverHTTPS, DNSoverTLS } = require('../lib/index')
-const DNSutils = require('../lib/dnsUtils')
-const util = require('util')
-const yargs = require('yargs/yargs')
+
+import { DNSoverHTTPS, DNSoverTLS } from '../lib/index.js'
+import DNSutils from '../lib/dnsUtils.js'
+import { fork } from 'child_process'
+import { hideBin } from 'yargs/helpers'
+import url from 'url'
+import util from 'util'
+import yargs from 'yargs'
 
 const argv = yargs()
   .version(DNSoverHTTPS.version)
   .usage('$0 [name] [rrtype]', 'Look up DNS name using DNS-over-HTTPS (DoH)', y => {
     y.positional('name', {
       desc: 'The name to look up.  If not specified, use a readline loop to look up multiple names.',
-      type: 'string'
+      type: 'string',
     })
     y.positional('rrtype', {
       desc: 'Resource Record type to look up',
       default: 'A',
-      type: 'string'
+      type: 'string',
     })
   })
   .alias('h', 'help')
@@ -24,76 +26,76 @@ const argv = yargs()
     contentType: {
       desc: 'MIME type for POST',
       alias: 'c',
-      default: 'application/dns-message'
+      default: 'application/dns-message',
     },
     dns: {
       desc: 'Use DNS format instead of JSON',
       alias: 'd',
-      boolean: true
+      boolean: true,
     },
     subnet: {
       desc: 'Use this IP address for EDNS Client Subnet (ECS)',
       alias: 'b',
-      string: true
+      string: true,
     },
     ecs: {
       desc: 'Use this many bits for EDNS Client Subnet (ECS)',
       alias: 'e',
-      number: true
+      number: true,
     },
     full: {
       desc: 'Full response, not just answers',
       alias: 'f',
-      boolean: true
+      boolean: true,
     },
     get: {
       desc: 'Force http GET for DNS-format lookups',
       alias: 'g',
-      boolean: true
+      boolean: true,
     },
     'no-decode': {
       alias: 'n',
       desc: 'Do not decode JSON or DNS wire format',
-      boolean: true
+      boolean: true,
     },
     dnssec: {
       alias: 's',
       desc: 'Request DNSsec records',
-      boolean: true
+      boolean: true,
     },
     url: {
       desc: 'The URL of the DoH service',
       alias: 'u',
       default: DNSoverHTTPS.url,
       string: true,
-      requiresArg: true
+      requiresArg: true,
     },
     tls: {
       desc: 'Use DNS-over-TLS instead of DNS-over-HTTPS',
       alias: 't',
-      boolean: true
+      boolean: true,
     },
     tlsServer: {
       desc: 'Connect to this DNS-over-TLS server',
       alias: 'i',
-      default: DNSoverTLS.server
+      default: DNSoverTLS.server,
     },
     tlsPort: {
       desc: 'Connect to this TCP port for DNS-over-TLS',
       alias: 'p',
-      default: 853
+      default: 853,
     },
     verbose: {
       desc: 'Print debug info',
       alias: 'v',
-      boolean: true
+      boolean: true,
     },
     INTERNAL_VERBOSE: {
       boolean: true,
-      hidden: true
-    }
+      hidden: true,
+    },
   })
-  .parse(process.argv.slice(2))
+  .parse(hideBin(process.argv))
 
 async function get(over, name, rrtype) {
   const opts = {
@@ -103,7 +105,7 @@ async function get(over, name, rrtype) {
     decode: !argv.noDecode,
     subnet: argv.subnet,
     ecs: argv.ecs,
-    dnssec: argv.dnssec
+    dnssec: argv.dnssec,
   }
   let resp = await over.lookup(opts)
   if (argv.noDecode) {
@@ -128,7 +130,7 @@ async function get(over, name, rrtype) {
     }
     console.log(util.inspect(DNSutils.buffersToB64(resp), {
       depth: Infinity,
-      colors: process.stdout.isTTY
+      colors: process.stdout.isTTY,
     }))
   }
 }
@@ -143,11 +145,10 @@ async function get(over, name, rrtype) {
         .filter(a => (a !== '-v') && (a !== '--verbose'))
         .map(a => a.replace(/^-(?<opt>[^-]*)v/, '-$<opt>')) // If run as "dohdec -tvs"
       newArgs.splice(2, 0, '--INTERNAL_VERBOSE')
-      const { fork } = require('child_process')
       process.env.NODE_DEBUG = 'http'
-      const cp = fork(__filename, newArgs.slice(2), {
+      const cp = fork(url.fileURLToPath(import.meta.url), newArgs.slice(2), {
         env: process.env,
-        stdio: [0, 1, 2, 'ipc']
+        stdio: [0, 1, 2, 'ipc'],
       })
       cp.on('exit', code => process.exit(code))
       return
@@ -158,13 +159,13 @@ async function get(over, name, rrtype) {
     new DNSoverTLS({
       host: argv.tlsServer,
       port: argv.tlsPort,
-      verbose: argv.verbose
+      verbose: argv.verbose,
     }) :
     new DNSoverHTTPS({
       url: argv.url,
       preferPost: !argv.get,
       verbose: argv.INTERNAL_VERBOSE,
-      contentType: argv.contentType
+      contentType: argv.contentType,
     })
 
   if (argv.name) {
@@ -181,7 +182,7 @@ async function get(over, name, rrtype) {
     const rl = readline.createInterface({
       input: process.stdin,
       output: process.stdout,
-      prompt: 'domain (rrtype)> '
+      prompt: 'domain (rrtype)> ',
     })
     rl.on('line', async line => {
       if (line.length === 0) {

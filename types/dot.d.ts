@@ -1,5 +1,4 @@
 /// <reference types="node" />
-export = DNSoverTLS;
 /**
  * Options for doing DOT lookups.
  *
@@ -37,7 +36,7 @@ export = DNSoverTLS;
  * `hashAlg` options are set correctly to a hash of the DER-encoded
  * certificate that the server will offer.
  */
-declare class DNSoverTLS extends DNSutils {
+export class DNSoverTLS extends DNSutils {
     /**
      * Hash a certificate using the given algorithm.
      *
@@ -122,8 +121,16 @@ declare class DNSoverTLS extends DNSutils {
      *   if this is an object.
      * @param {DOT_LookupOptions|string} [opts={}] Options for the request.  If
      *   a string is given, it will be used as the rrtype.
+     * @returns {Promise<packet.Packet|Buffer>} Response.
      */
-    lookup(name: string | DOT_LookupOptions, opts?: string | DOT_LookupOptions): Promise<any>;
+    lookup(name: string | DOT_LookupOptions, opts?: string | DOT_LookupOptions): Promise<packet.Packet | Buffer>;
+    /**
+     * Reject all pending requests, for example, on close.
+     *
+     * @param {Error} er The error to reject with.
+     * @private
+     */
+    private _rejectPending;
     /**
      * Close the socket.
      *
@@ -131,31 +138,14 @@ declare class DNSoverTLS extends DNSutils {
      */
     close(): Promise<void>;
 }
-declare namespace DNSoverTLS {
-    export { DEFAULT_SERVER as server, DOT_LookupOptions, pendingResolve, pendingError, Pending };
+export namespace DNSoverTLS {
+    export { DEFAULT_SERVER as server };
 }
-import DNSutils = require("./dnsUtils");
-import tls = require("tls");
-type Pending = {
-    /**
-     * Callback for success.
-     */
-    resolve: pendingResolve;
-    /**
-     * Callback for error.
-     */
-    reject: pendingError;
-    /**
-     * The original options for the request.
-     */
-    opts: DOT_LookupOptions;
-};
-import NoFilter = require("nofilter");
-import { Buffer } from "buffer";
+export default DNSoverTLS;
 /**
  * Options for doing DOT lookups.
  */
-type DOT_LookupOptions = {
+export type DOT_LookupOptions = {
     /**
      * The DNS name to look up.
      */
@@ -180,9 +170,27 @@ type DOT_LookupOptions = {
      */
     dnssec?: boolean;
 };
-import crypto = require("crypto");
+export type pendingResolve = (results: Buffer | object) => any;
+export type pendingError = (error: Error) => any;
+export type Pending = {
+    /**
+     * Callback for success.
+     */
+    resolve: pendingResolve;
+    /**
+     * Callback for error.
+     */
+    reject: pendingError;
+    /**
+     * The original options for the request.
+     */
+    opts: DOT_LookupOptions;
+};
+import { default as DNSutils } from "./dnsUtils.js";
+import tls from "tls";
+import NoFilter from "nofilter";
+import { Buffer } from "buffer";
+import packet from "dns-packet";
+import crypto from "crypto";
 import { Writable } from "stream";
 declare const DEFAULT_SERVER: "1.1.1.1";
-type pendingResolve = (results: Buffer | object) => any;
-type pendingError = (error: Error) => any;
-import packet = require("dns-packet");

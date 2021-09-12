@@ -8,6 +8,7 @@
     "declaration": true,
     "emitDeclarationOnly": true,
     "moduleResolution": "node",
+    "module": "es2020",
     // "noImplicitAny": true,
     "outDir": "types",
     "target": "ES2020",
