@@ -1,19 +1,19 @@
-'use strict'
-
-const {Buffer} = require('buffer')
-const path = require('path')
-const process = require('process')
-const test = require('ava')
-const nock = require('nock')
-const {DNSoverHTTPS} = require('../')
-const {Buf} = require('./utils')
+import {Buf} from './utils.js'
+import {Buffer} from 'buffer'
+import {DNSoverHTTPS} from '../lib/doh.js'
+import nock from 'nock'
+import path from 'path'
+import process from 'process'
+import test from 'ava'
+import url from 'url'
 
 test.before(async t => {
-  nock.back.fixtures = path.join(__dirname, 'fixtures')
+  nock.back.fixtures = url.fileURLToPath(new URL('fixtures/', import.meta.url))
   if (!process.env.NOCK_BACK_MODE) {
     nock.back.setMode('lockdown')
   }
-  const title = escape(path.basename(__filename))
+
+  const title = escape(path.basename(url.fileURLToPath(import.meta.url)))
   const { nockDone, context } = await nock.back(`${title}.json`)
   if (context.scopes.length === 0) {
     // Set the NOCK_BACK_MODE variable to "record" when needed

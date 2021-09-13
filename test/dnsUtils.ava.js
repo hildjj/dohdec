@@ -1,10 +1,8 @@
-'use strict'
-
-const {Buffer} = require('buffer')
-const test = require('ava')
-const packet = require('dns-packet')
-const DNSutils = require('../lib/dnsUtils')
-const {Buf} = require('./utils')
+import {Buf} from './utils.js'
+import {Buffer} from 'buffer'
+import DNSutils from '../lib/dnsUtils.js'
+import packet from 'dns-packet'
+import test from 'ava'
 
 test('makePacket', t => {
   const pkt = DNSutils.makePacket({ name: 'foo' })
@@ -65,6 +63,10 @@ test('normalizeArgs', t => {
     name: 'foo',
     rrtype: 'MX',
   })
+  t.deepEqual(DNSutils.normalizeArgs(null, {name: 'foo'}), {
+    name: 'foo',
+    rrtype: 'A',
+  })
   t.deepEqual(DNSutils.normalizeArgs('españa.icom.museum', undefined, {
     rrtype: 'A',
   }), {
@@ -77,6 +79,8 @@ test('normalizeArgs', t => {
     name: 'xn--v8jxj3d1dzdz08w.com',
     rrtype: 'A',
   })
+  t.throws(() => DNSutils.normalizeArgs(false))
+  t.throws(() => DNSutils.normalizeArgs(null, false))
 })
 
 test('base64urlEncode', t => {

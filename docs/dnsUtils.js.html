@@ -24,7 +24,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DNSoverHTTPS.html">DNSoverHTTPS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#getDNS">getDNS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#getJSON">getJSON</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#lookup">lookup</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DNSoverTLS.html">DNSoverTLS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverTLS.html#.hashCert">hashCert</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverTLS.html#close">close</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverTLS.html#lookup">lookup</a></span></li><li class="nav-heading">Events</li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:certificate">certificate</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:connect">connect</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:disconnect">disconnect</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:receive">receive</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:send">send</a></span></li>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DNSoverHTTPS.html">DNSoverHTTPS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#getDNS">getDNS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#getJSON">getJSON</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#lookup">lookup</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DNSoverTLS.html">DNSoverTLS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverTLS.html#.hashCert">hashCert</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverTLS.html#close">close</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverTLS.html#lookup">lookup</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DNSutils_DNSutils.html">DNSutils</a></span></li><li class="nav-heading">Events</li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:certificate">certificate</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:connect">connect</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:disconnect">disconnect</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:receive">receive</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:send">send</a></span></li><li class="nav-heading"><a href="global.html">Globals</a></li>
 </nav>
 
 <div id="main">
@@ -39,16 +39,16 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>'use strict'
+            <pre class="prettyprint source linenums"><code>import * as packet from 'dns-packet'
+import {Buffer} from 'buffer'
+import {EventEmitter} from 'events'
+import {Writable} from 'stream'
+import net from 'net'
+import url from 'url'
+import util from 'util'
 
-const util = require('util')
-const packet = require('dns-packet')
-const punycode = require('punycode/') // "/" at end to avoid deprecated internal version
-
-const CIRCULAR_MARK = Symbol('CIRCULAR_REFERENCE_MARK')
-
-// extracted from node source
-function stylizeWithColor (str, styleType) {
+// Extracted from node source
+function stylizeWithColor(str, styleType) {
   const style = util.inspect.styles[styleType]
   if (style !== undefined) {
     const color = util.inspect.colors[style]
@@ -57,11 +57,11 @@ function stylizeWithColor (str, styleType) {
   return str
 }
 
-function styleStream (stream, str, styleType) {
+function styleStream(stream, str, styleType) {
   stream.write(stream.isTTY ? stylizeWithColor(str, styleType) : str)
 }
 
-function printableString (stream, buf) {
+function printableString(stream, buf) {
   // Intent: each byte that is "printable" takes up one grapheme, and everything
   // else is replaced with '.'
 
@@ -77,18 +77,107 @@ function printableString (stream, buf) {
   return buf.length
 }
 
-class DNSutils {
+export class DNSutils extends EventEmitter {
+  /**
+   * Creates an instance of DNSutils.
+   *
+   * @param {object} [opts={}] Options.
+   * @param {boolean} [opts.verbose=false] Turn on verbose output?
+   * @param {Writable} [opts.verboseStream=process.stderr] Where to write
+   *   verbose output.
+   */
+  constructor(opts = {}) {
+    super()
+    this._verbose = Boolean(opts.verbose)
+    this.verboseStream = opts.verboseStream || process.stderr
+  }
+
+  /**
+   * Output verbose logging information, if this.verbose is true.
+   *
+   * @param {any[]} args Same as onsole.log parameters.
+   */
+  verbose(...args) {
+    if (this._verbose) {
+      this.verboseStream.write(util.formatWithOptions({
+        // Really, process.stderr is a tty.WriteStream, but this will work
+        // fine in practice since isTTY will be undefined on other streams.
+        // @ts-ignore TS2339
+        colors: this.verboseStream.isTTY,
+        depth: Infinity,
+        sorted: true,
+      }, ...args))
+      this.verboseStream.write('\n')
+    }
+  }
+
+  /**
+   * Dump a nice hex representation of the given buffer to verboseStream,
+   * if verbose is true.
+   *
+   * @param {Buffer} buf The buffer to dump.
+   */
+  hexDump(buf) {
+    if (!this._verbose) {
+      return
+    }
+    if (buf.length > 0) {
+      let offset = 0
+      for (const byte of buf.slice(0, buf.length)) {
+        // eslint-disable-next-line multiline-comment-style, indent
+/*
+00000000  7b 0a 20 20 22 6e 61 6d  65 22 3a 20 22 64 6f 68  |{.  "name": "doh|
+*/
+        if ((offset % 16) === 0) {
+          if (offset !== 0) {
+            this.verboseStream.write('  |')
+            printableString(this.verboseStream, buf.slice(offset - 16, offset))
+            this.verboseStream.write('|\n')
+          }
+          styleStream(this.verboseStream, offset.toString(16).padStart(8, '0'), 'undefined')
+        }
+        if ((offset % 8) === 0) {
+          this.verboseStream.write(' ')
+        }
+        this.verboseStream.write(' ')
+        this.verboseStream.write(byte.toString(16).padStart(2, '0'))
+        offset++
+      }
+      let left = offset % 16
+      if (left === 0) {
+        left = 16
+      } else {
+        let undone = 3 * (16 - left)
+        if (left &lt;= 8) {
+          undone++
+        }
+        this.verboseStream.write(' '.padStart(undone, ' '))
+      }
+
+      const start = offset > 16 ? offset - left : 0
+      this.verboseStream.write('  |')
+      printableString(this.verboseStream, buf.slice(start, offset))
+      this.verboseStream.write('|\n')
+    }
+    styleStream(this.verboseStream, buf.length.toString(16).padStart(8, '0'), 'undefined')
+    this.verboseStream.write('\n')
+  }
+
   /**
    * Encode a DNS query packet to a buffer.
    *
-   * @param {Object} opts - Options for the query
-   * @param {Number} [opts.id=0] - ID for the query.  SHOULD be 0 for DOH.
-   * @param {String} [opts.name] - The name to look up
-   * @param {String} [opts.rrtype="A"] - The record type to look up
-   * @param {Boolean} [opts.dnssec=false] - Request DNSSec information?
-   * @returns {Buffer} The encoded packet
+   * @param {object} opts Options for the query.
+   * @param {number} [opts.id=0] ID for the query.  SHOULD be 0 for DOH.
+   * @param {string} [opts.name] The name to look up.
+   * @param {packet.RecordType} [opts.rrtype="A"] The record type to look up.
+   * @param {boolean} [opts.dnssec=false] Request DNSSec information?
+   * @param {string} [opts.subnet] Subnet to use for ECS.
+   * @param {number} [opts.ecs] Number of ECS bits.  Defaults to 24 or 56
+   *   (IPv4/IPv6).
+   * @returns {Buffer} The encoded packet.
    */
-  static makePacket (opts) {
+  static makePacket(opts) {
+    /** @type {packet.Packet} */
     const dns = {
       type: 'query',
       id: opts.id || 0,
@@ -96,130 +185,138 @@ class DNSutils {
       questions: [{
         type: opts.rrtype || 'A',
         class: 'IN',
-        name: opts.name
+        name: opts.name,
       }],
       additionals: [{
         name: '.',
         type: 'OPT',
+        // @ts-ignore TS2339: types not up to date
         udpPayloadSize: 4096,
-        flags: 0
-      }]
+        flags: 0,
+      }],
     }
     if (opts.dnssec) {
       dns.flags |= packet.AUTHENTIC_DATA
+      // @ts-ignore TS2339: types not up to date
       dns.additionals[0].flags |= packet.DNSSEC_OK
     }
-    if (opts.ecs != null) {
-      dns.additionals.options = [{
+    if (opts.ecs != null || net.isIP(opts.subnet) !== 0) {
+      // https://tools.ietf.org/html/rfc7871#section-11.1
+      const prefix = (opts.subnet &amp;&amp; net.isIPv4(opts.subnet)) ? 24 : 56
+      // @ts-ignore TS2339: types not up to date
+      dns.additionals[0].options = [{
         code: 'CLIENT_SUBNET',
-        sourcePrefixLength: opts.ecs
+        ip: opts.subnet || '0.0.0.0',
+        sourcePrefixLength: (opts.ecs == null) ? prefix : opts.ecs,
       }]
-    }
-    if (opts.verbose) {
-      console.error('SEND', dns)
     }
     return packet.encode(dns)
   }
 
-  static normalizeArgs (name, opts, defaults) {
-    if (typeof name === 'object') {
-      opts = name
-      name = undefined
-    } else if (typeof opts === 'string') {
-      opts = {
-        name,
-        rrtype: opts
+  /**
+   * @typedef {object} LookupOptions
+   * @property {string} [name] Name to look up.
+   * @property {packet.RecordType} [rrtype] The Resource Record type to retrive.
+   * @property {number} [id] The 2-byte unsigned integer for the request.
+   *   For DOH, should be 0 or undefined.
+   * @property {boolean} [json] Force JSON lookups for DOH.  Ignored for DOT.
+   */
+  /**
+   * Normalize parameters into the lookup functions.
+   *
+   * @param {string|LookupOptions} [name] If string, lookup this name,
+   *   otherwise it is options.  Has precedence over opts.name if string.
+   * @param {packet.RecordType|LookupOptions} [opts] If string, rrtype.
+   *   Otherwise options.
+   * @param {object} [defaults] Defaults options.
+   * @returns {LookupOptions} Normalized options, including punycode∑d
+   *   options.name and upper-case options.rrtype.
+   * @throws {Error} Invalid type for name.
+   */
+  static normalizeArgs(name, opts, defaults) {
+    /** @type {LookupOptions} */
+    let nopts = {}
+    if (name != null) {
+      switch (typeof name) {
+        case 'object':
+          nopts = name
+          break
+        case 'string':
+          nopts.name = name
+          break
+        default:
+          throw new Error('Invalid type for name')
       }
-      name = undefined
     }
-    opts = Object.assign({}, defaults, opts)
-    opts.name = punycode.toASCII(opts.name || name)
-    opts.rrtype = (opts.rrtype || 'A').toUpperCase()
-    return opts
+    if (opts != null) {
+      switch (typeof opts) {
+        case 'object':
+          nopts = { ...opts, ...nopts }
+          break
+        case 'string':
+          nopts = { ...nopts, rrtype: opts }
+          break
+        default:
+          throw new Error('Invalid type for opts')
+      }
+    }
+
+    return {
+      ...defaults,
+      ...nopts,
+      name: url.domainToASCII(nopts.name),
+      rrtype: (nopts.rrtype || 'A').toUpperCase(),
+    }
   }
 
   /**
    * See [RFC 4648]{@link https://tools.ietf.org/html/rfc4648#section-5}.
    *
-   * @param {Buffer} buf - Buffer to encode
-   * @returns {String} The base64url string
+   * @param {Buffer} buf Buffer to encode.
+   * @returns {string} The base64url string.
    */
-  static base64urlEncode (buf) {
+  static base64urlEncode(buf) {
     const s = buf.toString('base64')
-    return s.replace(/[=+/]/g, c => {
-      switch (c) {
-        case '=': return ''
-        case '+': return '-'
-        case '/': return '_'
-      }
-    })
+    return s.replace(/[=+/]/g, c => ({
+      '=': '',
+      '+': '-',
+      '/': '_',
+    })[c])
   }
 
-  static hexDump (buf, stream = process.stdout) {
-    if (buf.length > 0) {
-      let offset = 0
-      for (const byte of buf.slice(0, buf.length)) {
-        // 00000000  7b 0a 20 20 22 6e 61 6d  65 22 3a 20 22 64 6f 68  |{.  "name": "doh|
-        if ((offset % 16) === 0) {
-          if (offset !== 0) {
-            stream.write('  |')
-            printableString(stream, buf.slice(offset - 16, offset))
-            stream.write('|\n')
-          }
-          styleStream(stream, offset.toString(16).padStart(8, '0'), 'undefined')
-        }
-        if ((offset % 8) === 0) {
-          stream.write(' ')
-        }
-        stream.write(' ')
-        stream.write(byte.toString(16).padStart(2, '0'))
-        offset++
-      }
-      let left = offset % 16
-      if (left !== 0) {
-        let undone = 3 * (16 - left)
-        if (left &lt;= 8) {
-          undone++
-        }
-        stream.write(' '.padStart(undone, ' '))
-      } else {
-        left = 16
-      }
-      const start = offset > 16 ? offset - left : 0
-      stream.write('  |')
-      printableString(stream, buf.slice(start, offset))
-      stream.write('|\n')
+  /**
+   * Recursively traverse an object, turning all of its properties that have
+   * Buffer values into base64 representations of the buffer.
+   *
+   * @param {any} o The object to traverse.
+   * @param {WeakSet&lt;object>} [circular] WeakMap to prevent circular
+   *   dependencies.
+   * @returns {any} The converted object.
+   */
+  static buffersToB64(o, circular = null) {
+    if (!circular) {
+      circular = new WeakSet()
     }
-    styleStream(stream, buf.length.toString(16).padStart(8, '0'), 'undefined')
-    stream.write('\n')
-  }
-
-  static buffersToB64 (o) {
     if (o &amp;&amp; (typeof o === 'object')) {
-      if (o[CIRCULAR_MARK]) {
+      if (circular.has(o)) {
         return '[Circular reference]'
       }
-      o[CIRCULAR_MARK] = true
-      let ret = null
+      circular.add(o)
       if (Buffer.isBuffer(o)) {
-        ret = o.toString('base64')
+        return o.toString('base64')
       } else if (Array.isArray(o)) {
-        ret = o.map(v => this.buffersToB64(v))
-      } else {
-        ret = Object.entries(o).reduce((prev, [k, v]) => {
-          prev[k] = this.buffersToB64(v)
-          return prev
-        }, {})
+        return o.map(v => this.buffersToB64(v, circular))
       }
-      delete o[CIRCULAR_MARK]
-      delete ret[CIRCULAR_MARK]
-      return ret
+      return Object.entries(o).reduce((prev, [k, v]) => {
+        prev[k] = this.buffersToB64(v, circular)
+        return prev
+      }, {})
     }
     return o
   }
 }
 
-module.exports = DNSutils
+export default DNSutils
 </code></pre>
         </article>
     </section>
@@ -232,7 +329,7 @@ module.exports = DNSutils
 <br class="clear">
 
 <footer>
-    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> using the Minami theme.
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.7</a> using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>
