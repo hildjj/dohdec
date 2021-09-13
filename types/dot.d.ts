@@ -119,18 +119,11 @@ export class DNSoverTLS extends DNSutils {
      *
      * @param {DOT_LookupOptions|string} name The DNS name to look up, or opts
      *   if this is an object.
-     * @param {DOT_LookupOptions|string} [opts={}] Options for the request.  If
-     *   a string is given, it will be used as the rrtype.
+     * @param {DOT_LookupOptions|packet.RecordType} [opts={}] Options for the
+     *   request.  If a string is given, it will be used as the rrtype.
      * @returns {Promise<packet.Packet|Buffer>} Response.
      */
-    lookup(name: string | DOT_LookupOptions, opts?: string | DOT_LookupOptions): Promise<packet.Packet | Buffer>;
-    /**
-     * Reject all pending requests, for example, on close.
-     *
-     * @param {Error} er The error to reject with.
-     * @private
-     */
-    private _rejectPending;
+    lookup(name: string | DOT_LookupOptions, opts?: packet.RecordType | DOT_LookupOptions): Promise<packet.Packet | Buffer>;
     /**
      * Close the socket.
      *
@@ -187,10 +180,10 @@ export type Pending = {
     opts: DOT_LookupOptions;
 };
 import { default as DNSutils } from "./dnsUtils.js";
-import tls from "tls";
-import NoFilter from "nofilter";
+import * as tls from "tls";
+import { default as NoFilter } from "nofilter";
 import { Buffer } from "buffer";
-import packet from "dns-packet";
-import crypto from "crypto";
+import * as packet from "dns-packet";
+import * as crypto from "crypto";
 import { Writable } from "stream";
 declare const DEFAULT_SERVER: "1.1.1.1";

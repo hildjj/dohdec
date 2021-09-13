@@ -39,11 +39,11 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import {Buffer} from 'buffer'
-import EventEmitter from 'events'
+            <pre class="prettyprint source linenums"><code>import * as packet from 'dns-packet'
+import {Buffer} from 'buffer'
+import {EventEmitter} from 'events'
 import {Writable} from 'stream'
 import net from 'net'
-import packet from 'dns-packet'
 import url from 'url'
 import util from 'util'
 
@@ -225,28 +225,42 @@ export class DNSutils extends EventEmitter {
    * Normalize parameters into the lookup functions.
    *
    * @param {string|LookupOptions} [name] If string, lookup this name,
-   *   otherwise it is options.
-   * @param {string|LookupOptions} [opts] If string, rrtype.  Otherwise
-   *   options.
+   *   otherwise it is options.  Has precedence over opts.name if string.
+   * @param {packet.RecordType|LookupOptions} [opts] If string, rrtype.
+   *   Otherwise options.
    * @param {object} [defaults] Defaults options.
    * @returns {LookupOptions} Normalized options, including punycode∑d
    *   options.name and upper-case options.rrtype.
+   * @throws {Error} Invalid type for name.
    */
   static normalizeArgs(name, opts, defaults) {
-    let nopts = null
-    if (typeof name === 'object') {
-      nopts = name
-      name = undefined
-    } else if (typeof opts === 'string') {
-      nopts = {
-        name,
-        rrtype: opts,
+    /** @type {LookupOptions} */
+    let nopts = {}
+    if (name != null) {
+      switch (typeof name) {
+        case 'object':
+          nopts = name
+          break
+        case 'string':
+          nopts.name = name
+          break
+        default:
+          throw new Error('Invalid type for name')
       }
-      name = undefined
-    } else {
-      nopts = opts || {}
-      nopts.name = name || nopts.name
     }
+    if (opts != null) {
+      switch (typeof opts) {
+        case 'object':
+          nopts = { ...opts, ...nopts }
+          break
+        case 'string':
+          nopts = { ...nopts, rrtype: opts }
+          break
+        default:
+          throw new Error('Invalid type for opts')
+      }
+    }
+
     return {
       ...defaults,
       ...nopts,

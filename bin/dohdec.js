@@ -66,7 +66,7 @@ const argv = yargs()
     url: {
       desc: 'The URL of the DoH service',
       alias: 'u',
-      default: DNSoverHTTPS.url,
+      default: DNSoverHTTPS.defaultURL,
       string: true,
       requiresArg: true,
     },

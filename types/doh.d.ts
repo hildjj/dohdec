@@ -80,13 +80,13 @@ export class DNSoverHTTPS extends DNSutils {
     /**
      * Look up a DNS entry using DNS-over-HTTPS (DoH).
      *
-     * @param {object|DOH_LookupOptions} name The DNS name to look up, or opts if
-     *   this is an object.
-     * @param {DOH_LookupOptions|string} [opts={}] Options for the request.  If a
-     *   string is given, it will be used as the rrtype.
+     * @param {object|DOH_LookupOptions} name The DNS name to look up, or opts
+     *   if this is an object.
+     * @param {DOH_LookupOptions|packet.RecordType} [opts={}] Options for the
+     *   request.  If a string is given, it will be used as the rrtype.
      * @returns {Promise<Buffer|string|object>} DNS result.
      */
-    lookup(name: object | DOH_LookupOptions, opts?: string | DOH_LookupOptions): Promise<Buffer | string | object>;
+    lookup(name: object | DOH_LookupOptions, opts?: packet.RecordType | DOH_LookupOptions): Promise<Buffer | string | object>;
 }
 export namespace DNSoverHTTPS {
     const version: string;
@@ -134,5 +134,5 @@ export type DOH_LookupOptions = {
     url?: string;
 };
 import DNSutils from "./dnsUtils.js";
-import packet from "dns-packet";
+import * as packet from "dns-packet";
 import { Writable } from "stream";

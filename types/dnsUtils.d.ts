@@ -33,12 +33,13 @@ export class DNSutils extends EventEmitter {
      * Normalize parameters into the lookup functions.
      *
      * @param {string|LookupOptions} [name] If string, lookup this name,
-     *   otherwise it is options.
-     * @param {string|LookupOptions} [opts] If string, rrtype.  Otherwise
-     *   options.
+     *   otherwise it is options.  Has precedence over opts.name if string.
+     * @param {packet.RecordType|LookupOptions} [opts] If string, rrtype.
+     *   Otherwise options.
      * @param {object} [defaults] Defaults options.
      * @returns {LookupOptions} Normalized options, including punycode∑d
      *   options.name and upper-case options.rrtype.
+     * @throws {Error} Invalid type for name.
      */
     static normalizeArgs(name?: string | {
         /**
@@ -58,7 +59,7 @@ export class DNSutils extends EventEmitter {
          * Force JSON lookups for DOH.  Ignored for DOT.
          */
         json?: boolean;
-    }, opts?: string | {
+    }, opts?: packet.RecordType | {
         /**
          * Name to look up.
          */
@@ -143,7 +144,7 @@ export class DNSutils extends EventEmitter {
     hexDump(buf: Buffer): void;
 }
 export default DNSutils;
-import EventEmitter from "events";
+import { EventEmitter } from "events";
 import { Writable } from "stream";
 import { Buffer } from "buffer";
-import packet from "dns-packet";
+import * as packet from "dns-packet";

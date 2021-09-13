@@ -63,6 +63,10 @@ test('normalizeArgs', t => {
     name: 'foo',
     rrtype: 'MX',
   })
+  t.deepEqual(DNSutils.normalizeArgs(null, {name: 'foo'}), {
+    name: 'foo',
+    rrtype: 'A',
+  })
   t.deepEqual(DNSutils.normalizeArgs('españa.icom.museum', undefined, {
     rrtype: 'A',
   }), {
@@ -75,6 +79,8 @@ test('normalizeArgs', t => {
     name: 'xn--v8jxj3d1dzdz08w.com',
     rrtype: 'A',
   })
+  t.throws(() => DNSutils.normalizeArgs(false))
+  t.throws(() => DNSutils.normalizeArgs(null, false))
 })
 
 test('base64urlEncode', t => {
