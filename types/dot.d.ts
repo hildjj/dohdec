@@ -58,7 +58,7 @@ export class DNSoverTLS extends DNSutils {
      * @param {string} [opts.hashAlg='sha256'] Hash algorithm for cert pinning.
      * @param {boolean} [opts.rejectUnauthorized=true] Should the server
      *   certificate even be checked using the normal TLS approach?
-     * @param {boolean} [opts.verbose=false] Print bytes sent and received.
+     * @param {number} [opts.verbose=0] How verbose do you want your logging?
      * @param {Writable} [opts.verboseStream=process.stderr] Where to write
      *   verbose output.
      */
@@ -68,7 +68,7 @@ export class DNSoverTLS extends DNSutils {
         hash?: string;
         hashAlg?: string;
         rejectUnauthorized?: boolean;
-        verbose?: boolean;
+        verbose?: number;
         verboseStream?: Writable;
     });
     opts: {

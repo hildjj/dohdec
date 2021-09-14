@@ -15,6 +15,7 @@
  *   requires `json: false`.
  * @property {string} [url=CLOUDFLARE_API] What DoH endpoint should be
  *   used?
+ * @property {boolean} [http2=false] Use http/2 if it is available.
  */
 /**
  * Request DNS information over HTTPS.  The [lookup]{@link DNSoverHTTPS#lookup}
@@ -33,7 +34,7 @@ export class DNSoverHTTPS extends DNSutils {
      *   for DNS-format queries?
      * @param {string} [opts.contentType="application/dns-udpwireformat"]
      *   MIME type for POST.
-     * @param {boolean} [opts.verbose=false] Turn on verbose output?
+     * @param {number} [opts.verbose=0] How verbose do you want your logging?
      * @param {Writable} [opts.verboseStream=process.stderr] Where to write
      *   verbose output.
      */
@@ -42,7 +43,7 @@ export class DNSoverHTTPS extends DNSutils {
         url?: string;
         preferPost?: boolean;
         contentType?: string;
-        verbose?: boolean;
+        verbose?: number;
         verboseStream?: Writable;
     });
     opts: {
@@ -50,6 +51,10 @@ export class DNSoverHTTPS extends DNSutils {
         url: string;
         preferPost: boolean;
         contentType: string;
+        http2: boolean;
+    };
+    hooks: {
+        beforeRequest: ((options: any) => void)[];
     };
     /**
      * @private
@@ -132,6 +137,10 @@ export type DOH_LookupOptions = {
      * used?
      */
     url?: string;
+    /**
+     * Use http/2 if it is available.
+     */
+    http2?: boolean;
 };
 import DNSutils from "./dnsUtils.js";
 import * as packet from "dns-packet";

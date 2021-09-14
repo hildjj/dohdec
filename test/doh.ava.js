@@ -46,7 +46,7 @@ test('dns get', async t => {
   const verboseStream = new Buf({encoding: 'utf8'})
   const doh = new DNSoverHTTPS({
     preferPost: false,
-    verbose: true,
+    verbose: 1,
     verboseStream,
   })
   const r = await doh.lookup('ietf.org', {
@@ -95,7 +95,7 @@ test('no decode', async t => {
 
 test('getJSON', async t => {
   const verboseStream = new Buf()
-  const doh = new DNSoverHTTPS({verbose: true, verboseStream})
+  const doh = new DNSoverHTTPS({verbose: 1, verboseStream})
   const r = await doh.getJSON({ name: 'ietf.org' })
   t.is(typeof r, 'object')
 })

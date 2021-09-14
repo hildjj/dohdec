@@ -8,7 +8,7 @@ export class DNSutils extends EventEmitter {
      * @param {string} [opts.name] The name to look up.
      * @param {packet.RecordType} [opts.rrtype="A"] The record type to look up.
      * @param {boolean} [opts.dnssec=false] Request DNSSec information?
-     * @param {string} [opts.subnet] Subnet to use for ECS.
+     * @param {string} [opts.ecsSubnet] Subnet to use for ECS.
      * @param {number} [opts.ecs] Number of ECS bits.  Defaults to 24 or 56
      *   (IPv4/IPv6).
      * @returns {Buffer} The encoded packet.
@@ -18,7 +18,7 @@ export class DNSutils extends EventEmitter {
         name?: string;
         rrtype?: packet.RecordType;
         dnssec?: boolean;
-        subnet?: string;
+        ecsSubnet?: string;
         ecs?: number;
     }): Buffer;
     /**
@@ -117,31 +117,33 @@ export class DNSutils extends EventEmitter {
      * Creates an instance of DNSutils.
      *
      * @param {object} [opts={}] Options.
-     * @param {boolean} [opts.verbose=false] Turn on verbose output?
+     * @param {number} [opts.verbose=0] How verbose do you want your logging?
      * @param {Writable} [opts.verboseStream=process.stderr] Where to write
      *   verbose output.
      */
     constructor(opts?: {
-        verbose?: boolean;
+        verbose?: number;
         verboseStream?: Writable;
     });
-    _verbose: boolean;
+    _verbose: number;
     verboseStream: Writable | (NodeJS.WriteStream & {
         fd: 2;
     });
     /**
      * Output verbose logging information, if this.verbose is true.
      *
+     * @param {number} level Print at this verbosity level or higher.
      * @param {any[]} args Same as onsole.log parameters.
      */
-    verbose(...args: any[]): void;
+    verbose(level: number, ...args: any[]): void;
     /**
      * Dump a nice hex representation of the given buffer to verboseStream,
      * if verbose is true.
      *
+     * @param {number} level Print at this verbosity level or higher.
      * @param {Buffer} buf The buffer to dump.
      */
-    hexDump(buf: Buffer): void;
+    hexDump(level: number, buf: Buffer): void;
 }
 export default DNSutils;
 import { EventEmitter } from "events";
