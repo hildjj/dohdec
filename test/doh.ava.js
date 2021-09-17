@@ -12,12 +12,15 @@ test.before(async t => {
   if (!process.env.NOCK_BACK_MODE) {
     nock.back.setMode('lockdown')
   }
+  if (nock.back.currentMode !== 'record') {
+    nock.disableNetConnect()
+  }
 
   const title = escape(path.basename(url.fileURLToPath(import.meta.url)))
   const { nockDone, context } = await nock.back(`${title}.json`)
   if (context.scopes.length === 0) {
     // Set the NOCK_BACK_MODE variable to "record" when needed
-    if (process.env.NOCK_BACK_MODE !== 'record') {
+    if (nock.back.currentMode !== 'record') {
       console.error(`WARNING: Nock recording needed for "${title}".
 Set NOCK_BACK_MODE=record`)
     }

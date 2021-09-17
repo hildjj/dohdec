@@ -8,7 +8,7 @@
   "scripts": {
     "lint": "eslint . --ext js",
     "test": "ava",
-    "coverage": "c8 -r lcov npm test",
+    "coverage": "c8 --all --src lib -r lcov npm test",
     "doc": "jsdoc -c .jsdoc.conf",
     "types": "tsc",
     "precheck": "npm run lint && npm run coverage && npm run types && npm run doc",
