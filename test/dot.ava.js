@@ -1,15 +1,14 @@
 
 import {Buffer} from 'buffer'
 import {DNSoverTLS} from '../lib/dot.js'
-import NoFilter from 'nofilter'
-import packet from 'dns-packet'
+import {MockDNSserver} from './mockServer.js'
+import {X509Certificate} from 'crypto'
 import test from 'ava'
 
-// NOTE: no network mocks for these yet.  Possible approach: write a quick
-// and dirty server
+const mockServer = new MockDNSserver('localhost')
 
 test('lookup', async t => {
-  const dot = new DNSoverTLS()
+  const dot = mockServer.dnsOverTLS()
   const res = await dot.lookup('ietf.org')
   const [{name, type, data}] = res.answers
   t.is(name, 'ietf.org')
@@ -28,7 +27,7 @@ test('lookup', async t => {
 })
 
 test('close with in-flight requests', async t => {
-  const dot = new DNSoverTLS()
+  const dot = mockServer.dnsOverTLS()
   // eslint-disable-next-line no-empty-function
   dot._data = () => {} // Ignore any data received
   dot.on('send', buf => {
@@ -42,7 +41,7 @@ test('close with in-flight requests', async t => {
 })
 
 test('immediate close', async t => {
-  const dot = new DNSoverTLS()
+  const dot = mockServer.dnsOverTLS()
   dot.on('error', e => {
     t.fail(`Should not get error: ${e.message}`)
   })
@@ -57,82 +56,36 @@ test('hash fail', async t => {
   t.is(DNSoverTLS.hashCert(buf),
     '2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae')
 
-  const dot = new DNSoverTLS({
+  const dot = mockServer.dnsOverTLS({
     hash: 'WRONG',
   })
   await t.throwsAsync(dot.lookup('ietf.org'))
 })
 
 test('bad cert', async t => {
-  const dot = new DNSoverTLS({
+  const dot = mockServer.dnsOverTLS({
     host: 'untrusted-root.badssl.com',
-    port: 443,
-    rejectUnauthorized: false,
-  })
-  let hash = null
-  dot.on('certificate', c => {
-    ({hash} = c)
-  })
-  let wait = null
-  const prom = new Promise((resolve, reject) => {
-    wait = { resolve, reject }
-  })
-  dot.once('disconnect', () => {
-    // Second try, now with hash.
-    dot.opts.hash = hash
-    dot.lookup('ietf.org').then(wait.resolve, wait.reject)
   })
   await t.throwsAsync(dot.lookup('ietf.org'), null, 'UNABLE_TO_VERIFY_LEAF_SIGNATURE')
-  await t.throwsAsync(prom, null, 'Timeout looking up "ietf.org":A')
 })
 
-class MockedTLS extends DNSoverTLS {
-  constructor(opts = {}) {
-    super(opts)
-    this.socket = new NoFilter()
-    this.socket.on('finish', () => this._disconnected())
-    this.nof = new NoFilter()
-    this.on('send', b => {
-      if (b.length > 2) {
-        const sz = this.socket.readUInt16BE()
-        const buf = this.socket.read(sz)
-        const pkt = packet.decode(buf)
-        this.respond(pkt)
-      }
-    })
-  }
-
-  respond(req) {
-    const resp = {
-      id: this.opts.badid || req.id,
-      type: 'response',
-      rcode: 'NOERROR',
-      questions: req.questions,
-      answers: [{
-        name: req.questions[0].name,
-        type: req.questions[0].type,
-        ttl: 1,
-        class: req.questions[0].class,
-        data: '1.2.3.4',
-      }],
-    }
-    const rbuf = packet.encode(resp)
-    const rbufsz = Buffer.alloc(2)
-    rbufsz.writeUInt16BE(rbuf.length)
-    this._data(rbufsz.slice(0, 1))
-    this._data(rbufsz.slice(1))
-    this._data(rbuf.slice(0, 5))
-    this._data(rbuf.slice(5))
-  }
-}
+test('pin cert', async t => {
+  const dot = mockServer.dnsOverTLS({
+    host: 'untrusted-root.badssl.com',
+    hash: DNSoverTLS.hashCert(new X509Certificate(mockServer.chain.srv_pem)),
+  })
+  const res = await dot.lookup('ietf.org')
+  t.is(res.rcode, 'NOERROR')
+})
 
 test('chunked reads', async t => {
-  const dot = new MockedTLS()
-  const resp = await dot.lookup('ietf.org', { id: 123 })
+  const dot = mockServer.dnsOverTLS()
+  const resp = await dot.lookup('chunky.example', { id: 123 })
   t.is(resp.id, 123)
+  t.is(resp.rcode, 'NOERROR')
 })
 
 test('bad id', async t => {
-  const dot = new MockedTLS({ badid: 4 })
+  const dot = mockServer.dnsOverTLS(null, {badId: 4})
   await t.throwsAsync(dot.lookup('ietf.org', { id: 123 }))
 })
