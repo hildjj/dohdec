@@ -21,7 +21,7 @@ test('lookup', async t => {
     target: 'hermes2.jabber.org',
     weight: 30,
   })
-  const buf = await dot.lookup('ietf.org', { decode: false })
+  const buf = await dot.lookup('ietf.org', {decode: false})
   t.truthy(Buffer.isBuffer(buf))
   dot.close()
 })
@@ -80,12 +80,12 @@ test('pin cert', async t => {
 
 test('chunked reads', async t => {
   const dot = mockServer.dnsOverTLS()
-  const resp = await dot.lookup('chunky.example', { id: 123 })
+  const resp = await dot.lookup('chunky.example', {id: 123})
   t.is(resp.id, 123)
   t.is(resp.rcode, 'NOERROR')
 })
 
 test('bad id', async t => {
   const dot = mockServer.dnsOverTLS(null, {badId: 4})
-  await t.throwsAsync(dot.lookup('ietf.org', { id: 123 }))
+  await t.throwsAsync(dot.lookup('ietf.org', {id: 123}))
 })

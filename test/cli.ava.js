@@ -54,7 +54,7 @@ test.before(async t => {
   }
 
   const title = escape(path.basename(url.fileURLToPath(import.meta.url)))
-  const { nockDone, context } = await nock.back(`${title}.json`)
+  const {nockDone, context} = await nock.back(`${title}.json`)
   if (context.scopes.length === 0) {
     // Set the NOCK_BACK_MODE variable to "record" when needed
     if (nock.back.currentMode !== 'record') {

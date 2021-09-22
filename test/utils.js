@@ -6,7 +6,7 @@ const MINS_5 = 5 * 60 * 1000
 
 export class Buf extends Transform {
   constructor(opts = {}) {
-    const { errorToThrow, ...others } = opts
+    const {errorToThrow, ...others} = opts
     super(others)
     this.errorToThrow = errorToThrow
   }

@@ -5,7 +5,7 @@ import packet from 'dns-packet'
 import test from 'ava'
 
 test('makePacket', t => {
-  const pkt = DNSutils.makePacket({ name: 'foo' })
+  const pkt = DNSutils.makePacket({name: 'foo'})
   const dns = packet.decode(pkt)
   t.is(dns.id, 0)
   t.is(dns.questions[0].type, 'A')
@@ -14,7 +14,7 @@ test('makePacket', t => {
 
 test('makePacket - subnet', t => {
   const ecsSubnet = '1.1.1.1'
-  const pkt = DNSutils.makePacket({ name: 'foo', ecsSubnet })
+  const pkt = DNSutils.makePacket({name: 'foo', ecsSubnet})
   const dns = packet.decode(pkt)
   const [additionals] = dns.additionals
   const [options] = additionals.options
@@ -27,7 +27,7 @@ test('makePacket - subnet', t => {
 test('makePacket - subnet & ecs = 0', t => {
   const ecsSubnet = '1.1.1.1'
   const ecs = 0
-  const pkt = DNSutils.makePacket({ name: 'foo', ecsSubnet, ecs })
+  const pkt = DNSutils.makePacket({name: 'foo', ecsSubnet, ecs})
   const dns = packet.decode(pkt)
   const [additionals] = dns.additionals
   const [options] = additionals.options
@@ -40,7 +40,7 @@ test('makePacket - subnet & ecs = 0', t => {
 test('makePacket - subnet & ecs = 16', t => {
   const ecsSubnet = '1.1.1.1'
   const ecs = 16
-  const pkt = DNSutils.makePacket({ name: 'foo', ecsSubnet, ecs })
+  const pkt = DNSutils.makePacket({name: 'foo', ecsSubnet, ecs})
   const dns = packet.decode(pkt)
   const [additionals] = dns.additionals
   const [options] = additionals.options
@@ -55,11 +55,11 @@ test('normalizeArgs', t => {
     name: 'foo',
     rrtype: 'MX',
   })
-  t.deepEqual(DNSutils.normalizeArgs('foo', { rrtype: 'mx' }, {}), {
+  t.deepEqual(DNSutils.normalizeArgs('foo', {rrtype: 'mx'}, {}), {
     name: 'foo',
     rrtype: 'MX',
   })
-  t.deepEqual(DNSutils.normalizeArgs({ name: 'foo', rrtype: 'mx' }, {}), {
+  t.deepEqual(DNSutils.normalizeArgs({name: 'foo', rrtype: 'mx'}, {}), {
     name: 'foo',
     rrtype: 'MX',
   })

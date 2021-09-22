@@ -37,7 +37,7 @@
     "yargs": "^17.1.1"
   },
   "devDependencies": {
-    "@cto.af/eslint-config": "^0.0.8",
+    "@cto.af/eslint-config": "^0.0.9",
     "@types/dns-packet": "^5.2.2",
     "@types/node": "^16.9.6",
     "@types/yargs": "^17.0.3",
