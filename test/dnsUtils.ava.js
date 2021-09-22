@@ -159,3 +159,11 @@ test('ecs', t => {
   })
   t.truthy(Buffer.isBuffer(pkt))
 })
+
+test('verbose', t => {
+  const du = new DNSutils({
+    verbose: false,
+  })
+  t.truthy(du)
+  t.throws(() => new DNSutils({verbose: true}))
+})

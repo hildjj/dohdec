@@ -1,9 +1,12 @@
 import {Buf} from './utils.js'
 import {DnsCli} from '../lib/cli.js'
+import {MockDNSserver} from './mockServer.js'
 import nock from 'nock'
 import path from 'path'
 import test from 'ava'
 import url from 'url'
+
+const mockServer = new MockDNSserver('localhost')
 
 function parse(cli, args) {
   return new Promise((resolve, reject) => {
@@ -103,6 +106,33 @@ test('main', async t => {
     name: 'ietf.org',
     type: 28,
     TTL: 1615,
+    data: '2001:1900:3001:11::2c'
+  }
+]
+`)
+})
+
+test('tls', async t => {
+  const cli = new DnsCli()
+  t.truthy(cli)
+  cli.out = new Buf()
+  cli.err = new Buf()
+  await parse(cli, '-t ietf.org AAAA')
+
+  const m = mockServer.instance()
+  cli.transport.opts.socket = m.rawClientSocket
+  cli.transport.opts.ca = mockServer.chain.ca_pem
+  cli.transport.opts.host = 'localhost'
+  await cli.main()
+  t.is(cli.err.read(), null)
+  t.is(cli.out.read().toString(), `\
+[
+  {
+    name: 'ietf.org',
+    type: 'AAAA',
+    ttl: 1000,
+    class: 'IN',
+    flush: false,
     data: '2001:1900:3001:11::2c'
   }
 ]
