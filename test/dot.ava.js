@@ -23,6 +23,7 @@ test('lookup', async t => {
   })
   const buf = await dot.lookup('ietf.org', {decode: false})
   t.truthy(Buffer.isBuffer(buf))
+  t.is(buf.length, 468, 'Check padding')
   dot.close()
 })
 

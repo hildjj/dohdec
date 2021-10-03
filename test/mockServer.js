@@ -3,7 +3,9 @@ import * as rcodes from 'dns-packet/rcodes.js'
 import {MockServerInstance, MockTLSserver} from './utils.js'
 import {DNSoverTLS} from '../lib/dot.js'
 
+const PAD_SIZE = 468 // See RFC 8467
 const AA = 1 << 10
+
 const DNS = {
   'ietf.org': {
     A: '4.31.198.44',
@@ -50,7 +52,7 @@ class MockDNSserverInstance extends MockServerInstance {
     if (domain) {
       const data = domain[type]
       if (data) {
-        const reply = packet.streamEncode({
+        const rp = {
           id: (this.badId == null) ? pkt.id : this.badId,
           type: 'response',
           flags: AA,
@@ -64,7 +66,24 @@ class MockDNSserverInstance extends MockServerInstance {
               data,
             },
           ],
-        })
+          additionals: [{
+            name: '.',
+            type: 'OPT',
+            udpPayloadSize: 4096,
+            flags: 0,
+            options: [],
+          }],
+        }
+        // Only pad if client said they support EDNS0
+        if (pkt.additionals.find(a => a.type === 'OPT')) {
+          const unpadded = packet.encodingLength(rp)
+          rp.additionals[0].options.push({
+            code: 'PADDING',
+            length: (Math.ceil(unpadded / PAD_SIZE) * PAD_SIZE) - unpadded - 4,
+          })
+        }
+
+        const reply = packet.streamEncode(rp)
         if (/chunky/.test(name)) {
           // Write in chunks, for testing reassembly
           this.write(reply.slice(0, 1))

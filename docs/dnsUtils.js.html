@@ -49,6 +49,8 @@ import net from 'net'
 import url from 'url'
 import util from 'util'
 
+const PAD_SIZE = 128
+
 // Extracted from node source
 function stylizeWithColor(str, styleType) {
   const style = util.inspect.styles[styleType]
@@ -211,6 +213,7 @@ export class DNSutils extends EventEmitter {
         // @ts-ignore TS2339: types not up to date
         udpPayloadSize: 4096,
         flags: 0,
+        options: [],
       }],
     }
     if (opts.dnssec) {
@@ -222,12 +225,18 @@ export class DNSutils extends EventEmitter {
       // https://tools.ietf.org/html/rfc7871#section-11.1
       const prefix = (opts.ecsSubnet &amp;&amp; net.isIPv4(opts.ecsSubnet)) ? 24 : 56
       // @ts-ignore TS2339: types not up to date
-      dns.additionals[0].options = [{
+      dns.additionals[0].options.push({
         code: 'CLIENT_SUBNET',
         ip: opts.ecsSubnet || '0.0.0.0',
         sourcePrefixLength: (opts.ecs == null) ? prefix : opts.ecs,
-      }]
+      })
     }
+    const unpadded = packet.encodingLength(dns)
+    // @ts-ignore TS2339: types not up to date
+    dns.additionals[0].options.push({
+      code: 'PADDING',
+      length: (Math.ceil(unpadded / PAD_SIZE) * PAD_SIZE) - unpadded - 4,
+    })
     if (opts.stream) {
       // @ts-ignore TS2339: types not up to date
       return packet.streamEncode(dns)
