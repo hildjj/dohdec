@@ -2,7 +2,7 @@
 import {Buffer} from 'buffer'
 import {DNSoverTLS} from '../lib/dot.js'
 import {MockDNSserver} from './mockServer.js'
-import {X509Certificate} from 'crypto'
+import crypto from 'crypto'
 import test from 'ava'
 
 const mockServer = new MockDNSserver('localhost')
@@ -70,9 +70,16 @@ test('bad cert', async t => {
 })
 
 test('pin cert', async t => {
+  if (!crypto.X509Certificate) {
+    // X509Certificate added in node 15.6.0
+    t.pass()
+    return
+  }
   const dot = mockServer.dnsOverTLS({
     host: 'untrusted-root.badssl.com',
-    hash: DNSoverTLS.hashCert(new X509Certificate(mockServer.chain.srv_pem)),
+    hash: DNSoverTLS.hashCert(
+      new crypto.X509Certificate(mockServer.chain.srv_pem)
+    ),
   })
   const res = await dot.lookup('ietf.org')
   t.is(res.rcode, 'NOERROR')

@@ -24,7 +24,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DNSoverHTTPS.html">DNSoverHTTPS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#getDNS">getDNS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#getJSON">getJSON</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#lookup">lookup</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DNSoverTLS.html">DNSoverTLS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverTLS.html#.hashCert">hashCert</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverTLS.html#close">close</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverTLS.html#lookup">lookup</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DNSutils_DNSutils.html">DNSutils</a></span></li><li class="nav-heading">Events</li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:certificate">certificate</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:connect">connect</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:disconnect">disconnect</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:receive">receive</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:send">send</a></span></li><li class="nav-heading"><a href="global.html">Globals</a></li>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DnsCli.html">DnsCli</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DnsCli.html#main">main</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DNSoverHTTPS.html">DNSoverHTTPS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#getDNS">getDNS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#getJSON">getJSON</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#lookup">lookup</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DNSoverTLS.html">DNSoverTLS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverTLS.html#.hashCert">hashCert</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverTLS.html#close">close</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverTLS.html#lookup">lookup</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DNSutils_DNSutils.html">DNSutils</a></span></li><li class="nav-heading">Events</li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:certificate">certificate</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:connect">connect</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:disconnect">disconnect</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:receive">receive</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:send">send</a></span></li><li class="nav-heading"><a href="global.html">Globals</a></li>
 </nav>
 
 <div id="main">
@@ -54,31 +54,39 @@
 <pre class="prettyprint source lang-bash"><code>npm i -S dohdec
 </code></pre>
 <h2>Command Line Usage</h2>
-<pre class="prettyprint source lang-txt"><code>dohdec [name] [rrtype]
+<pre class="prettyprint source lang-txt"><code>Usage: dohdec [options] [name] [rrtype]
 
-Look up DNS name using DNS-over-HTTPS (DoH)
-
-Positionals:
-  name    The name to look up.  If not specified, use a readline loop to look up
-          multiple names.                                               [string]
-  rrtype  Resource Record type to look up                [string] [default: &quot;A&quot;]
+Arguments:
+  name                        DNS name to look up (e.g. domain name)
+  rrtype                      Resource record name or number (default: &quot;A&quot;)
 
 Options:
-  --version        Show version number                                 [boolean]
-  --dns, -d        Use DNS format instead of JSON                      [boolean]
-  --subnet, -b     Use this IP address for EDNS Client Subnet (ECS)     [string]
-  --ecs, -e        Use this many bits for EDNS Client Subnet (ECS)      [number]
-  --full, -f       Full response, not just answers                     [boolean]
-  --get, -g        Force http GET for DNS-format lookups               [boolean]
-  --no-decode, -n  Do not decode JSON or DNS wire format               [boolean]
-  --dnssec, -s     Request DNSsec records                              [boolean]
-  --url, -u        The URL of the DoH service
-                      [string] [default: &quot;https://cloudflare-dns.com/dns-query&quot;]
-  --tls, -t        Use DNS-over-TLS instead of DNS-over-HTTPS          [boolean]
-  --tlsServer, -i  Connect to this DNS-over-TLS server      [default: &quot;1.1.1.1&quot;]
-  --tlsPort, -p    Connect to this TCP port for DNS-over-TLS      [default: 853]
-  --verbose, -v    Print debug info                                    [boolean]
-  -h, --help       Show help                                           [boolean]
+  -V, --version               output the version number
+  -c, --contentType &lt;type>    MIME type for POST (default:
+                              &quot;application/dns-message&quot;)
+  -d, --dns                   Use DNS format instead of JSON
+  -s, --dnssec                Request DNSsec records
+  -e, --ecs &lt;number>          Use this many bits for EDNS Client Subnet (ECS)
+  -b, --ecsSubnet &lt;address>   Use this IP address for EDNS Client Subnet (ECS)
+  -f, --full                  Full response, not just answers
+  -g, --get                   Force http GET for DNS-format lookups (default:
+                              true)
+  -n, --no-decode             Do not decode JSON or DNS wire format
+  -2, --no-http2              Disable http2 support
+  -t, --tls                   Use DNS-over-TLS instead of DNS-over-HTTPS
+  -i, --tlsServer &lt;serverIP>  Connect to this DNS-over-TLS server (default:
+                              &quot;1.1.1.1&quot;)
+  -p, --tlsPort &lt;number>      Connect to this TCP port for DNS-over-TLS
+                              (default: 853)
+  -u, --url &lt;URL>             The URL of the DoH service (default:
+                              &quot;https://cloudflare-dns.com/dns-query&quot;)
+  -v, --verbose               Increase verbosity of debug information.  May be
+                              specified multiple times. (default: 0)
+  -h, --help                  display help for command
+
+For more debug information:
+
+  $ NODE_DEBUG=http,https,http2 dohdec -v [arguments]
 </code></pre>
 <h2>API Usage</h2>
 <pre class="prettyprint source lang-js"><code>const { DNSoverHTTP, DNSoverTLS } = require('dohdec')

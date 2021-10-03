@@ -1,6 +1,8 @@
 import * as rs from 'jsrsasign'
 import {Duplex, Transform} from 'stream'
 import {TLSSocket} from 'tls'
+import path from 'path'
+import url from 'url'
 
 const MINS_5 = 5 * 60 * 1000
 
@@ -23,6 +25,49 @@ export class Buf extends Transform {
   static from(str) {
     return new Buf().end(str)
   }
+}
+
+/**
+ * Prepare the test environment for using nock.
+ *
+ * @param {any} test The AVA test suite.
+ * @param {any} nock The nock instance.
+ * @param {URL} metaUrl The import.meta.url of the calling module.
+ */
+export function prepNock(test, nock, metaUrl) {
+  test.before(async t => {
+    nock.back.fixtures = url.fileURLToPath(new URL('fixtures/', metaUrl))
+    if (!process.env.NOCK_BACK_MODE) {
+      nock.back.setMode('lockdown')
+    }
+
+    const title = escape(path.basename(url.fileURLToPath(metaUrl)))
+    const {nockDone, context} = await nock.back(`${title}.json`)
+    if (context.scopes.length === 0) {
+      // Set the NOCK_BACK_MODE variable to "record" when needed
+      if (nock.back.currentMode !== 'record') {
+        console.error(`WARNING: Nock recording needed for "${title}".
+  Set NOCK_BACK_MODE=record`)
+      }
+    }
+    t.context.nockDone = nockDone
+
+    if (nock.back.currentMode === 'record') {
+      nock.enableNetConnect()
+    } else {
+      nock.disableNetConnect()
+    }
+  })
+
+  test.after(t => {
+    t.truthy(nock.isDone(), 'Ingore error if running selected tests')
+  })
+
+  test.after.always(t => {
+    // Ensure recording gets written, even if the tests don't all pass.
+    // For example, TTLs might need to be tweaked.
+    t.context.nockDone()
+  })
 }
 
 // Below to be pulled into a separate project the next time I need a mock TLS
@@ -142,11 +187,9 @@ export class MockServerInstance extends Duplex {
 
     this.server = new TLSSocket(this.rawServerSocket, {
       isServer: true,
-      enableTrace: true,
       requestCert: false,
       cert: this.chain.srv_pem,
       key: this.chain.srv_key,
-      secureProtocol: 'TLSv1_2_method',
     })
     this.server.on('data', chunk => {
       this.push(chunk)

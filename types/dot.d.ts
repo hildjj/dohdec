@@ -77,6 +77,7 @@ export class DNSoverTLS extends DNSutils {
         hash?: string;
         hashAlg: string;
         rejectUnauthorized: boolean;
+        checkServerIdentity: any;
     };
     _reset(): void;
     size: number;
@@ -94,6 +95,7 @@ export class DNSoverTLS extends DNSutils {
      * @private
      */
     private _connect;
+    _checkServerIdentity(host: any, cert: any): Error;
     /**
      * Server socket was disconnected.  Clean up any pending requests.
      *

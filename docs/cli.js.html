@@ -1,4 +1,45 @@
-import {Command, InvalidArgumentError} from 'commander'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>cli.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DnsCli.html">DnsCli</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DnsCli.html#main">main</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DNSoverHTTPS.html">DNSoverHTTPS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#getDNS">getDNS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#getJSON">getJSON</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverHTTPS.html#lookup">lookup</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DNSoverTLS.html">DNSoverTLS</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverTLS.html#.hashCert">hashCert</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverTLS.html#close">close</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DNSoverTLS.html#lookup">lookup</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DNSutils_DNSutils.html">DNSutils</a></span></li><li class="nav-heading">Events</li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:certificate">certificate</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:connect">connect</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:disconnect">disconnect</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:receive">receive</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="DNSoverTLS.html#event:send">send</a></span></li><li class="nav-heading"><a href="global.html">Globals</a></li>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">cli.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import {Command, InvalidArgumentError} from 'commander'
 import {DNSError, DNSutils} from '../lib/dnsUtils.js'
 import {DNSoverHTTPS, DNSoverTLS} from '../lib/index.js'
 import net from 'net'
@@ -80,19 +121,19 @@ export class DnsCli extends Command {
       .argument('[name]', 'DNS name to look up (e.g. domain name).  If not specified, a read-execute-print loop (REPL) is started.')
       .argument('[rrtype]', 'Resource record name or number', 'A')
       .option(
-        '-c, --contentType <type>',
+        '-c, --contentType &lt;type>',
         'MIME type for POST',
         'application/dns-message'
       )
       .option('-d, --dns', 'Use DNS format instead of JSON (ignored for TLS)')
       .option('-s, --dnssec', 'Request DNSsec records')
       .option(
-        '-e, --ecs <number>',
+        '-e, --ecs &lt;number>',
         'Use this many bits for EDNS Client Subnet (ECS)',
         myParseInt
       )
       .option(
-        '-b, --ecsSubnet <address>',
+        '-b, --ecsSubnet &lt;address>',
         'Use this IP address for EDNS Client Subnet (ECS)',
         checkAddress
       )
@@ -102,18 +143,18 @@ export class DnsCli extends Command {
       .option('-2, --no-http2', 'Disable http2 support')
       .option('-t, --tls', 'Use DNS-over-TLS instead of DNS-over-HTTPS')
       .option(
-        '-i, --tlsServer <serverIP>',
+        '-i, --tlsServer &lt;serverIP>',
         'Connect to this DNS-over-TLS server',
         '1.1.1.1'
       )
       .option(
-        '-p, --tlsPort <number>',
+        '-p, --tlsPort &lt;number>',
         'Connect to this TCP port for DNS-over-TLS',
         myParseInt,
         853
       )
       .option(
-        '-u, --url <URL>',
+        '-u, --url &lt;URL>',
         'The URL of the DoH service',
         DNSoverHTTPS.defaultURL
       )
@@ -129,7 +170,7 @@ For more debug information:
   $ NODE_DEBUG=http,https,http2 dohdec -v [arguments]`)
     // END CLI CONFIG
 
-    if (stdio && (Object.keys(stdio).length > 0)) {
+    if (stdio &amp;&amp; (Object.keys(stdio).length > 0)) {
       this.exitOverride()
     }
 
@@ -203,7 +244,7 @@ For more debug information:
         this.std.out.write('\n')
       } else {
         this.std.out.write(resp)
-        if (!this.argv.dns && !this.argv.tls) {
+        if (!this.argv.dns &amp;&amp; !this.argv.tls) {
           this.std.out.write('\n')
         }
       }
@@ -239,3 +280,22 @@ For more debug information:
     return [errors, total]
   }
 }
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.7</a> using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

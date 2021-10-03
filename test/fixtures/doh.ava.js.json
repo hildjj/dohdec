@@ -3,22 +3,24 @@
         "scope": "https://cloudflare-dns.com:443",
         "method": "POST",
         "path": "/dns-query",
-        "body": "0000012000010000000000010469657466036f726700000100010000291000000080000000",
+        "body": "\u0000\u0000\u0001\u0000\u0000\u0001\u0000\u0000\u0000\u0000\u0000\u0001\u0004ietf\u0003org\u0000\u0000\u0001\u0000\u0001\u0000\u0000)\u0010\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
         "status": 200,
-        "response": "000081a000010002000000010469657466036f72670000010001c00c00010001000000e40004041fc62cc00c002e0001000000e4011c000105020000012c5e3ddcac5c5c9b7b9e040469657466036f72670078f0a88a163cc8def3856ff60f354a6b705f59f16b59f9bc86f2e530b9606361ed1433d275dedde720a6a2620af29a6acc560ab9db2ef0d462384a002841a75e821d3719092e04d21f8e512a996312e413a8e9fa483830de6877b8d09d391cd4124b408c97bae6ecd7f551ff8befab664f9e97078d022e540b7fd3bbc2d88cba1eb320de0af46007bb4a85e464f98a1902d53f5b3fb12a14487c555af5d63b312a12a2fb9fc3a736172b03feddc9bfced66078660a2f529d33baf602d333fdd790e53aa58b2668568e748996d5bee0419ad2d5ffd1eedb8b8c36c0aeca9e12bec5a2462aade1d0b7040c8da6e448edeb7d70fccbdb8b3a220f1388a24689596f00002905ac000080000000",
+        "response": "0000818000010001000000010469657466036f72670000010001c00c00010001000004ce0004041fc62c00002904d0000000000000",
         "rawHeaders": [
             "Date",
-            "Sat, 16 Feb 2019 08:45:45 GMT",
+            "Fri, 24 Sep 2021 01:58:51 GMT",
             "Content-Type",
-            "application/dns-udpwireformat",
+            "application/dns-message",
             "Content-Length",
-            "349",
+            "53",
             "Connection",
             "close",
+            "Report-To",
+            "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=isyifJtlvOZwLJ%2BLC%2F0r0x05g2AsSI24VQCppoyNfKv4o41SHEul4Tn6BiLpTVUKv5KolF9Tceej%2B%2BhzrxWSDxyVHIiB%2FycMKtWtVkZYRN2HlAvh%2BAGA3z5vGfUt0AJK80LESg%3D%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+            "NEL",
+            "{\"report_to\":\"cf-nel\",\"max_age\":604800}",
             "Access-Control-Allow-Origin",
             "*",
-            "cache-control",
-            "max-age=228",
             "Expect-CT",
             "max-age=604800, report-uri=\"https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct\"",
             "Vary",
@@ -26,111 +28,9 @@
             "Server",
             "cloudflare",
             "CF-RAY",
-            "4a9ebd687d7dc7c7-DEN"
+            "693868fbcb28f784-DEN"
         ],
         "responseIsBinary": true
-    },
-    {
-        "scope": "https://cloudflare-dns.com:443",
-        "method": "GET",
-        "path": "/dns-query?name=ietf.org&type=A",
-        "body": "",
-        "status": 200,
-        "response": {
-            "Status": 0,
-            "TC": false,
-            "RD": true,
-            "RA": true,
-            "AD": true,
-            "CD": false,
-            "Question": [
-                {
-                    "name": "ietf.org.",
-                    "type": 1
-                }
-            ],
-            "Answer": [
-                {
-                    "name": "ietf.org.",
-                    "type": 1,
-                    "TTL": 228,
-                    "data": "4.31.198.44"
-                }
-            ]
-        },
-        "rawHeaders": [
-            "Date",
-            "Sat, 16 Feb 2019 08:45:45 GMT",
-            "Content-Type",
-            "application/dns-json",
-            "Content-Length",
-            "197",
-            "Connection",
-            "close",
-            "Access-Control-Allow-Origin",
-            "*",
-            "cache-control",
-            "max-age=228",
-            "Expect-CT",
-            "max-age=604800, report-uri=\"https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct\"",
-            "Vary",
-            "Accept-Encoding",
-            "Server",
-            "cloudflare",
-            "CF-RAY",
-            "4a9ebd688eebc7d3-DEN"
-        ]
-    },
-    {
-        "scope": "https://cloudflare-dns.com:443",
-        "method": "GET",
-        "path": "/dns-query?name=ietf.org&type=A",
-        "body": "",
-        "status": 200,
-        "response": {
-            "Status": 0,
-            "TC": false,
-            "RD": true,
-            "RA": true,
-            "AD": true,
-            "CD": false,
-            "Question": [
-                {
-                    "name": "ietf.org.",
-                    "type": 1
-                }
-            ],
-            "Answer": [
-                {
-                    "name": "ietf.org.",
-                    "type": 1,
-                    "TTL": 228,
-                    "data": "4.31.198.44"
-                }
-            ]
-        },
-        "rawHeaders": [
-            "Date",
-            "Sat, 16 Feb 2019 08:45:45 GMT",
-            "Content-Type",
-            "application/dns-json",
-            "Content-Length",
-            "197",
-            "Connection",
-            "close",
-            "Access-Control-Allow-Origin",
-            "*",
-            "cache-control",
-            "max-age=228",
-            "Expect-CT",
-            "max-age=604800, report-uri=\"https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct\"",
-            "Vary",
-            "Accept-Encoding",
-            "Server",
-            "cloudflare",
-            "CF-RAY",
-            "4a9ebd688d84c7c7-DEN"
-        ]
     },
     {
         "scope": "https://cloudflare-dns.com:443",
@@ -138,20 +38,22 @@
         "path": "/dns-query?dns=AAABAAABAAAAAAABBGlldGYDb3JnAAAcAAEAACkQAAAAAAAAAA",
         "body": "",
         "status": 200,
-        "response": "000081a000010001000000010469657466036f726700001c0001c00c001c00010000006500102001190030010011000000000000002c00002905ac000000000000",
+        "response": "0000818000010001000000010469657466036f726700001c0001c00c001c0001000004d000102001190030010011000000000000002c00002904d0000000000000",
         "rawHeaders": [
             "Date",
-            "Sat, 16 Feb 2019 08:45:45 GMT",
+            "Fri, 24 Sep 2021 01:58:51 GMT",
             "Content-Type",
-            "application/dns-udpwireformat",
+            "application/dns-message",
             "Content-Length",
             "65",
             "Connection",
             "close",
+            "Report-To",
+            "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=3MEgij%2BEIQHZ%2BkSYfq9N3%2FRYFtjbgTWt3P1l4M6QIchgP32WwHuHh0vSseEEU8B3vFomCXQuUHCwFoYXFLMiUCL5OY2wO%2F65z5xjuKbj6ofzAFxZnq457GZqOYiq5%2BNYhMSAdQ%3D%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+            "NEL",
+            "{\"report_to\":\"cf-nel\",\"max_age\":604800}",
             "Access-Control-Allow-Origin",
             "*",
-            "cache-control",
-            "max-age=101",
             "Expect-CT",
             "max-age=604800, report-uri=\"https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct\"",
             "Vary",
@@ -159,30 +61,53 @@
             "Server",
             "cloudflare",
             "CF-RAY",
-            "4a9ebd6889d1c7d7-DEN"
+            "693868fbcc542707-DEN"
         ],
         "responseIsBinary": true
     },
     {
         "scope": "https://cloudflare-dns.com:443",
-        "method": "POST",
-        "path": "/dns-query",
-        "body": "\u0000\u0000\u0001\u0000\u0000\u0001\u0000\u0000\u0000\u0000\u0000\u0001\u0004ietf\u0003org\u0000\u0000\u0001\u0000\u0001\u0000\u0000)\u0010\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+        "method": "GET",
+        "path": "/dns-query?name=ietf.org&type=A",
+        "body": "",
         "status": 200,
-        "response": "000081a000010001000000010469657466036f72670000010001c00c00010001000000e40004041fc62c00002905ac000000000000",
+        "response": {
+            "Status": 0,
+            "TC": false,
+            "RD": true,
+            "RA": true,
+            "AD": true,
+            "CD": false,
+            "Question": [
+                {
+                    "name": "ietf.org",
+                    "type": 1
+                }
+            ],
+            "Answer": [
+                {
+                    "name": "ietf.org",
+                    "type": 1,
+                    "TTL": 1226,
+                    "data": "4.31.198.44"
+                }
+            ]
+        },
         "rawHeaders": [
             "Date",
-            "Sat, 16 Feb 2019 08:45:45 GMT",
+            "Fri, 24 Sep 2021 01:58:51 GMT",
             "Content-Type",
-            "application/dns-udpwireformat",
+            "application/dns-json",
             "Content-Length",
-            "53",
+            "178",
             "Connection",
             "close",
+            "Report-To",
+            "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=C9wXAlwnq%2F%2F5eSeZ3Ee309gFyk9isDSuv%2BW1a%2B9Jo8MqREH34%2FwIfkA%2BccR7YqZbSzd7UjiwOzIBfkqqqciFS7DfqyXGCGtQBnSffgtzpOpOR3wV2GxomeKpsVzb3OEeNGgcJw%3D%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+            "NEL",
+            "{\"report_to\":\"cf-nel\",\"max_age\":604800}",
             "Access-Control-Allow-Origin",
             "*",
-            "cache-control",
-            "max-age=228",
             "Expect-CT",
             "max-age=604800, report-uri=\"https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct\"",
             "Vary",
@@ -190,7 +115,94 @@
             "Server",
             "cloudflare",
             "CF-RAY",
-            "4a9ebd6889d2c7d7-DEN"
+            "693868fbdadef780-DEN"
+        ],
+        "responseIsBinary": false
+    },
+    {
+        "scope": "https://cloudflare-dns.com:443",
+        "method": "GET",
+        "path": "/dns-query?name=ietf.org&type=A",
+        "body": "",
+        "status": 200,
+        "response": {
+            "Status": 0,
+            "TC": false,
+            "RD": true,
+            "RA": true,
+            "AD": true,
+            "CD": false,
+            "Question": [
+                {
+                    "name": "ietf.org",
+                    "type": 1
+                }
+            ],
+            "Answer": [
+                {
+                    "name": "ietf.org",
+                    "type": 1,
+                    "TTL": 1225,
+                    "data": "4.31.198.44"
+                }
+            ]
+        },
+        "rawHeaders": [
+            "Date",
+            "Fri, 24 Sep 2021 01:58:51 GMT",
+            "Content-Type",
+            "application/dns-json",
+            "Content-Length",
+            "178",
+            "Connection",
+            "close",
+            "Report-To",
+            "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=jFoLllrrUgsDPmN4SOJjmcSd36r9SvaFTYlQ%2FJr09cG70P2EeAWbJTEB3TGWUlihPAwNUu6GiIyXxiwpwGqRnfrL4qvrkDLaH1NgaCPq%2BW5enqdCEYL7w%2FfjgEkuvlQikycSGQ%3D%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+            "NEL",
+            "{\"report_to\":\"cf-nel\",\"max_age\":604800}",
+            "Access-Control-Allow-Origin",
+            "*",
+            "Expect-CT",
+            "max-age=604800, report-uri=\"https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct\"",
+            "Vary",
+            "Accept-Encoding",
+            "Server",
+            "cloudflare",
+            "CF-RAY",
+            "693868fbdf3cc7a5-DEN"
+        ],
+        "responseIsBinary": false
+    },
+    {
+        "scope": "https://cloudflare-dns.com:443",
+        "method": "POST",
+        "path": "/dns-query",
+        "body": "0000012000010000000000010469657466036f726700000100010000291000000080000000",
+        "status": 200,
+        "response": "000081a000010002000000010469657466036f72670000010001c00c002e0001000006d9011c0001050200000708631d3366613bf1dc9e040469657466036f726700abae7f87e8695712871ea24a34bbef335b50bb0dc13e97200210c5f4e1eb4e9b103b9ca7b63bffab50b06ef581e9e5e07cbcd1e287d73b6d53e86d129e522ea09afe6e28582b4cfc08b53df218e61605d2ebb3d82e8f0c0551cacd912a455728262460767a60cf327985207fa876f9bc5d7039036def3d34e0302650623bfe645665421ee831fd41672b9864109a6f07e86fdaf336e9ca2337d567a8fdb98edcdc0b79d5869803f082179d5d62ce48599fe3d49997f4b199e076a90814b26642cef7e69f4d7e24fbfd113ef9d406204123433eef187deff65e783a02119823d0c39abcb4e084c3881402a25406d2ebedbb54b538ebeb2db1c05c525dc57bc455c00c00010001000006d90004041fc62c00002904d0000080000000",
+        "rawHeaders": [
+            "Date",
+            "Fri, 24 Sep 2021 01:58:51 GMT",
+            "Content-Type",
+            "application/dns-message",
+            "Content-Length",
+            "349",
+            "Connection",
+            "close",
+            "Report-To",
+            "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=0tJGE5coqzM1NgH9S7ua4238t1kEeweanJN6N8gC8ze11yUX6ClFtIgLvFSEDGRnZbouQPvuVBTxkto3WAkhJf06533Io%2F1A9DO7pD0YJpGRxn3HPTB1HslYHzb0rJfS4AfUYg%3D%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+            "NEL",
+            "{\"report_to\":\"cf-nel\",\"max_age\":604800}",
+            "Access-Control-Allow-Origin",
+            "*",
+            "Expect-CT",
+            "max-age=604800, report-uri=\"https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct\"",
+            "Vary",
+            "Accept-Encoding",
+            "Server",
+            "cloudflare",
+            "CF-RAY",
+            "693868fbdc5d2752-DEN"
         ],
         "responseIsBinary": true
     },
@@ -209,32 +221,34 @@
             "CD": false,
             "Question": [
                 {
-                    "name": "ietf.org.",
+                    "name": "ietf.org",
                     "type": 15
                 }
             ],
             "Answer": [
                 {
-                    "name": "ietf.org.",
+                    "name": "ietf.org",
                     "type": 15,
-                    "TTL": 291,
+                    "TTL": 1800,
                     "data": "0 mail.ietf.org."
                 }
             ]
         },
         "rawHeaders": [
             "Date",
-            "Sat, 16 Feb 2019 08:45:45 GMT",
+            "Fri, 24 Sep 2021 01:58:51 GMT",
             "Content-Type",
             "application/dns-json",
             "Content-Length",
-            "204",
+            "185",
             "Connection",
             "close",
+            "Report-To",
+            "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=qGZuAsXJixdIg645%2BcyDb8zlK12Wc6gqiiOL4R1yxDyYsxBjFWRuipCWo98TKTBbjgJAcVLt2hvEQV7nxUhMk932Yt1X6%2Fh3B5YWylMv%2BFoqSsAjTO32mQzfylG6CkI9njzfGQ%3D%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+            "NEL",
+            "{\"report_to\":\"cf-nel\",\"max_age\":604800}",
             "Access-Control-Allow-Origin",
             "*",
-            "cache-control",
-            "max-age=291",
             "Expect-CT",
             "max-age=604800, report-uri=\"https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct\"",
             "Vary",
@@ -242,8 +256,9 @@
             "Server",
             "cloudflare",
             "CF-RAY",
-            "4a9ebd68fa7ac7b3-DEN"
-        ]
+            "693868fc2f13270f-DEN"
+        ],
+        "responseIsBinary": false
     },
     {
         "scope": "https://dns.google.com:443",
@@ -256,17 +271,31 @@
             "8b",
             "08",
             "00",
-            "0000000002ffab560a2e492c292d56b25230d0510a7106d2698939c5a93a4a412e407649512988e908673a22449d5d108a034b538b4b32f3f394aca215aa95f212735381724a99a925697af945e97a4a3a4a2595052031c3da58a02179c5e5a94584d5021d14e20364185902dd96925892085268a2676ca8676869a16762a2541b5b0b0076827461c1000000"
+            "00",
+            "00",
+            "00",
+            "00",
+            "02",
+            "ff",
+            "85",
+            "8e",
+            "b1",
+            "0a",
+            "834010447f45b696c53326e875a2659a18bb90e2206b10727772b71282f8ef598bd8a69a61f6ed300b5cd9f01c416729f40de8c1bc22a5d0b5a039cc9bab7faedeb3a6ddc1cb4c9147ef40df1670c61268188907f4e18990027f2689d47a977f17df14fe80b2a23f8b96990c7a183682157850a8aa128b02b6a2c65b4b8ee5d2519cbc8b940cc1dbe474c43cc70a15c2fa0590065f65d9000000"
         ],
         "rawHeaders": [
             "Strict-Transport-Security",
             "max-age=31536000; includeSubDomains; preload",
+            "Access-Control-Allow-Origin",
+            "*",
+            "X-Content-Type-Options",
+            "nosniff",
             "Date",
-            "Sat, 16 Feb 2019 08:45:45 GMT",
+            "Fri, 24 Sep 2021 01:58:51 GMT",
             "Expires",
-            "Sat, 16 Feb 2019 08:45:45 GMT",
+            "Fri, 24 Sep 2021 01:58:51 GMT",
             "Cache-Control",
-            "private, max-age=290",
+            "private, max-age=1800",
             "Content-Type",
             "application/x-javascript; charset=UTF-8",
             "Content-Encoding",
@@ -274,15 +303,16 @@
             "Server",
             "HTTP server (unknown)",
             "X-XSS-Protection",
-            "1; mode=block",
+            "0",
             "X-Frame-Options",
             "SAMEORIGIN",
             "Alt-Svc",
-            "quic=\":443\"; ma=2592000; v=\"44,43,39\"",
+            "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
             "Connection",
             "close",
             "Transfer-Encoding",
             "chunked"
-        ]
+        ],
+        "responseIsBinary": false
     }
 ]
