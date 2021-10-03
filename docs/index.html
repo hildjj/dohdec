@@ -57,14 +57,16 @@
 <pre class="prettyprint source lang-txt"><code>Usage: dohdec [options] [name] [rrtype]
 
 Arguments:
-  name                        DNS name to look up (e.g. domain name)
+  name                        DNS name to look up (e.g. domain name) or IP
+                              address to reverse lookup.  If not specified, a
+                              read-execute-print loop (REPL) is started.
   rrtype                      Resource record name or number (default: &quot;A&quot;)
 
 Options:
   -V, --version               output the version number
   -c, --contentType &lt;type>    MIME type for POST (default:
                               &quot;application/dns-message&quot;)
-  -d, --dns                   Use DNS format instead of JSON
+  -d, --dns                   Use DNS format instead of JSON (ignored for TLS)
   -s, --dnssec                Request DNSsec records
   -e, --ecs &lt;number>          Use this many bits for EDNS Client Subnet (ECS)
   -b, --ecsSubnet &lt;address>   Use this IP address for EDNS Client Subnet (ECS)

@@ -15,9 +15,9 @@ npm i -S dohdec
 Usage: dohdec [options] [name] [rrtype]
 
 Arguments:
-  name                        DNS name to look up (e.g. domain name).  If not
-                              specified, a read-execute-print loop (REPL) is
-                              started.
+  name                        DNS name to look up (e.g. domain name) or IP
+                              address to reverse lookup.  If not specified, a
+                              read-execute-print loop (REPL) is started.
   rrtype                      Resource record name or number (default: "A")
 
 Options:

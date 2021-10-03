@@ -138,6 +138,7 @@ export class DNSutils extends EventEmitter {
      * @returns {any} The converted object.
      */
     static buffersToB64(o: any, circular?: WeakSet<object>): any;
+    static reverse(addr: any): string;
     /**
      * Creates an instance of DNSutils.
      *
