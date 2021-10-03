@@ -105,6 +105,11 @@ const dot = new DNSoverTLS({host: '1.1.1.1'})
 await dot.lookup('ietf.org')
 </code></pre>
 <p>Full documents <a href="https://hildjj.github.io/dohdec/">here</a></p>
+<h2>Notes</h2>
+<ul>
+<li>All queries will be padded to the next multiple of 128 bytes (see <a href="https://datatracker.ietf.org/doc/html/rfc8467#section-4.1">RFC 8467</a>)</li>
+<li>The JSON protocols are not standardized.  The best we have is Google's <a href="https://developers.google.com/speed/public-dns/docs/doh/json">documentation</a>, which Cloudlflare seems to have followed.</li>
+</ul>
 <h2>License</h2>
 <p><a href="https://www.mozilla.org/en-US/MPL/2.0/">MPL-2.0</a></p>
 <p><a href="https://github.com/hildjj/dohdec/actions/workflows/node.js.yml"><img src="https://github.com/hildjj/dohdec/actions/workflows/node.js.yml/badge.svg" alt="Tests"></a>
