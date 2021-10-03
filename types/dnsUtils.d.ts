@@ -8,9 +8,12 @@ export class DNSutils extends EventEmitter {
      * @param {string} [opts.name] The name to look up.
      * @param {packet.RecordType} [opts.rrtype="A"] The record type to look up.
      * @param {boolean} [opts.dnssec=false] Request DNSSec information?
-     * @param {string} [opts.subnet] Subnet to use for ECS.
+     * @param {string} [opts.ecsSubnet] Subnet to use for ECS.
      * @param {number} [opts.ecs] Number of ECS bits.  Defaults to 24 or 56
      *   (IPv4/IPv6).
+     * @param {boolean} [opts.stream=false] Encode for streaming, with the packet
+     *   prefixed by a 2-byte big-endian integer of the number of bytes in the
+     *   packet.
      * @returns {Buffer} The encoded packet.
      */
     static makePacket(opts: {
@@ -18,8 +21,9 @@ export class DNSutils extends EventEmitter {
         name?: string;
         rrtype?: packet.RecordType;
         dnssec?: boolean;
-        subnet?: string;
+        ecsSubnet?: string;
         ecs?: number;
+        stream?: boolean;
     }): Buffer;
     /**
      * @typedef {object} LookupOptions
@@ -28,6 +32,9 @@ export class DNSutils extends EventEmitter {
      * @property {number} [id] The 2-byte unsigned integer for the request.
      *   For DOH, should be 0 or undefined.
      * @property {boolean} [json] Force JSON lookups for DOH.  Ignored for DOT.
+     * @property {boolean} [stream=false] Encode for streaming, with the packet
+     *   prefixed by a 2-byte big-endian integer of the number of bytes in the
+     *   packet.
      */
     /**
      * Normalize parameters into the lookup functions.
@@ -59,6 +66,12 @@ export class DNSutils extends EventEmitter {
          * Force JSON lookups for DOH.  Ignored for DOT.
          */
         json?: boolean;
+        /**
+         * Encode for streaming, with the packet
+         * prefixed by a 2-byte big-endian integer of the number of bytes in the
+         * packet.
+         */
+        stream?: boolean;
     }, opts?: packet.RecordType | {
         /**
          * Name to look up.
@@ -77,6 +90,12 @@ export class DNSutils extends EventEmitter {
          * Force JSON lookups for DOH.  Ignored for DOT.
          */
         json?: boolean;
+        /**
+         * Encode for streaming, with the packet
+         * prefixed by a 2-byte big-endian integer of the number of bytes in the
+         * packet.
+         */
+        stream?: boolean;
     }, defaults?: object): {
         /**
          * Name to look up.
@@ -95,6 +114,12 @@ export class DNSutils extends EventEmitter {
          * Force JSON lookups for DOH.  Ignored for DOT.
          */
         json?: boolean;
+        /**
+         * Encode for streaming, with the packet
+         * prefixed by a 2-byte big-endian integer of the number of bytes in the
+         * packet.
+         */
+        stream?: boolean;
     };
     /**
      * See [RFC 4648]{@link https://tools.ietf.org/html/rfc4648#section-5}.
@@ -117,31 +142,41 @@ export class DNSutils extends EventEmitter {
      * Creates an instance of DNSutils.
      *
      * @param {object} [opts={}] Options.
-     * @param {boolean} [opts.verbose=false] Turn on verbose output?
+     * @param {number} [opts.verbose=0] How verbose do you want your logging?
      * @param {Writable} [opts.verboseStream=process.stderr] Where to write
      *   verbose output.
      */
     constructor(opts?: {
-        verbose?: boolean;
+        verbose?: number;
         verboseStream?: Writable;
     });
-    _verbose: boolean;
+    _verbose: number;
     verboseStream: Writable | (NodeJS.WriteStream & {
         fd: 2;
     });
     /**
      * Output verbose logging information, if this.verbose is true.
      *
+     * @param {number} level Print at this verbosity level or higher.
      * @param {any[]} args Same as onsole.log parameters.
+     * @returns {boolean} True if output was written.
      */
-    verbose(...args: any[]): void;
+    verbose(level: number, ...args: any[]): boolean;
     /**
      * Dump a nice hex representation of the given buffer to verboseStream,
      * if verbose is true.
      *
+     * @param {number} level Print at this verbosity level or higher.
      * @param {Buffer} buf The buffer to dump.
+     * @returns {boolean} True if output was written.
      */
-    hexDump(buf: Buffer): void;
+    hexDump(level: number, buf: Buffer): boolean;
+}
+export class DNSError extends Error {
+    static getError(pkt: any): DNSError;
+    constructor(er: any, pkt: any);
+    packet: any;
+    code: string;
 }
 export default DNSutils;
 import { EventEmitter } from "events";

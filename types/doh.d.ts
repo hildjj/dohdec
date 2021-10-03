@@ -33,23 +33,29 @@ export class DNSoverHTTPS extends DNSutils {
      *   for DNS-format queries?
      * @param {string} [opts.contentType="application/dns-udpwireformat"]
      *   MIME type for POST.
-     * @param {boolean} [opts.verbose=false] Turn on verbose output?
+     * @param {number} [opts.verbose=0] How verbose do you want your logging?
      * @param {Writable} [opts.verboseStream=process.stderr] Where to write
      *   verbose output.
+     * @param {boolean} [opts.http2=false] Use http/2 if it is available.
      */
     constructor(opts?: {
         userAgent?: string;
         url?: string;
         preferPost?: boolean;
         contentType?: string;
-        verbose?: boolean;
+        verbose?: number;
         verboseStream?: Writable;
+        http2?: boolean;
     });
     opts: {
         userAgent: string;
         url: string;
         preferPost: boolean;
         contentType: string;
+        http2: boolean;
+    };
+    hooks: {
+        beforeRequest: ((options: any) => void)[];
     };
     /**
      * @private
@@ -87,6 +93,7 @@ export class DNSoverHTTPS extends DNSutils {
      * @returns {Promise<Buffer|string|object>} DNS result.
      */
     lookup(name: object | DOH_LookupOptions, opts?: packet.RecordType | DOH_LookupOptions): Promise<Buffer | string | object>;
+    close(): void;
 }
 export namespace DNSoverHTTPS {
     const version: string;

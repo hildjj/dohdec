@@ -1,11 +1,11 @@
+import * as packet from 'dns-packet'
 import {Buf} from './utils.js'
 import {Buffer} from 'buffer'
 import DNSutils from '../lib/dnsUtils.js'
-import packet from 'dns-packet'
 import test from 'ava'
 
 test('makePacket', t => {
-  const pkt = DNSutils.makePacket({ name: 'foo' })
+  const pkt = DNSutils.makePacket({name: 'foo'})
   const dns = packet.decode(pkt)
   t.is(dns.id, 0)
   t.is(dns.questions[0].type, 'A')
@@ -13,21 +13,21 @@ test('makePacket', t => {
 })
 
 test('makePacket - subnet', t => {
-  const subnet = '1.1.1.1'
-  const pkt = DNSutils.makePacket({ name: 'foo', subnet })
+  const ecsSubnet = '1.1.1.1'
+  const pkt = DNSutils.makePacket({name: 'foo', ecsSubnet})
   const dns = packet.decode(pkt)
   const [additionals] = dns.additionals
   const [options] = additionals.options
   t.is(additionals.type, 'OPT')
   t.is(options.type, 'CLIENT_SUBNET')
-  t.is(options.ip, subnet.slice(0, -1).concat('0')) // 1.1.1.0
+  t.is(options.ip, ecsSubnet.slice(0, -1).concat('0')) // 1.1.1.0
   t.is(options.sourcePrefixLength, 24)
 })
 
 test('makePacket - subnet & ecs = 0', t => {
-  const subnet = '1.1.1.1'
+  const ecsSubnet = '1.1.1.1'
   const ecs = 0
-  const pkt = DNSutils.makePacket({ name: 'foo', subnet, ecs })
+  const pkt = DNSutils.makePacket({name: 'foo', ecsSubnet, ecs})
   const dns = packet.decode(pkt)
   const [additionals] = dns.additionals
   const [options] = additionals.options
@@ -38,15 +38,15 @@ test('makePacket - subnet & ecs = 0', t => {
 })
 
 test('makePacket - subnet & ecs = 16', t => {
-  const subnet = '1.1.1.1'
+  const ecsSubnet = '1.1.1.1'
   const ecs = 16
-  const pkt = DNSutils.makePacket({ name: 'foo', subnet, ecs })
+  const pkt = DNSutils.makePacket({name: 'foo', ecsSubnet, ecs})
   const dns = packet.decode(pkt)
   const [additionals] = dns.additionals
   const [options] = additionals.options
   t.is(additionals.type, 'OPT')
   t.is(options.type, 'CLIENT_SUBNET')
-  t.is(options.ip, subnet.slice(0, -3).concat('0.0')) // 1.1.0.0
+  t.is(options.ip, ecsSubnet.slice(0, -3).concat('0.0')) // 1.1.0.0
   t.is(options.sourcePrefixLength, ecs)
 })
 
@@ -55,11 +55,11 @@ test('normalizeArgs', t => {
     name: 'foo',
     rrtype: 'MX',
   })
-  t.deepEqual(DNSutils.normalizeArgs('foo', { rrtype: 'mx' }, {}), {
+  t.deepEqual(DNSutils.normalizeArgs('foo', {rrtype: 'mx'}, {}), {
     name: 'foo',
     rrtype: 'MX',
   })
-  t.deepEqual(DNSutils.normalizeArgs({ name: 'foo', rrtype: 'mx' }, {}), {
+  t.deepEqual(DNSutils.normalizeArgs({name: 'foo', rrtype: 'mx'}, {}), {
     name: 'foo',
     rrtype: 'MX',
   })
@@ -89,9 +89,9 @@ test('base64urlEncode', t => {
 
 test('hexDump', t => {
   const verboseStream = new Buf({encoding: 'utf8'})
-  const du = new DNSutils({verbose: true, verboseStream})
+  const du = new DNSutils({verbose: 1, verboseStream})
   for (const sz of [0, 1, 4, 8, 12, 16, 24, 32]) {
-    du.hexDump(Buffer.alloc(sz))
+    du.hexDump(1, Buffer.alloc(sz))
   }
   t.is(verboseStream.read(), `\
 00000000
@@ -114,7 +114,7 @@ test('hexDump', t => {
 `)
   du.verboseStream = new Buf()
   du.verboseStream.isTTY = true
-  du.hexDump(Buffer.from('666f6f7fa2adae'))
+  du.hexDump(1, Buffer.from('666f6f7fa2adae'))
   t.deepEqual(du.verboseStream.read(), Buffer.from(
     '1b5b39306d30303030303030301b5b33396d2020333620333620333620363620' +
     '3336203636203337203636202036312033322036312036342036312036352020' +
@@ -150,7 +150,7 @@ test('ecs', t => {
   t.falsy(du._verbose)
   let pkt = DNSutils.makePacket({
     name: 'ietf.org',
-    subnet: 'fe80::fffb:fffc:fffd:fffe',
+    ecsSubnet: 'fe80::fffb:fffc:fffd:fffe',
   })
   t.truthy(Buffer.isBuffer(pkt))
   pkt = DNSutils.makePacket({
@@ -158,4 +158,12 @@ test('ecs', t => {
     ecs: 12,
   })
   t.truthy(Buffer.isBuffer(pkt))
+})
+
+test('verbose', t => {
+  const du = new DNSutils({
+    verbose: false,
+  })
+  t.truthy(du)
+  t.throws(() => new DNSutils({verbose: true}))
 })
