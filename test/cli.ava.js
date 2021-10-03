@@ -201,7 +201,7 @@ test('reverse ipv4', async t => {
 })
 
 test('reverse ipv6', async t => {
-  const {out, code} = await cliMainTLS('-t', '2001:1900:3001:11::2c')
+  const {out, code} = await cliMainTLS('-t', '2001:1900:3001:11::2c', 'PTR')
   t.is(code, undefined)
   t.is(out, `\
 [

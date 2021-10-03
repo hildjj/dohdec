@@ -138,7 +138,14 @@ export class DNSutils extends EventEmitter {
      * @returns {any} The converted object.
      */
     static buffersToB64(o: any, circular?: WeakSet<object>): any;
-    static reverse(addr: any): string;
+    /**
+     * Calculate the reverse name to look up for an IP address.
+     *
+     * @param {string} addr The IPv[46] address to reverse.
+     * @returns {string} Address ending in .in-addr.arpa or .ip6.arpa.
+     * @throws {Error} Invalid IP Address.
+     */
+    static reverse(addr: string): string;
     /**
      * Creates an instance of DNSutils.
      *
