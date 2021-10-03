@@ -42,7 +42,19 @@ export function prepNock(test, nock, metaUrl) {
     }
 
     const title = escape(path.basename(url.fileURLToPath(metaUrl)))
-    const {nockDone, context} = await nock.back(`${title}.json`)
+    const {nockDone, context} = await nock.back(`${title}.json`, {
+      before(scope) {
+        // Strip off padding when checking for a path match
+        scope.filteringPath = p => p.replace(/&random_padding=.*/, '&random_padding=0')
+      },
+      afterRecord(scopes) {
+        for (const scope of scopes) {
+          // Strip off padding when saving recording
+          scope.path = scope.path.replace(/&random_padding=.*/, '&random_padding=0')
+        }
+        return scopes
+      },
+    })
     if (context.scopes.length === 0) {
       // Set the NOCK_BACK_MODE variable to "record" when needed
       if (nock.back.currentMode !== 'record') {

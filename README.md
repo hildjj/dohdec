@@ -68,6 +68,11 @@ await dot.lookup('ietf.org')
 
 Full documents [here](https://hildjj.github.io/dohdec/)
 
+## Notes
+
+- All queries will be padded to the next multiple of 128 bytes (see [RFC 8467](https://datatracker.ietf.org/doc/html/rfc8467#section-4.1))
+- The JSON protocols are not standardized.  The best we have is Google's [documentation](https://developers.google.com/speed/public-dns/docs/doh/json), which Cloudlflare seems to have followed.
+
 ## License
 
 [MPL-2.0](https://www.mozilla.org/en-US/MPL/2.0/)
