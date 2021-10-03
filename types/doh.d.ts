@@ -76,12 +76,14 @@ export class DNSoverHTTPS extends DNSutils {
      * @param {string} [opts.name] The name to look up.
      * @param {packet.RecordType} [opts.rrtype="A"] The record type to look up.
      * @param {boolean} [opts.decode=true] Parse the returned JSON?
+     * @param {boolean} [opts.dnssec=false] Request DNSSEC records.
      * @returns {Promise<string|object>} DNS result.
      */
     getJSON(opts: {
         name?: string;
         rrtype?: packet.RecordType;
         decode?: boolean;
+        dnssec?: boolean;
     }): Promise<string | object>;
     /**
      * Look up a DNS entry using DNS-over-HTTPS (DoH).

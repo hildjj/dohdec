@@ -15,9 +15,10 @@ test('dns put', async t => {
   })
   t.truthy(r)
 
-  t.is(r.answers[0].type, 'RRSIG')
-  t.is(r.answers[1].name, 'ietf.org')
-  t.truthy(r.answers[1].type, 'A')
+  r.answers.sort((a, b) => a.type.localeCompare(b.type, 'en'))
+  t.is(r.answers[0].name, 'ietf.org')
+  t.is(r.answers[0].type, 'A')
+  t.is(r.answers[1].type, 'RRSIG')
 })
 
 test('dns get', async t => {
@@ -43,10 +44,12 @@ test('dns get', async t => {
 
 test('json get', async t => {
   const doh = new DNSoverHTTPS({http2: false})
-  let r = await doh.lookup('ietf.org')
+  let r = await doh.lookup('ietf.org', {dnssec: true})
   t.truthy(r)
+  r.Answer.sort((a, b) => a.type - b.type)
   t.is(r.Answer[0].name, 'ietf.org')
   t.is(r.Answer[0].type, 1)
+  t.is(r.Answer[1].type, 46)
 
   r = await doh.lookup('ietf.org', 'MX')
   t.truthy(r)

@@ -2,7 +2,7 @@
     {
         "scope": "https://cloudflare-dns.com:443",
         "method": "GET",
-        "path": "/dns-query?name=unknown.example&type=A",
+        "path": "/dns-query?name=unknown.example&type=A&random_padding=0",
         "body": "",
         "status": 200,
         "response": {
@@ -23,13 +23,13 @@
                     "name": "",
                     "type": 6,
                     "TTL": 86400,
-                    "data": "a.root-servers.net. nstld.verisign-grs.com. 2021092302 1800 900 604800 86400"
+                    "data": "a.root-servers.net. nstld.verisign-grs.com. 2021100300 1800 900 604800 86400"
                 }
             ]
         },
         "rawHeaders": [
             "Date",
-            "Fri, 24 Sep 2021 01:54:28 GMT",
+            "Sun, 03 Oct 2021 17:04:11 GMT",
             "Content-Type",
             "application/dns-json",
             "Content-Length",
@@ -37,7 +37,7 @@
             "Connection",
             "close",
             "Report-To",
-            "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=6fGkmagNgahJ8Knb4H%2FnSmYBlOy5Q92yilK9OV%2FygwU9blrnBYNTf7gtuRI%2FXg%2BDODl5PfdwxeGt330bxucmd0UeoFuowaYDQoulWnTViDf9ga52PKjU8TD876%2FD2PnQhYl15g%3D%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+            "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=mcKFuhqjy1Sn77cWoHLoWR8Eav29AnuW6XtndnbKG%2F%2FXIrHlfVx3yVmqyVOMbfCbaRHbSRuB5dnVE17DvXAxnU7QQXSy%2BoSPmpqqF6qG6gonMlWWNVmrr%2BNmdXX3189O%2BnjQdg%3D%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
             "NEL",
             "{\"report_to\":\"cf-nel\",\"max_age\":604800}",
             "Access-Control-Allow-Origin",
@@ -49,14 +49,14 @@
             "Server",
             "cloudflare",
             "CF-RAY",
-            "6938628f4bdbf77c-DEN"
+            "6987bf8a9b13c7c9-DEN"
         ],
         "responseIsBinary": false
     },
     {
         "scope": "https://cloudflare-dns.com:443",
         "method": "GET",
-        "path": "/dns-query?name=ietf.org&type=AAAA",
+        "path": "/dns-query?name=ietf.org&type=AAAA&random_padding=0",
         "body": "",
         "status": 200,
         "response": {
@@ -76,14 +76,14 @@
                 {
                     "name": "ietf.org",
                     "type": 28,
-                    "TTL": 1615,
+                    "TTL": 1097,
                     "data": "2001:1900:3001:11::2c"
                 }
             ]
         },
         "rawHeaders": [
             "Date",
-            "Fri, 24 Sep 2021 01:54:28 GMT",
+            "Sun, 03 Oct 2021 17:04:11 GMT",
             "Content-Type",
             "application/dns-json",
             "Content-Length",
@@ -91,7 +91,7 @@
             "Connection",
             "close",
             "Report-To",
-            "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=jAWwVTFIVxf90XtXvq1egrT3ELyqKMZ%2BkItFYJQL%2B6N0w1WMzUqLx%2Bomg3mYJZLUoL5pUMeGJes24Bd%2F8VewwmjaSbm66eMHFc%2By9Q351Gk%2BNYvB0BBbizp2pMnjQ4S7qj8i4A%3D%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+            "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=eA6Tcm6kB6qgywcx%2Bm3%2B4Jp76ghzYt3cKQqPuoTC4gWPKUXPlI8U68HGJgANo%2BE8Mus3UrtvqE8%2FzmvCtQu6s89la9LCd006PshIDwSSMYd%2FrWoOKdbPjPkMMikAswazSJ%2B8lQ%3D%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
             "NEL",
             "{\"report_to\":\"cf-nel\",\"max_age\":604800}",
             "Access-Control-Allow-Origin",
@@ -103,7 +103,7 @@
             "Server",
             "cloudflare",
             "CF-RAY",
-            "6938628f4e84271b-DEN"
+            "6987bf8a9db62723-DEN"
         ],
         "responseIsBinary": false
     }
