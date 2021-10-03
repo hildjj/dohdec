@@ -12,9 +12,9 @@ const HELP = `\
 Usage: dohdec [options] [name] [rrtype]
 
 Arguments:
-  name                        DNS name to look up (e.g. domain name).  If not
-                              specified, a read-execute-print loop (REPL) is
-                              started.
+  name                        DNS name to look up (e.g. domain name) or IP
+                              address to reverse lookup.  If not specified, a
+                              read-execute-print loop (REPL) is started.
   rrtype                      Resource record name or number (default: "A")
 
 Options:
@@ -181,4 +181,38 @@ test('prompt error', async t => {
   t.is(code, undefined)
   t.is(err, 'DNS error: NXDOMAIN\n\n1/1 error\n')
   t.is(out, 'domain (rrtype)> domain (rrtype)> ')
+})
+
+test('reverse ipv4', async t => {
+  const {out, code} = await cliMainTLS('-t', '4.31.198.44')
+  t.is(code, undefined)
+  t.is(out, `\
+[
+  {
+    name: '44.198.31.4.in-addr.arpa',
+    type: 'PTR',
+    ttl: 1000,
+    class: 'IN',
+    flush: false,
+    data: 'mail.ietf.org'
+  }
+]
+`)
+})
+
+test('reverse ipv6', async t => {
+  const {out, code} = await cliMainTLS('-t', '2001:1900:3001:11::2c')
+  t.is(code, undefined)
+  t.is(out, `\
+[
+  {
+    name: 'c.2.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.1.0.0.1.0.0.3.0.0.9.1.1.0.0.2.ip6.arpa',
+    type: 'PTR',
+    ttl: 1000,
+    class: 'IN',
+    flush: false,
+    data: 'mail.ietf.org'
+  }
+]
+`)
 })

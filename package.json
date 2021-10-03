@@ -34,6 +34,7 @@
     "commander": "^8.2.0",
     "dns-packet": "^5.3.0",
     "got": "^11.8.2",
+    "ip": "^1.1.5",
     "nofilter": "^3.0.3"
   },
   "devDependencies": {
