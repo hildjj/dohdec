@@ -1,0 +1,48 @@
+{
+  "name": "dohdec",
+  "version": "4.0.0",
+  "description": "DNS over HTTPS and DNS over TLS",
+  "main": "./lib/index.js",
+  "types": "types/",
+  "type": "module",
+  "scripts": {
+    "lint": "eslint . --ext js",
+    "test": "ava",
+    "types": "tsc",
+    "check": "npm pack --dry-run"
+  },
+  "keywords": [
+    "doh",
+    "dns-over-https",
+    "dns-over-tls",
+    "dns",
+    "dnssec",
+    "rfc7858",
+    "rfc8484"
+  ],
+  "author": "Joe Hildebrand <joe-github@cursive.net>",
+  "license": "MPL-2.0",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/hildjj/dohdec.git",
+    "directory": "pkg/dohdec"
+  },
+  "dependencies": {
+    "crypto-random-string": "^4.0.0",
+    "dns-packet": "^5.3.0",
+    "got": "^11.8.2",
+    "ip": "^1.1.5",
+    "nofilter": "^3.1.0"
+  },
+  "devDependencies": {
+    "@types/dns-packet": "^5.2.2",
+    "@types/node": "^16.10.3",
+    "ava": "^3.15.0",
+    "mock-dns-server": "^0.0.0",
+    "nock": "^13.1.3",
+    "typescript": "^4.4.3"
+  },
+  "engines": {
+    "node": "^12.20.0 || ^14.13.1 || >=16.0.0"
+  }
+}

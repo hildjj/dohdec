@@ -1,12 +1,12 @@
-import {Buf, prepNock} from './utils.js'
+import {Buf, prepNock} from '../../../test/utils.js'
+import {createServer, plainConnect} from 'mock-dns-server'
 import {DnsCli} from '../lib/cli.js'
-import {MockDNSserver} from './mockServer.js'
 import nock from 'nock'
 import stream from 'stream'
 import test from 'ava'
 
 prepNock(test, nock, import.meta.url)
-const mockServer = new MockDNSserver('localhost')
+const mockServer = createServer()
 
 const HELP = `\
 Usage: dohdec [options] [name] [rrtype]
@@ -81,9 +81,9 @@ async function cliMain(...args) {
 
 async function cliMainTLS(...args) {
   const res = await cliMain(cli => {
-    const m = mockServer.instance()
-    cli.transport.opts.socket = m.rawClientSocket
-    cli.transport.opts.ca = mockServer.chain.ca_pem
+    const m = plainConnect(mockServer.port)
+    cli.transport.opts.socket = m
+    cli.transport.opts.ca = mockServer.ca
     cli.transport.opts.host = 'localhost'
   }, ...args)
   return res

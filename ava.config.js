@@ -1,5 +1,5 @@
 export default {
   files: [
-    'test/*.ava.js',
+    'pkg/*/test/*.ava.js',
   ],
 }

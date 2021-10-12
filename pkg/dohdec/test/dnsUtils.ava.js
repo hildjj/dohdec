@@ -1,5 +1,5 @@
 import * as packet from 'dns-packet'
-import {Buf} from './utils.js'
+import {Buf} from '../../../test/utils.js'
 import {Buffer} from 'buffer'
 import DNSutils from '../lib/dnsUtils.js'
 import test from 'ava'
