@@ -44,6 +44,6 @@ export type Stdio = {
     err?: stream.Writable;
 };
 import { Command } from "commander";
-import { DNSoverHTTPS } from "../lib/index.js";
-import { DNSoverTLS } from "../lib/index.js";
+import { DNSoverHTTPS } from "dohdec";
+import { DNSoverTLS } from "dohdec";
 import stream from "stream";

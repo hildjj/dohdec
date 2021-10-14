@@ -1,0 +1,14 @@
+{
+  "reporter": ["lcov"],
+  "all": true,
+  "src": [
+    "pkg/dohdec/lib/*.js",
+    "pkg/dohdec-cli/lib/*.js",
+    "pkg/mock-dns-server/*.js"
+  ],
+  "exclude": [
+    "pkg/*/test/**",
+    "**/ava.config.js",
+    "test/**"
+  ]
+}

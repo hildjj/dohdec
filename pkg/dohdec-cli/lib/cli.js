@@ -1,6 +1,6 @@
 import {Command, InvalidArgumentError} from 'commander'
-import {DNSError, DNSutils} from '../lib/dnsUtils.js'
-import {DNSoverHTTPS, DNSoverTLS} from '../lib/index.js'
+import {DNSError, DNSutils} from 'dohdec/lib/dnsUtils.js'
+import {DNSoverHTTPS, DNSoverTLS} from 'dohdec'
 import net from 'net'
 import readline from 'readline'
 // eslint-disable-next-line no-unused-vars
@@ -199,7 +199,9 @@ For more debug information:
             // this turned out to be easier to test.
             throw er
           }
-          resp = resp.answers || resp.Answer || resp
+          // Avoid typescript errors
+          // eslint-disable-next-line dot-notation
+          resp = resp['answers'] || resp['Answer'] || resp
         }
         this.std.out.write(util.inspect(DNSutils.buffersToB64(resp), {
           depth: Infinity,

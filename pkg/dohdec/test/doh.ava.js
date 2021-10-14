@@ -1,4 +1,4 @@
-import {Buf, prepNock} from './utils.js'
+import {Buf, prepNock} from '../../../test/utils.js'
 import {Buffer} from 'buffer'
 import {DNSoverHTTPS} from '../lib/doh.js'
 import nock from 'nock'
