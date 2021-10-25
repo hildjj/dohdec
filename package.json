@@ -13,10 +13,10 @@
     "coverage": "c8 npm test",
     "docs": "jsdoc -c .jsdoc.conf",
     "release": "npm version patch && git push --follow-tags && npm publish",
-    "all:types": "pnpm run -r types",
-    "all:install": "pnpm i -r",
     "preall:check": "npm run lint && npm run coverage && npm run all:types && npm run docs",
     "all:check": "pnpm run -r --stream check",
+    "all:types": "pnpm run -r types",
+    "all:install": "pnpm i -r",
     "clean": "rm -rf node_modules coverage pkg/*/node_modules pkg/*/coverage"
   },
   "keywords": [
@@ -35,16 +35,16 @@
     "dohdec": "bin/dohdec.js"
   },
   "devDependencies": {
-    "@cto.af/eslint-config": "^0.0.10",
+    "@cto.af/eslint-config": "^0.0.11",
     "ava": "^3.15.0",
     "c8": "^7.10.0",
     "eslint": "^7.32.0",
-    "eslint-plugin-ava": "^13.0.0",
-    "eslint-plugin-jsdoc": "^36.1.1",
+    "eslint-plugin-ava": "^13.1.0",
+    "eslint-plugin-jsdoc": "^37.0.0",
     "eslint-plugin-node": "^11.1.0",
     "jsdoc": "^3.6.7",
     "minami": "^1.2.3",
-    "pnpm": "^6.17.0"
+    "pnpm": "^6.19.0"
   },
   "engines": {
     "node": "^12.20.0 || ^14.13.1 || >=16.0.0"
