@@ -9,8 +9,7 @@
     "lint": "eslint . --ext js",
     "test": "ava",
     "types": "tsc",
-    "check": "npm pack --dry-run",
-    "release": "npm version patch && git push --follow-tags && npm publish"
+    "check": "npm pack --dry-run"
   },
   "keywords": [
     "doh",
