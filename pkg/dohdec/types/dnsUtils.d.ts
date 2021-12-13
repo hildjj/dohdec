@@ -6,7 +6,7 @@ export class DNSutils extends EventEmitter {
      * @param {object} opts Options for the query.
      * @param {number} [opts.id=0] ID for the query.  SHOULD be 0 for DOH.
      * @param {string} [opts.name] The name to look up.
-     * @param {packet.RecordType} [opts.rrtype="A"] The record type to look up.
+     * @param {string} [opts.rrtype="A"] The record type to look up.
      * @param {boolean} [opts.dnssec=false] Request DNSSec information?
      * @param {string} [opts.ecsSubnet] Subnet to use for ECS.
      * @param {number} [opts.ecs] Number of ECS bits.  Defaults to 24 or 56
@@ -19,7 +19,7 @@ export class DNSutils extends EventEmitter {
     static makePacket(opts: {
         id?: number;
         name?: string;
-        rrtype?: packet.RecordType;
+        rrtype?: string;
         dnssec?: boolean;
         ecsSubnet?: string;
         ecs?: number;
@@ -28,7 +28,7 @@ export class DNSutils extends EventEmitter {
     /**
      * @typedef {object} LookupOptions
      * @property {string} [name] Name to look up.
-     * @property {packet.RecordType} [rrtype] The Resource Record type to retrive.
+     * @property {string} [rrtype] The Resource Record type to retrive.
      * @property {number} [id] The 2-byte unsigned integer for the request.
      *   For DOH, should be 0 or undefined.
      * @property {boolean} [json] Force JSON lookups for DOH.  Ignored for DOT.
@@ -41,7 +41,7 @@ export class DNSutils extends EventEmitter {
      *
      * @param {string|LookupOptions} [name] If string, lookup this name,
      *   otherwise it is options.  Has precedence over opts.name if string.
-     * @param {packet.RecordType|LookupOptions} [opts] If string, rrtype.
+     * @param {string|LookupOptions} [opts] If string, rrtype.
      *   Otherwise options.
      * @param {object} [defaults] Defaults options.
      * @returns {LookupOptions} Normalized options, including punycode∑d
@@ -56,7 +56,7 @@ export class DNSutils extends EventEmitter {
         /**
          * The Resource Record type to retrive.
          */
-        rrtype?: packet.RecordType;
+        rrtype?: string;
         /**
          * The 2-byte unsigned integer for the request.
          * For DOH, should be 0 or undefined.
@@ -72,7 +72,7 @@ export class DNSutils extends EventEmitter {
          * packet.
          */
         stream?: boolean;
-    }, opts?: packet.RecordType | {
+    }, opts?: string | {
         /**
          * Name to look up.
          */
@@ -80,7 +80,7 @@ export class DNSutils extends EventEmitter {
         /**
          * The Resource Record type to retrive.
          */
-        rrtype?: packet.RecordType;
+        rrtype?: string;
         /**
          * The 2-byte unsigned integer for the request.
          * For DOH, should be 0 or undefined.
@@ -104,7 +104,7 @@ export class DNSutils extends EventEmitter {
         /**
          * The Resource Record type to retrive.
          */
-        rrtype?: packet.RecordType;
+        rrtype?: string;
         /**
          * The 2-byte unsigned integer for the request.
          * For DOH, should be 0 or undefined.
@@ -190,4 +190,3 @@ export default DNSutils;
 import { EventEmitter } from "events";
 import { Writable } from "stream";
 import { Buffer } from "buffer";
-import * as packet from "dns-packet";
