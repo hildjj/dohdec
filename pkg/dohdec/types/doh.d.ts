@@ -3,7 +3,7 @@
  *
  * @typedef {object} DOH_LookupOptions
  * @property {string} [name] The DNS name to look up.
- * @property {packet.RecordType} [rrtype='A'] The Resource Record type
+ * @property {string} [rrtype='A'] The Resource Record type
  *   to retrive.
  * @property {boolean} [json=true] Retrieve a JSON response.  If false,
  *   retrieve using DNS format.
@@ -74,14 +74,14 @@ export class DNSoverHTTPS extends DNSutils {
      *
      * @param {object} opts Options for the request.
      * @param {string} [opts.name] The name to look up.
-     * @param {packet.RecordType} [opts.rrtype="A"] The record type to look up.
+     * @param {string} [opts.rrtype="A"] The record type to look up.
      * @param {boolean} [opts.decode=true] Parse the returned JSON?
      * @param {boolean} [opts.dnssec=false] Request DNSSEC records.
      * @returns {Promise<string|object>} DNS result.
      */
     getJSON(opts: {
         name?: string;
-        rrtype?: packet.RecordType;
+        rrtype?: string;
         decode?: boolean;
         dnssec?: boolean;
     }): Promise<string | object>;
@@ -90,11 +90,11 @@ export class DNSoverHTTPS extends DNSutils {
      *
      * @param {string|DOH_LookupOptions} name The DNS name to look up, or opts
      *   if this is an object.
-     * @param {DOH_LookupOptions|packet.RecordType} [opts={}] Options for the
+     * @param {DOH_LookupOptions|string} [opts={}] Options for the
      *   request.  If a string is given, it will be used as the rrtype.
      * @returns {Promise<Buffer|string|object>} DNS result.
      */
-    lookup(name: string | DOH_LookupOptions, opts?: packet.RecordType | DOH_LookupOptions): Promise<Buffer | string | object>;
+    lookup(name: string | DOH_LookupOptions, opts?: string | DOH_LookupOptions): Promise<Buffer | string | object>;
     close(): void;
 }
 export namespace DNSoverHTTPS {
@@ -115,7 +115,7 @@ export type DOH_LookupOptions = {
      * The Resource Record type
      * to retrive.
      */
-    rrtype?: packet.RecordType;
+    rrtype?: string;
     /**
      * Retrieve a JSON response.  If false,
      * retrieve using DNS format.
@@ -143,5 +143,4 @@ export type DOH_LookupOptions = {
     url?: string;
 };
 import DNSutils from "./dnsUtils.js";
-import * as packet from "dns-packet";
 import { Writable } from "stream";

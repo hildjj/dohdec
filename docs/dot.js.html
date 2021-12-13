@@ -57,7 +57,7 @@ const DEFAULT_SERVER = '1.1.1.1'
  *
  * @typedef {object} DOT_LookupOptions
  * @property {string} [name] The DNS name to look up.
- * @property {packet.RecordType} [rrtype='A'] The Resource Record type
+ * @property {string} [rrtype='A'] The Resource Record type
  *   to retrive.
  * @property {number} [id] 2-byte ID for the DNS packet.  Defaults to random.
  * @property {boolean} [decode=true] Decode the response, either into JSON
@@ -312,9 +312,9 @@ Received: "${hash}"`)
    *
    * @param {DOT_LookupOptions|string} name The DNS name to look up, or opts
    *   if this is an object.
-   * @param {DOT_LookupOptions|packet.RecordType} [opts={}] Options for the
+   * @param {DOT_LookupOptions|string} [opts={}] Options for the
    *   request.  If a string is given, it will be used as the rrtype.
-   * @returns {Promise&lt;packet.Packet|Buffer>} Response.
+   * @returns {Promise&lt;Buffer|object>} Response.
    */
   async lookup(name, opts = {}) {
     const nopts = DNSutils.normalizeArgs(name, opts, {

@@ -4,7 +4,7 @@
  *
  * @typedef {object} DOT_LookupOptions
  * @property {string} [name] The DNS name to look up.
- * @property {packet.RecordType} [rrtype='A'] The Resource Record type
+ * @property {string} [rrtype='A'] The Resource Record type
  *   to retrive.
  * @property {number} [id] 2-byte ID for the DNS packet.  Defaults to random.
  * @property {boolean} [decode=true] Decode the response, either into JSON
@@ -121,11 +121,11 @@ export class DNSoverTLS extends DNSutils {
      *
      * @param {DOT_LookupOptions|string} name The DNS name to look up, or opts
      *   if this is an object.
-     * @param {DOT_LookupOptions|packet.RecordType} [opts={}] Options for the
+     * @param {DOT_LookupOptions|string} [opts={}] Options for the
      *   request.  If a string is given, it will be used as the rrtype.
-     * @returns {Promise<packet.Packet|Buffer>} Response.
+     * @returns {Promise<Buffer|object>} Response.
      */
-    lookup(name: string | DOT_LookupOptions, opts?: packet.RecordType | DOT_LookupOptions): Promise<packet.Packet | Buffer>;
+    lookup(name: string | DOT_LookupOptions, opts?: string | DOT_LookupOptions): Promise<Buffer | object>;
     /**
      * Close the socket.
      *
@@ -149,7 +149,7 @@ export type DOT_LookupOptions = {
      * The Resource Record type
      * to retrive.
      */
-    rrtype?: packet.RecordType;
+    rrtype?: string;
     /**
      * 2-byte ID for the DNS packet.  Defaults to random.
      */
@@ -185,7 +185,6 @@ import { default as DNSutils } from "./dnsUtils.js";
 import * as tls from "tls";
 import { default as NoFilter } from "nofilter";
 import { Buffer } from "buffer";
-import * as packet from "dns-packet";
 import * as crypto from "crypto";
 import { Writable } from "stream";
 declare const DEFAULT_SERVER: "1.1.1.1";
