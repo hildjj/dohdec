@@ -32,5 +32,8 @@
     "@types/node": "^18.11.2",
     "p-event": "^5.0.1",
     "typescript": "^4.8.4"
+  },
+  "engines": {
+    "node": ">=14.20"
   }
 }
