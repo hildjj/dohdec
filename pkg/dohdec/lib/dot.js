@@ -4,6 +4,7 @@ import * as tls from 'tls'
 import {Buffer} from 'buffer'
 import {default as DNSutils} from './dnsUtils.js'
 import {default as NoFilter} from 'nofilter'
+// eslint-disable-next-line no-unused-vars
 import {Writable} from 'stream'
 import util from 'util'
 
@@ -95,7 +96,7 @@ export class DNSoverTLS extends DNSutils {
     /** @type {tls.TLSSocket} */
     this.socket = null
 
-    /** @type {Object.<number, Pending>} */ // eslint-disable-line jsdoc/check-types, max-len
+    /** @type {Object.<number, Pending>} */
     this.pending = {}
 
     /** @type {NoFilter} */

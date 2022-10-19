@@ -3,6 +3,7 @@ import {createServer, plainConnect} from 'mock-dns-server'
 import {DnsCli} from '../lib/cli.js'
 import nock from 'nock'
 import stream from 'stream'
+// eslint-disable-next-line node/no-missing-import
 import test from 'ava'
 
 prepNock(test, nock, import.meta.url)
@@ -38,7 +39,7 @@ Options:
   -u, --url <URL>             The URL of the DoH service (default:
                               "https://cloudflare-dns.com/dns-query")
   -v, --verbose               Increase verbosity of debug information.  May be
-                              specified multiple times. (default: 0)
+                              specified multiple times.
   -h, --help                  display help for command
 
 For more debug information:

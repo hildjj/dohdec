@@ -2,6 +2,7 @@ import * as packet from 'dns-packet'
 import {Buf} from '../../../test/utils.js'
 import {Buffer} from 'buffer'
 import DNSutils from '../lib/dnsUtils.js'
+// eslint-disable-next-line node/no-missing-import
 import test from 'ava'
 
 test('makePacket', t => {

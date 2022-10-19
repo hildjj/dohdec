@@ -54,6 +54,7 @@ export function prepNock(test, nock, metaUrl) {
     if (context.scopes.length === 0) {
       // Set the NOCK_BACK_MODE variable to "record" when needed
       if (nock.back.currentMode !== 'record') {
+        // eslint-disable-next-line no-console
         console.error(`WARNING: Nock recording needed for "${title}".
   Set NOCK_BACK_MODE=record`)
       }

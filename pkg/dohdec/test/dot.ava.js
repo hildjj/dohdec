@@ -2,6 +2,7 @@ import {createServer, plainConnect} from 'mock-dns-server'
 import {Buffer} from 'buffer'
 import {DNSoverTLS} from '../lib/dot.js'
 import crypto from 'crypto'
+// eslint-disable-next-line node/no-missing-import
 import test from 'ava'
 
 const mockServer = createServer()
@@ -78,7 +79,7 @@ test('bad cert', async t => {
   const dot = create({
     host: 'untrusted-root.badssl.com',
   })
-  await t.throwsAsync(dot.lookup('ietf.org'), null, 'UNABLE_TO_VERIFY_LEAF_SIGNATURE')
+  await t.throwsAsync(dot.lookup('ietf.org'), undefined, 'UNABLE_TO_VERIFY_LEAF_SIGNATURE')
 })
 
 test('pin cert', async t => {

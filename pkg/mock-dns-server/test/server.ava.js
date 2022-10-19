@@ -2,6 +2,7 @@ import * as packet from 'dns-packet'
 import {connect, createServer} from '../index.js'
 import {default as NoFilter} from 'nofilter'
 import {pEvent} from 'p-event'
+// eslint-disable-next-line node/no-missing-import
 import test from 'ava'
 
 test('server', async t => {
