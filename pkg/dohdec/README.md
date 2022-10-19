@@ -20,9 +20,9 @@ npm install -g dohdec-cli
 ## API Usage
 
 ```js
-const { DNSoverHTTP, DNSoverTLS } = require('dohdec')
+const { DNSoverHTTPS, DNSoverTLS } = require('dohdec')
 
-const doh = new DNSoverHTTP()
+const doh = new DNSoverHTTPS()
 await doh.lookup('ietf.org', 'AAAA') // JSON result from CloudFlare
 await doh.lookup('ietf.org', {
   rrtype: 'MX',
