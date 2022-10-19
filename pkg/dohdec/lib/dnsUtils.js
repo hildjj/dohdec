@@ -2,6 +2,7 @@ import * as packet from 'dns-packet'
 import * as rcodes from 'dns-packet/rcodes.js'
 import {Buffer} from 'buffer'
 import {EventEmitter} from 'events'
+// eslint-disable-next-line no-unused-vars
 import {Writable} from 'stream'
 import ip from 'ip'
 import net from 'net'

@@ -1,6 +1,7 @@
 import * as packet from 'dns-packet'
 import * as tls from 'tls'
 import DNSutils from './dnsUtils.js'
+// eslint-disable-next-line no-unused-vars
 import {Writable} from 'stream'
 import cryptoRandomString from 'crypto-random-string'
 import fs from 'fs'
@@ -122,7 +123,7 @@ export class DNSoverHTTPS extends DNSutils {
       headers: {
         'Content-Type': this.opts.contentType,
         'User-Agent': this.opts.userAgent,
-        Accept: this.opts.contentType,
+        'Accept': this.opts.contentType,
       },
       body,
       https: this._checkServerIdentity(),
@@ -167,7 +168,7 @@ export class DNSoverHTTPS extends DNSutils {
       req, {
         headers: {
           'User-Agent': this.opts.userAgent,
-          Accept: WF_JSON,
+          'Accept': WF_JSON,
         },
         https: this._checkServerIdentity(),
         http2: this.opts.http2,
