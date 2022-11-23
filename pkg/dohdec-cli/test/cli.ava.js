@@ -24,6 +24,7 @@ Options:
                               "application/dns-message")
   -d, --dns                   Use DNS format instead of JSON (ignored for TLS)
   -s, --dnssec                Request DNSsec records
+  -k, --dnssec-cd             Disable DNSsec validation
   -e, --ecs <number>          Use this many bits for EDNS Client Subnet (ECS)
   -b, --ecsSubnet <address>   Use this IP address for EDNS Client Subnet (ECS)
   -f, --full                  Full response, not just answers
