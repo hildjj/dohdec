@@ -8,6 +8,7 @@ export class DNSutils extends EventEmitter {
      * @param {string} [opts.name] The name to look up.
      * @param {string} [opts.rrtype="A"] The record type to look up.
      * @param {boolean} [opts.dnssec=false] Request DNSSec information?
+     * @param {boolean} [opts.dnssecCd=false] Disable DNSSec validation?
      * @param {string} [opts.ecsSubnet] Subnet to use for ECS.
      * @param {number} [opts.ecs] Number of ECS bits.  Defaults to 24 or 56
      *   (IPv4/IPv6).
@@ -21,6 +22,7 @@ export class DNSutils extends EventEmitter {
         name?: string;
         rrtype?: string;
         dnssec?: boolean;
+        dnssecCd?: boolean;
         ecsSubnet?: string;
         ecs?: number;
         stream?: boolean;

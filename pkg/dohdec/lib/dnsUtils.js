@@ -148,6 +148,7 @@ export class DNSutils extends EventEmitter {
    * @param {string} [opts.name] The name to look up.
    * @param {string} [opts.rrtype="A"] The record type to look up.
    * @param {boolean} [opts.dnssec=false] Request DNSSec information?
+   * @param {boolean} [opts.dnssecCd=false] Disable DNSSec validation?
    * @param {string} [opts.ecsSubnet] Subnet to use for ECS.
    * @param {number} [opts.ecs] Number of ECS bits.  Defaults to 24 or 56
    *   (IPv4/IPv6).
@@ -179,6 +180,9 @@ export class DNSutils extends EventEmitter {
       dns.flags |= packet.AUTHENTIC_DATA
       // @ts-ignore TS2339: types not up to date
       dns.additionals[0].flags |= packet.DNSSEC_OK
+      if (opts.dnssecCd) {
+        dns.flags |= packet.CHECKING_DISABLED
+      }
     }
     if (opts.ecs != null || net.isIP(opts.ecsSubnet) !== 0) {
       // https://tools.ietf.org/html/rfc7871#section-11.1

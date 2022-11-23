@@ -160,10 +160,13 @@ export type DOT_LookupOptions = {
      */
     decode?: boolean;
     /**
-     * Request DNSSec records.  Currently
-     * requires `json: false`.
+     * Request DNSSec records.
      */
     dnssec?: boolean;
+    /**
+     * Disable DNSSec validation.
+     */
+    dnssecCd?: boolean;
 };
 export type pendingResolve = (results: Buffer | object) => any;
 export type pendingError = (error: Error) => any;
