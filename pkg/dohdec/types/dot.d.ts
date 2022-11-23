@@ -160,7 +160,8 @@ export type DOT_LookupOptions = {
      */
     decode?: boolean;
     /**
-     * Request DNSSec records.
+     * Request DNSSec records.  Currently
+     * requires `json: false`.
      */
     dnssec?: boolean;
     /**
