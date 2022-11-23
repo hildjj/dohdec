@@ -86,7 +86,7 @@ export class DnsCli extends Command {
       )
       .option('-d, --dns', 'Use DNS format instead of JSON (ignored for TLS)')
       .option('-s, --dnssec', 'Request DNSsec records')
-      .option('-k, --dnssec-cd', 'Disable DNSsec validation')
+      .option('-k, --dnssecCheckingDisabled', 'Disable DNSsec validation')
       .option(
         '-e, --ecs <number>',
         'Use this many bits for EDNS Client Subnet (ECS)',
