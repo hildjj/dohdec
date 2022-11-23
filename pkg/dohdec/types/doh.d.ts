@@ -139,6 +139,10 @@ export type DOH_LookupOptions = {
      */
     dnssec?: boolean;
     /**
+     * Disable DNSSec validation.
+     */
+    dnssecCd?: boolean;
+    /**
      * What DoH endpoint should be
      * used?
      */
