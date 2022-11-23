@@ -181,9 +181,9 @@ export class DNSutils extends EventEmitter {
       dns.flags |= packet.AUTHENTIC_DATA
       // @ts-ignore TS2339: types not up to date
       dns.additionals[0].flags |= packet.DNSSEC_OK
-      if (opts.dnssecCheckingDisabled) {
-        dns.flags |= packet.CHECKING_DISABLED
-      }
+    }
+    if (opts.dnssecCheckingDisabled) {
+      dns.flags |= packet.CHECKING_DISABLED
     }
     if (opts.ecs != null || net.isIP(opts.ecsSubnet) !== 0) {
       // https://tools.ietf.org/html/rfc7871#section-11.1

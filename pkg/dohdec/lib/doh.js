@@ -158,9 +158,9 @@ export class DNSoverHTTPS extends DNSutils {
     let req = `${this.opts.url}?name=${opts.name}&type=${rrtype}`
     if (opts.dnssec) {
       req += '&do=1'
-      if (opts.dnssecCheckingDisabled) {
-        req += '&cd=1'
-      }
+    }
+    if (opts.dnssecCheckingDisabled) {
+      req += '&cd=1'
     }
     req += '&random_padding='
     req += cryptoRandomString({
