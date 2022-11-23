@@ -21,6 +21,7 @@
     "rfc8484"
   ],
   "author": "Joe Hildebrand <joe-github@cursive.net>",
+  "contributors": ["Gus Narea <gnarea@users.noreply.github.com>"],
   "license": "MPL-2.0",
   "repository": {
     "type": "git",

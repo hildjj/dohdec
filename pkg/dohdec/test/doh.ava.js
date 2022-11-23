@@ -83,3 +83,14 @@ test('getJSON', async t => {
   const r = await doh.getJSON({name: 'ietf.org'})
   t.is(typeof r, 'object')
 })
+
+test('DNSSEC with cd=1', async t => {
+  const doh = new DNSoverHTTPS({
+    preferPost: false,
+    verbose: 1,
+    http2: false,
+  })
+  const r = await doh.lookup('ietf.org', {rrtype: 'MX', dnssec: true, dnssecCheckingDisabled: true})
+  t.truthy(r)
+  t.truthy(r.CD)
+})

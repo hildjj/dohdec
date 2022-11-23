@@ -51,6 +51,27 @@ test('makePacket - subnet & ecs = 16', t => {
   t.is(options.sourcePrefixLength, ecs)
 })
 
+test('makePacket - dnssec disabled', t => {
+  const pkt = DNSutils.makePacket({name: 'foo'})
+  const dns = packet.decode(pkt)
+  t.false(dns.flag_ad)
+  t.false(dns.flag_cd)
+})
+
+test('makePacket - dnssec', t => {
+  const pkt = DNSutils.makePacket({name: 'foo', dnssec: true})
+  const dns = packet.decode(pkt)
+  t.true(dns.flag_ad)
+  t.false(dns.flag_cd)
+})
+
+test('makePacket - dnssec with cd=1', t => {
+  const pkt = DNSutils.makePacket({name: 'foo', dnssec: true, dnssecCheckingDisabled: true})
+  const dns = packet.decode(pkt)
+  t.true(dns.flag_ad)
+  t.true(dns.flag_cd)
+})
+
 test('normalizeArgs', t => {
   t.deepEqual(DNSutils.normalizeArgs('foo', 'mx'), {
     name: 'foo',

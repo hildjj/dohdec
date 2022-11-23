@@ -147,6 +147,8 @@ export class DNSoverHTTPS extends DNSutils {
    * @param {string} [opts.rrtype="A"] The record type to look up.
    * @param {boolean} [opts.decode=true] Parse the returned JSON?
    * @param {boolean} [opts.dnssec=false] Request DNSSEC records.
+   * @param {boolean} [opts.dnssecCheckingDisabled=false] Disable DNSSEC
+   *   validation.
    * @returns {Promise<string|object>} DNS result.
    */
   getJSON(opts) {
@@ -156,6 +158,9 @@ export class DNSoverHTTPS extends DNSutils {
     let req = `${this.opts.url}?name=${opts.name}&type=${rrtype}`
     if (opts.dnssec) {
       req += '&do=1'
+    }
+    if (opts.dnssecCheckingDisabled) {
+      req += '&cd=1'
     }
     req += '&random_padding='
     req += cryptoRandomString({
@@ -200,6 +205,7 @@ export class DNSoverHTTPS extends DNSutils {
       json: true,
       decode: true,
       dnssec: false,
+      dnssecCheckingDisabled: false,
     })
     this.verbose(1, 'DNSoverHTTPS.lookup options:', nopts)
 

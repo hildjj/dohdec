@@ -280,6 +280,7 @@ Received: "${hash}"`)
     const nopts = DNSutils.normalizeArgs(name, opts, {
       rrtype: 'A',
       dnsssec: false,
+      dnssecCheckingDisabled: false,
       decode: true,
       stream: true,
     })

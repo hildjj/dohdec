@@ -86,6 +86,7 @@ export class DnsCli extends Command {
       )
       .option('-d, --dns', 'Use DNS format instead of JSON (ignored for TLS)')
       .option('-s, --dnssec', 'Request DNSsec records')
+      .option('-k, --dnssecCheckingDisabled', 'Disable DNSsec validation')
       .option(
         '-e, --ecs <number>',
         'Use this many bits for EDNS Client Subnet (ECS)',
@@ -180,6 +181,7 @@ For more debug information:
       ecsSubnet: this.argv.ecsSubnet,
       ecs: this.argv.ecs,
       dnssec: this.argv.dnssec,
+      dnssecCheckingDisabled: this.argv.dnssecCheckingDisabled,
     }
     try {
       if (net.isIP(opts.name)) {
