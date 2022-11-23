@@ -77,7 +77,7 @@ export class DNSoverHTTPS extends DNSutils {
      * @param {string} [opts.rrtype="A"] The record type to look up.
      * @param {boolean} [opts.decode=true] Parse the returned JSON?
      * @param {boolean} [opts.dnssec=false] Request DNSSEC records.
-     * @param {boolean} [opts.dnssecCd=false] Disable DNSSEC validation.
+     * @param {boolean} [opts.dnssecCheckingDisabled=false] Disable DNSSEC validation.
      * @returns {Promise<string|object>} DNS result.
      */
     getJSON(opts: {
@@ -85,7 +85,7 @@ export class DNSoverHTTPS extends DNSutils {
         rrtype?: string;
         decode?: boolean;
         dnssec?: boolean;
-        dnssecCd?: boolean;
+        dnssecCheckingDisabled?: boolean;
     }): Promise<string | object>;
     /**
      * Look up a DNS entry using DNS-over-HTTPS (DoH).
@@ -141,7 +141,7 @@ export type DOH_LookupOptions = {
     /**
      * Disable DNSSec validation.
      */
-    dnssecCd?: boolean;
+    dnssecCheckingDisabled?: boolean;
     /**
      * What DoH endpoint should be
      * used?

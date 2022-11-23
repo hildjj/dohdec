@@ -66,7 +66,7 @@ test('makePacket - dnssec', t => {
 })
 
 test('makePacket - dnssec with cd=1', t => {
-  const pkt = DNSutils.makePacket({name: 'foo', dnssec: true, dnssecCd: true})
+  const pkt = DNSutils.makePacket({name: 'foo', dnssec: true, dnssecCheckingDisabled: true})
   const dns = packet.decode(pkt)
   t.true(dns.flag_ad)
   t.true(dns.flag_cd)

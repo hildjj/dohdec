@@ -90,7 +90,7 @@ test('DNSSEC with cd=1', async t => {
     verbose: 1,
     http2: false,
   })
-  const r = await doh.lookup('ietf.org', {rrtype: 'MX', dnssec: true, dnssecCd: true})
+  const r = await doh.lookup('ietf.org', {rrtype: 'MX', dnssec: true, dnssecCheckingDisabled: true})
   t.truthy(r)
   t.truthy(r.CD)
 })

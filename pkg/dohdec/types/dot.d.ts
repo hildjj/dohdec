@@ -167,7 +167,7 @@ export type DOT_LookupOptions = {
     /**
      * Disable DNSSec validation.
      */
-    dnssecCd?: boolean;
+    dnssecCheckingDisabled?: boolean;
 };
 export type pendingResolve = (results: Buffer | object) => any;
 export type pendingError = (error: Error) => any;
