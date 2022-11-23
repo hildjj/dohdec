@@ -181,7 +181,7 @@ For more debug information:
       ecsSubnet: this.argv.ecsSubnet,
       ecs: this.argv.ecs,
       dnssec: this.argv.dnssec,
-      dnssecCheckingDisabled: this.argv.dnssecCd,
+      dnssecCheckingDisabled: this.argv.dnssecCheckingDisabled,
     }
     try {
       if (net.isIP(opts.name)) {
