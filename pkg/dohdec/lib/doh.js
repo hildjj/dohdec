@@ -55,6 +55,8 @@ export class DNSoverHTTPS extends DNSutils {
    * @param {Writable} [opts.verboseStream=process.stderr] Where to write
    *   verbose output.
    * @param {boolean} [opts.http2=false] Use http/2 if it is available.
+   *   GOT Agent objects
+   * @param {object} [opts.agent=Agents] Pass down got agent option
    */
   constructor(opts = {}) {
     const {
@@ -69,6 +71,7 @@ export class DNSoverHTTPS extends DNSutils {
       preferPost: true,
       contentType: WF_DNS,
       http2: false,
+      agent: undefined,
       ...rest,
     }
 
@@ -132,6 +135,7 @@ export class DNSoverHTTPS extends DNSutils {
       retry: {
         limit: 0,
       },
+      agent: this.opts.agent,
     }).buffer()
     this.hexDump(2, response)
     this.verbose(1, 'RESPONSE:', () => packet.decode(response))
@@ -181,6 +185,7 @@ export class DNSoverHTTPS extends DNSutils {
         retry: {
           limit: 0,
         },
+        agent: this.opts.agent,
       }
     )
 

@@ -1,3 +1,5 @@
+import type {Agents} from 'got';
+
 /**
  * Options for doing DOH lookups.
  *
@@ -46,6 +48,7 @@ export class DNSoverHTTPS extends DNSutils {
         verbose?: number;
         verboseStream?: Writable;
         http2?: boolean;
+        agent?: Agents;
     });
     opts: {
         userAgent: string;
@@ -53,6 +56,7 @@ export class DNSoverHTTPS extends DNSutils {
         preferPost: boolean;
         contentType: string;
         http2: boolean;
+        agent: Agents;
     };
     hooks: {
         beforeRequest: ((options: any) => void)[];
