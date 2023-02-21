@@ -60,7 +60,7 @@ See the [`dohdec`](../dohdec) package.
 ## Notes
 
 - All queries will be padded to the next multiple of 128 bytes (see [RFC 8467](https://datatracker.ietf.org/doc/html/rfc8467#section-4.1))
-- The JSON protocols are not standardized.  The best we have is Google's [documentation](https://developers.google.com/speed/public-dns/docs/doh/json), which Cloudlflare seems to have followed.
+- The JSON protocols are not standardized.  The best we have is Google's [documentation](https://developers.google.com/speed/public-dns/docs/doh/json), which Cloudflare seems to have followed.
 
 ## License
 
