@@ -28,7 +28,7 @@
     "rfc8484"
   ],
   "author": "Joe Hildebrand <joe-github@cursive.net>",
-  "license": "MPL-2.0",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/hildjj/dohdec.git"

@@ -22,7 +22,7 @@
     "dns-over-tls"
   ],
   "author": "Joe Hildebrand <joe-github@cursive.net>",
-  "license": "MPL-2.0",
+  "license": "MIT",
   "dependencies": {
     "dns-packet": "^5.6.1",
     "mock-tls-server": "^1.0.1",
