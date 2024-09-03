@@ -1,11 +1,9 @@
-import {Command, InvalidArgumentError} from 'commander'
-import {DNSError, DNSutils} from 'dohdec/lib/dnsUtils.js'
-import {DNSoverHTTPS, DNSoverTLS} from 'dohdec'
-import net from 'net'
-import readline from 'readline'
-// eslint-disable-next-line no-unused-vars
-import stream from 'stream' // Used in typedef
-import util from 'util'
+import {Command, InvalidArgumentError} from 'commander';
+import {DNSError, DNSutils} from 'dohdec/lib/dnsUtils.js';
+import {DNSoverHTTPS, DNSoverTLS} from 'dohdec';
+import net from 'node:net';
+import readline from 'node:readline';
+import util from 'node:util';
 
 /**
  * Parse an int or throw if invalid.
@@ -16,11 +14,11 @@ import util from 'util'
  * @private
  */
 function myParseInt(value) {
-  const parsedValue = parseInt(value, 10)
+  const parsedValue = parseInt(value, 10);
   if (isNaN(parsedValue)) {
-    throw new InvalidArgumentError('Bad number')
+    throw new InvalidArgumentError('Bad number');
   }
-  return parsedValue
+  return parsedValue;
 }
 
 /**
@@ -32,18 +30,18 @@ function myParseInt(value) {
  * @private
  */
 function checkAddress(value) {
-  const family = net.isIP(value)
+  const family = net.isIP(value);
   if (family === 0) {
-    throw new InvalidArgumentError('Invalid IPv[46] address')
+    throw new InvalidArgumentError('Invalid IPv[46] address');
   }
-  return value
+  return value;
 }
 
 /**
  * @typedef {object} Stdio
- * @property {stream.Readable} [in] StdIn.
- * @property {stream.Writable} [out] StdOut.
- * @property {stream.Writable} [err] StdErr.
+ * @property {import('stream').Readable} [in] StdIn.
+ * @property {import('stream').Writable} [out] StdOut.
+ * @property {import('stream').Writable} [err] StdErr.
  */
 
 /**
@@ -58,10 +56,10 @@ export class DnsCli extends Command {
    * @param {Stdio} [stdio] Replacement streams for stdio, for testing.
    */
   constructor(args, stdio) {
-    super()
+    super();
 
     /** @type {DNSoverHTTPS|DNSoverTLS} */
-    this.transport = null
+    this.transport = null;
 
     /** @type {Stdio} */
     this.std = {
@@ -69,7 +67,7 @@ export class DnsCli extends Command {
       out: process.stdout,
       err: process.stderr,
       ...stdio,
-    }
+    };
 
     this
       .configureOutput({
@@ -127,16 +125,16 @@ export class DnsCli extends Command {
       .addHelpText('after', `
 For more debug information:
 
-  $ NODE_DEBUG=http,https,http2 dohdec -v [arguments]`)
+  $ NODE_DEBUG=http,https,http2 dohdec -v [arguments]`);
     // END CLI CONFIG
 
     if (stdio && (Object.keys(stdio).length > 0)) {
-      this.exitOverride()
+      this.exitOverride();
     }
 
-    this.argv = this.parse(args).opts()
-    this.argv.name = this.args.shift()
-    this.argv.rrtype = this.args.shift()
+    this.argv = this.parse(args).opts();
+    this.argv.name = this.args.shift();
+    this.argv.rrtype = this.args.shift();
 
     this.transport = this.argv.tls ?
       new DNSoverTLS({
@@ -152,8 +150,8 @@ For more debug information:
         url: this.argv.url,
         verbose: this.argv.verbose,
         verboseStream: this.std.err,
-      })
-    this.transport.verbose(1, 'DnsCli options:', this.argv)
+      });
+    this.transport.verbose(1, 'DnsCli options:', this.argv);
   }
 
   /**
@@ -162,13 +160,13 @@ For more debug information:
   async main() {
     try {
       if (this.argv.name) {
-        await this.get(this.argv.name, this.argv.rrtype)
+        await this.get(this.argv.name, this.argv.rrtype);
       } else {
-        const [errors, total] = await this.prompt()
-        this.transport.verbose(0, `\n${errors}/${total} error${total === 1 ? '' : 's'}`)
+        const [errors, total] = await this.prompt();
+        this.transport.verbose(0, `\n${errors}/${total} error${total === 1 ? '' : 's'}`);
       }
     } finally {
-      this.transport.close()
+      this.transport.close();
     }
   }
 
@@ -182,70 +180,70 @@ For more debug information:
       ecs: this.argv.ecs,
       dnssec: this.argv.dnssec,
       dnssecCheckingDisabled: this.argv.dnssecCheckingDisabled,
-    }
+    };
     try {
       if (net.isIP(opts.name)) {
-        opts.name = DNSutils.reverse(opts.name)
+        opts.name = DNSutils.reverse(opts.name);
         if (!opts.rrtype) {
-          opts.rrtype = 'PTR'
+          opts.rrtype = 'PTR';
         }
       }
-      let resp = await this.transport.lookup(opts)
+      let resp = await this.transport.lookup(opts);
 
       if (this.argv.decode) {
         if (!this.argv.full) {
-          const er = DNSError.getError(resp)
+          const er = DNSError.getError(resp);
           if (er) {
             // This isn't ideal, since a) this is normal operation and
             // b) we're just going to re-raise the error below.  However,
             // this turned out to be easier to test.
-            throw er
+            throw er;
           }
           // Avoid typescript errors
           // eslint-disable-next-line dot-notation
-          resp = resp['answers'] || resp['Answer'] || resp
+          resp = resp['answers'] || resp['Answer'] || resp;
         }
         this.std.out.write(util.inspect(DNSutils.buffersToB64(resp), {
           depth: Infinity,
           // @ts-ignore TS2339: It's too hard to make this work correctly.
           colors: this.std.out.isTTY,
-        }))
-        this.std.out.write('\n')
+        }));
+        this.std.out.write('\n');
       } else {
-        this.std.out.write(resp)
+        this.std.out.write(resp);
         if (!this.argv.dns && !this.argv.tls) {
-          this.std.out.write('\n')
+          this.std.out.write('\n');
         }
       }
     } catch (er) {
       this.transport.verbose(1, er) ||
-      this.transport.verbose(0, () => (er.message ? er.message : er))
-      throw er
+      this.transport.verbose(0, () => (er.message ? er.message : er));
+      throw er;
     }
   }
 
   async prompt() {
-    let errors = 0
-    let total = 0
+    let errors = 0;
+    let total = 0;
     const rl = readline.createInterface({
       input: this.std.in,
       output: this.std.out,
       prompt: 'domain (rrtype)> ',
-    })
-    rl.prompt()
+    });
+    rl.prompt();
     for await (const line of rl) {
-      this.transport.verbose(1, 'LINE', line)
+      this.transport.verbose(1, 'LINE', line);
       if (line.length > 0) {
-        total++
+        total++;
         try {
-          await this.get(...line.split(/\s+/))
+          await this.get(...line.split(/\s+/));
         } catch (ignored) {
           // Catches all errors.  get() printed them already
-          errors++
+          errors++;
         }
       }
-      rl.prompt()
+      rl.prompt();
     }
-    return [errors, total]
+    return [errors, total];
   }
 }

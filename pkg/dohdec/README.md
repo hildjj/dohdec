@@ -2,7 +2,6 @@
 
 Retrieve and decode DNS records using [DNS-over-HTTPS](https://tools.ietf.org/html/rfc8484) (DoH) or [DNS-over-TLS](https://tools.ietf.org/html/rfc7858) (DoT).
 
-
 ## Install
 
 ```bash
@@ -20,18 +19,18 @@ npm install -g dohdec-cli
 ## API Usage
 
 ```js
-const { DNSoverHTTPS, DNSoverTLS } = require('dohdec')
+const {DNSoverHTTPS, DNSoverTLS} = require('dohdec');
 
-const doh = new DNSoverHTTPS()
-await doh.lookup('ietf.org', 'AAAA') // JSON result from CloudFlare
+const doh = new DNSoverHTTPS();
+await doh.lookup('ietf.org', 'AAAA'); // JSON result from CloudFlare
 await doh.lookup('ietf.org', {
   rrtype: 'MX',
-  json: false,       // Use DNS wire format
-  decode: false,     // do not decode results
-  dnssec: true,      // request DNS records
-})
-const dot = new DNSoverTLS({host: '1.1.1.1'})
-await dot.lookup('ietf.org')
+  json: false, // Use DNS wire format
+  decode: false, // Do not decode results
+  dnssec: true, // Request DNS records
+});
+const dot = new DNSoverTLS({host: '1.1.1.1'});
+await dot.lookup('ietf.org');
 ```
 
 Full documents [here](https://hildjj.github.io/dohdec/)

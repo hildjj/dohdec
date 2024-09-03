@@ -6,7 +6,6 @@
   "types": "types/",
   "type": "module",
   "scripts": {
-    "lint": "eslint . --ext js",
     "test": "ava",
     "types": "tsc",
     "check": "npm pack --dry-run"
@@ -21,7 +20,9 @@
     "rfc8484"
   ],
   "author": "Joe Hildebrand <joe-github@cursive.net>",
-  "contributors": ["Gus Narea <gnarea@users.noreply.github.com>"],
+  "contributors": [
+    "Gus Narea <gnarea@users.noreply.github.com>"
+  ],
   "license": "MPL-2.0",
   "repository": {
     "type": "git",
@@ -30,18 +31,18 @@
   },
   "dependencies": {
     "crypto-random-string": "^5.0.0",
-    "dns-packet": "^5.4.0",
+    "dns-packet": "^5.6.1",
     "got": "^11.8.2",
-    "ip": "^1.1.8",
-    "nofilter": "^3.1.0"
+    "ip": "^2.0.1",
+    "nofilter": "^5.0.0"
   },
   "devDependencies": {
-    "@types/node": "^18.11.2",
-    "mock-dns-server": "^5.0.3",
-    "nock": "^13.2.9",
-    "typescript": "^4.8.4"
+    "@types/node": "^22.5.2",
+    "mock-dns-server": "link:../mock-dns-server",
+    "nock": "^13.5.5",
+    "typescript": "^5.5.4"
   },
   "engines": {
-    "node": ">=14.20"
+    "node": ">=18"
   }
 }

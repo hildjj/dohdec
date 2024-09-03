@@ -1,13 +1,12 @@
-import {Buf, prepNock} from '../../../test/utils.js'
-import {createServer, plainConnect} from 'mock-dns-server'
-import {DnsCli} from '../lib/cli.js'
-import nock from 'nock'
-import stream from 'stream'
-// eslint-disable-next-line node/no-missing-import
-import test from 'ava'
+import {Buf, prepNock} from '../../../test/utils.js';
+import {createServer, plainConnect} from 'mock-dns-server';
+import {DnsCli} from '../lib/cli.js';
+import nock from 'nock';
+import stream from 'node:stream';
+import test from 'ava';
 
-prepNock(test, nock, import.meta.url)
-const mockServer = createServer()
+prepNock(test, nock, import.meta.url);
+const mockServer = createServer();
 
 const HELP = `\
 Usage: dohdec [options] [name] [rrtype]
@@ -48,74 +47,74 @@ Options:
 For more debug information:
 
   $ NODE_DEBUG=http,https,http2 dohdec -v [arguments]
-`
+`;
 
 async function cliMain(...args) {
-  const setup = []
-  let inp = process.stdin
-  let code = undefined
-  const out = new Buf({encoding: 'utf8'})
-  const err = new Buf({encoding: 'utf8'})
+  const setup = [];
+  let inp = process.stdin;
+  let code = undefined;
+  const out = new Buf({encoding: 'utf8'});
+  const err = new Buf({encoding: 'utf8'});
 
   if ((args.length > 0) && (typeof args[0] === 'function')) {
-    setup.push(args.shift())
+    setup.push(args.shift());
   }
 
   if ((args.length > 0) && (args[0] instanceof stream.Readable)) {
-    inp = args.shift()
+    inp = args.shift();
   }
 
   try {
-    const cli = new DnsCli([process.execPath, 'dohdec', ...args], {in: inp, out, err})
+    const cli = new DnsCli([process.execPath, 'dohdec', ...args], {in: inp, out, err});
 
     for (const s of setup) {
-      await s(cli)
+      await s(cli);
     }
 
-    await cli.main()
+    await cli.main();
   } catch (e) {
-    ({code} = e)
+    ({code} = e);
   }
   return {
     out: out.read(),
     err: err.read(),
     code,
-  }
+  };
 }
 
 async function cliMainTLS(...args) {
   const res = await cliMain(cli => {
-    const m = plainConnect(mockServer.port)
-    cli.transport.opts.socket = m
-    cli.transport.opts.ca = mockServer.ca
-    cli.transport.opts.host = 'localhost'
-  }, ...args)
-  return res
+    const m = plainConnect(mockServer.port);
+    cli.transport.opts.socket = m;
+    cli.transport.opts.ca = mockServer.ca;
+    cli.transport.opts.host = 'localhost';
+  }, ...args);
+  return res;
 }
 
 test('help', async t => {
-  let {err, out, code} = await cliMain('--help')
-  t.falsy(err)
-  t.is(out, HELP)
-  t.is(code, 'commander.helpDisplayed')
+  let {err, out, code} = await cliMain('--help');
+  t.falsy(err);
+  t.is(out, HELP);
+  t.is(code, 'commander.helpDisplayed');
 
-  ;({err, out, code} = await cliMain('-h'))
-  t.falsy(err)
-  t.is(out, HELP)
-  t.is(code, 'commander.helpDisplayed')
-})
+  ({err, out, code} = await cliMain('-h'));
+  t.falsy(err);
+  t.is(out, HELP);
+  t.is(code, 'commander.helpDisplayed');
+});
 
 test('main', async t => {
-  const {out, err, code} = await cliMain('-2n', 'ietf.org', 'AAAA')
-  t.falsy(code)
-  t.falsy(err)
-  t.regex(out, /"data":\s*"2001:1900:3001:11::2c"/)
-})
+  const {out, err, code} = await cliMain('-2n', 'ietf.org', 'AAAA');
+  t.falsy(code);
+  t.falsy(err);
+  t.regex(out, /"data":\s*"2001:1900:3001:11::2c"/);
+});
 
 test('tls', async t => {
-  const {out, err, code} = await cliMainTLS('-t', 'ietf.org', 'AAAA')
-  t.is(err, null)
-  t.is(code, undefined)
+  const {out, err, code} = await cliMainTLS('-t', 'ietf.org', 'AAAA');
+  t.is(err, null);
+  t.is(code, undefined);
   t.is(out, `\
 [
   {
@@ -127,43 +126,43 @@ test('tls', async t => {
     data: '2001:1900:3001:11::2c'
   }
 ]
-`)
-})
+`);
+});
 
 test('bad args', async t => {
-  let res = await cliMain('-e', 'foo')
-  t.is(res.code, 'commander.invalidArgument')
+  let res = await cliMain('-e', 'foo');
+  t.is(res.code, 'commander.invalidArgument');
 
-  res = await cliMain('-e', '24', '-b', '24')
-  t.is(res.code, 'commander.invalidArgument')
+  res = await cliMain('-e', '24', '-b', '24');
+  t.is(res.code, 'commander.invalidArgument');
 
-  res = await cliMain('-b', '::1', '-e', 'foo')
-  t.is(res.code, 'commander.invalidArgument')
-})
+  res = await cliMain('-b', '::1', '-e', 'foo');
+  t.is(res.code, 'commander.invalidArgument');
+});
 
 test('TLS NXDOMAIN', async t => {
-  const {code} = await cliMainTLS('-t', 'unknown.example')
-  t.is(code, 'dns.NXDOMAIN')
-})
+  const {code} = await cliMainTLS('-t', 'unknown.example');
+  t.is(code, 'dns.NXDOMAIN');
+});
 
 test('HTTPS NXDOMAIN', async t => {
-  const {code} = await cliMain('-2', 'unknown.example')
-  t.is(code, 'dns.NXDOMAIN')
-})
+  const {code} = await cliMain('-2', 'unknown.example');
+  t.is(code, 'dns.NXDOMAIN');
+});
 
 test('no decode', async t => {
-  const {out, code, err} = await cliMainTLS('-tnv', 'ietf.org')
-  t.is(code, undefined)
-  t.false(out[out.length - 1] === '\n')
-  t.true(err.length > 0)
-})
+  const {out, code, err} = await cliMainTLS('-tnv', 'ietf.org');
+  t.is(code, undefined);
+  t.false(out[out.length - 1] === '\n');
+  t.true(err.length > 0);
+});
 
 test('prompt', async t => {
-  const inp = new Buf({encoding: 'utf8'})
-  inp.end('\nunknown.example\nietf.org AAAA\n')
-  const {out, code, err} = await cliMainTLS(inp, '-t')
-  t.is(code, undefined)
-  t.is(err, 'DNS error: NXDOMAIN\n\n1/2 errors\n')
+  const inp = new Buf({encoding: 'utf8'});
+  inp.end('\nunknown.example\nietf.org AAAA\n');
+  const {out, code, err} = await cliMainTLS(inp, '-t');
+  t.is(code, undefined);
+  t.is(err, 'DNS error: NXDOMAIN\n\n1/2 errors\n');
   t.is(out, `\
 domain (rrtype)> domain (rrtype)> domain (rrtype)> [
   {
@@ -175,21 +174,21 @@ domain (rrtype)> domain (rrtype)> domain (rrtype)> [
     data: '2001:1900:3001:11::2c'
   }
 ]
-domain (rrtype)> `)
-})
+domain (rrtype)> `);
+});
 
 test('prompt error', async t => {
-  const inp = new Buf({encoding: 'utf8'})
-  inp.end('unknown.example\n')
-  const {out, code, err} = await cliMainTLS(inp, '-t')
-  t.is(code, undefined)
-  t.is(err, 'DNS error: NXDOMAIN\n\n1/1 error\n')
-  t.is(out, 'domain (rrtype)> domain (rrtype)> ')
-})
+  const inp = new Buf({encoding: 'utf8'});
+  inp.end('unknown.example\n');
+  const {out, code, err} = await cliMainTLS(inp, '-t');
+  t.is(code, undefined);
+  t.is(err, 'DNS error: NXDOMAIN\n\n1/1 error\n');
+  t.is(out, 'domain (rrtype)> domain (rrtype)> ');
+});
 
 test('reverse ipv4', async t => {
-  const {out, code} = await cliMainTLS('-t', '4.31.198.44')
-  t.is(code, undefined)
+  const {out, code} = await cliMainTLS('-t', '4.31.198.44');
+  t.is(code, undefined);
   t.is(out, `\
 [
   {
@@ -201,12 +200,12 @@ test('reverse ipv4', async t => {
     data: 'mail.ietf.org'
   }
 ]
-`)
-})
+`);
+});
 
 test('reverse ipv6', async t => {
-  const {out, code} = await cliMainTLS('-t', '2001:1900:3001:11::2c', 'PTR')
-  t.is(code, undefined)
+  const {out, code} = await cliMainTLS('-t', '2001:1900:3001:11::2c', 'PTR');
+  t.is(code, undefined);
   t.is(out, `\
 [
   {
@@ -218,5 +217,5 @@ test('reverse ipv6', async t => {
     data: 'mail.ietf.org'
   }
 ]
-`)
-})
+`);
+});
