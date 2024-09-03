@@ -24,7 +24,6 @@ jobs:
           cache: pnpm
       - run: pnpm i -r
       - run: npm run all:check
-      - run: npm run all:docs
       - name: Deploy Docs
         uses: peaceiris/actions-gh-pages@v4
         with:
