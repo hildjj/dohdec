@@ -1,5 +1,5 @@
 {
-  "reporter": ["lcov"],
+  "reporter": ["lcov", "text"],
   "all": true,
   "src": [
     "pkg/dohdec/lib/*.js",

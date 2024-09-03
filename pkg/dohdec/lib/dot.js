@@ -1,16 +1,16 @@
-import * as crypto from 'crypto'
-import * as packet from 'dns-packet'
-import * as tls from 'tls'
-import {Buffer} from 'buffer'
-import {default as DNSutils} from './dnsUtils.js'
-import {default as NoFilter} from 'nofilter'
+import * as crypto from 'node:crypto';
+import * as packet from 'dns-packet';
+import * as tls from 'node:tls';
+import {Buffer} from 'node:buffer';
+import {default as DNSutils} from './dnsUtils.js';
+import {NoFilter} from 'nofilter';
 // eslint-disable-next-line no-unused-vars
-import {Writable} from 'stream'
-import util from 'util'
+import {Writable} from 'node:stream';
+import util from 'node:util';
 
-const randomBytes = util.promisify(crypto.randomBytes)
+const randomBytes = util.promisify(crypto.randomBytes);
 
-const DEFAULT_SERVER = '1.1.1.1'
+const DEFAULT_SERVER = '1.1.1.1';
 
 /**
  * Options for doing DOT lookups.
@@ -75,9 +75,9 @@ export class DNSoverTLS extends DNSutils {
       verbose,
       verboseStream,
       ...rest
-    } = opts
+    } = opts;
 
-    super({verbose, verboseStream})
+    super({verbose, verboseStream});
     this.opts = {
       host: DNSoverTLS.server,
       port: 853,
@@ -85,25 +85,25 @@ export class DNSoverTLS extends DNSutils {
       rejectUnauthorized: true,
       checkServerIdentity: this._checkServerIdentity.bind(this),
       ...rest,
-    }
-    this.verbose(1, 'DNSoverTLS options:', this.opts)
-    this._reset()
+    };
+    this.verbose(1, 'DNSoverTLS options:', this.opts);
+    this._reset();
   }
 
   _reset() {
-    this.size = -1
+    this.size = -1;
 
     /** @type {tls.TLSSocket} */
-    this.socket = null
+    this.socket = null;
 
     /** @type {Object.<number, Pending>} */
-    this.pending = {}
+    this.pending = {};
 
     /** @type {NoFilter} */
-    this.nof = null
+    this.nof = null;
 
     /** @type {Buffer[]} */
-    this.bufs = []
+    this.bufs = [];
   }
 
   /**
@@ -113,8 +113,8 @@ export class DNSoverTLS extends DNSutils {
   _connect() {
     return new Promise((resolve, reject) => {
       if (this.socket) {
-        resolve()
-        return
+        resolve();
+        return;
       }
 
       /**
@@ -123,22 +123,21 @@ export class DNSoverTLS extends DNSutils {
        * @event DNSoverTLS#connect
        * @property {object} cert [lookup]{@link DNSoverTLS#lookup} options.
        */
-      this.emit('connect', this.opts)
-      this.verbose(1, 'CONNECT:', this.opts)
+      this.emit('connect', this.opts);
+      this.verbose(1, 'CONNECT:', this.opts);
 
-      this.nof = new NoFilter()
-      this.socket = tls.connect(this.opts, resolve)
-      this.socket.on('data', this._data.bind(this))
-      this.socket.on('error', reject)
-      this.socket.on('end', this._disconnected.bind(this))
-    })
+      this.nof = new NoFilter();
+      this.socket = tls.connect(this.opts, resolve);
+      this.socket.on('data', this._data.bind(this));
+      this.socket.on('error', reject);
+      this.socket.on('end', this._disconnected.bind(this));
+    });
   }
 
   _checkServerIdentity(host, cert) {
     // Same as cert.fingerprint256, but with hash agility
-    const hash = DNSoverTLS.hashCert(cert, this.opts.hashAlg)
+    const hash = DNSoverTLS.hashCert(cert, this.opts.hashAlg);
 
-    /* eslint-disable max-len */
     /**
      * Fired on connection when the server sends a certificate.
      *
@@ -146,24 +145,24 @@ export class DNSoverTLS extends DNSutils {
      * @property {crypto.Certificate} cert
      *   A [crypto.Certificate]{@link https://nodejs.org/api/crypto.html#crypto_class_certificate}
      *   from the server.
-     * @property {string} host The hostname the client thinks it is connecting to.
+     * @property {string} host The hostname the client thinks it is
+     *   connecting to.
      * @property {string} hash The hash computed over the cert.
      */
-    this.emit('certificate', cert, host, hash)
-    /* eslint-enable max-len */
+    this.emit('certificate', cert, host, hash);
 
-    this.verbose(2, 'CERTIFICATE:', () => DNSutils.buffersToB64(cert))
-    const err = tls.checkServerIdentity(host, cert)
+    this.verbose(2, 'CERTIFICATE:', () => DNSutils.buffersToB64(cert));
+    const err = tls.checkServerIdentity(host, cert);
     if (!err) {
       if (this.opts.hash && (this.opts.hash !== hash)) {
         return new Error(`Invalid cert hash for ${this.opts.host}:${this.opts.port}.
 Expected: "${this.opts.hash}"
-Received: "${hash}"`)
+Received: "${hash}"`);
       }
     } else if (this.opts.hash !== hash) {
-      return err
+      return err;
     }
-    return undefined
+    return undefined;
   }
 
   /**
@@ -173,17 +172,17 @@ Received: "${hash}"`)
    */
   _disconnected() {
     for (const {reject, opts} of Object.values(this.pending)) {
-      reject(new Error(`Timeout looking up "${opts.name}":${opts.rrtype}`))
+      reject(new Error(`Timeout looking up "${opts.name}":${opts.rrtype}`));
     }
-    this._reset()
+    this._reset();
 
     /**
      * Server disconnected.  All pending requests will have failed.
      *
      * @event DNSoverTLS#disconnect
      */
-    this.emit('disconnect')
-    this.verbose(1, 'DISCONNECT')
+    this.emit('disconnect');
+    this.verbose(1, 'DISCONNECT');
   }
 
   /**
@@ -199,36 +198,36 @@ Received: "${hash}"`)
      *
      * @event DNSoverTLS#receive
      */
-    this.emit('receive', b)
-    this.nof.write(b)
+    this.emit('receive', b);
+    this.nof.write(b);
 
     // There might be multiple results in one read.
     while (this.nof.length > 0) {
       // No size read yet
       if (this.size === -1) {
         if (this.nof.length < 2) {
-          return
+          return;
         }
 
-        this.size = this.nof.readUInt16BE()
+        this.size = this.nof.readUInt16BE();
       }
       if (this.nof.length < this.size) {
-        return
+        return;
       }
-      const buf = this.nof.read(this.size)
-      this.verbose(1, 'RECV:')
-      this.hexDump(1, buf)
+      const buf = this.nof.read(this.size);
+      this.verbose(1, 'RECV:');
+      this.hexDump(1, (typeof buf === 'string') ? Buffer.from(buf) : buf);
 
-      this.size = -1
-      const pkt = packet.decode(buf)
-      const pend = this.pending[pkt.id]
+      this.size = -1;
+      const pkt = packet.decode(buf);
+      const pend = this.pending[pkt.id];
       if (!pend) {
         // Something bad happened, like an injection attack or a corrupted
         // result. Abandon everything pending.
-        this.close()
-        return
+        this.close();
+        return;
       }
-      pend.resolve(pend.opts.decode ? pkt : buf)
+      pend.resolve(pend.opts.decode ? pkt : buf);
     }
   }
 
@@ -239,11 +238,11 @@ Received: "${hash}"`)
    * @private
    */
   async _id() {
-    let id = null
+    let id = null;
     do {
-      id = (await randomBytes(2)).readUInt16BE()
-    } while (this.pending[id])
-    return id
+      id = (await randomBytes(2)).readUInt16BE();
+    } while (this.pending[id]);
+    return id;
   }
 
   /**
@@ -255,16 +254,16 @@ Received: "${hash}"`)
    * @throws {Error} Unknown certificate type.
    */
   static hashCert(cert, hashAlg = 'sha256') {
-    const hash = crypto.createHash(hashAlg)
+    const hash = crypto.createHash(hashAlg);
     if (Buffer.isBuffer(cert)) {
-      hash.update(cert)
+      hash.update(cert);
     } else if (cert.raw) {
-      hash.update(cert.raw)
+      hash.update(cert.raw);
     } else {
-      throw new Error('Unknown certificate type')
+      throw new Error('Unknown certificate type');
     }
 
-    return hash.digest('hex')
+    return hash.digest('hex');
   }
 
   /**
@@ -283,30 +282,30 @@ Received: "${hash}"`)
       dnssecCheckingDisabled: false,
       decode: true,
       stream: true,
-    })
-    this.verbose(1, 'DNSoverTLS.lookup options:', nopts)
+    });
+    this.verbose(1, 'DNSoverTLS.lookup options:', nopts);
 
-    await this._connect()
+    await this._connect();
     if (!nopts.id) {
       // eslint-disable-next-line require-atomic-updates
-      nopts.id = await this._id()
+      nopts.id = await this._id();
     }
 
     return new Promise((resolve, reject) => {
-      const pkt = DNSutils.makePacket(nopts)
+      const pkt = DNSutils.makePacket(nopts);
 
-      this.verbose(1, 'REQUEST:')
-      this.hexDump(2, pkt)
+      this.verbose(1, 'REQUEST:');
+      this.hexDump(2, pkt);
       this.verbose(
         1,
         'Length:',
         () => pkt.readUInt16BE(0),
         () => packet.decode(pkt, 2) // Skip length
-      )
+      );
 
-      this.pending[nopts.id] = {resolve, reject, opts: nopts}
+      this.pending[nopts.id] = {resolve, reject, opts: nopts};
 
-      this.socket.write(pkt)
+      this.socket.write(pkt);
 
       /**
        * A buffer of data has been sent to the server.  Useful for
@@ -314,9 +313,9 @@ Received: "${hash}"`)
        *
        * @event DNSoverTLS#send
        */
-      this.emit('send', pkt)
-      this.verbose(2, 'REQUEST:', pkt)
-    })
+      this.emit('send', pkt);
+      this.verbose(2, 'REQUEST:', pkt);
+    });
   }
 
   /**
@@ -325,17 +324,17 @@ Received: "${hash}"`)
    * @returns {Promise<void>} Resolved on socket close.
    */
   close() {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, _reject) => {
       if (this.socket) {
         this.socket.end(null, () => {
-          resolve()
-        })
+          resolve();
+        });
       } else {
-        resolve()
+        resolve();
       }
-    })
+    });
   }
 }
-DNSoverTLS.server = DEFAULT_SERVER
+DNSoverTLS.server = DEFAULT_SERVER;
 
-export default DNSoverTLS
+export default DNSoverTLS;

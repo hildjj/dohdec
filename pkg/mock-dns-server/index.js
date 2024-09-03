@@ -1,13 +1,13 @@
-import * as packet from 'dns-packet'
-import * as rcodes from 'dns-packet/rcodes.js'
-import {MockTLSServer} from 'mock-tls-server'
-import {default as NoFilter} from 'nofilter'
+import * as packet from 'dns-packet';
+import * as rcodes from 'dns-packet/rcodes.js';
+import {MockTLSServer} from 'mock-tls-server';
+import {NoFilter} from 'nofilter';
 
-export {connect, plainConnect} from 'mock-tls-server'
+export {connect, plainConnect} from 'mock-tls-server';
 
-const PAD_SIZE = 468 // See RFC 8467
-const AA = 1 << 10
-const CONNECTION = Symbol('connection')
+const PAD_SIZE = 468; // See RFC 8467
+const AA = 1 << 10;
+const CONNECTION = Symbol('connection');
 
 const DNS = {
   'ietf.org': {
@@ -34,39 +34,39 @@ const DNS = {
   'c.2.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.1.0.0.1.0.0.3.0.0.9.1.1.0.0.2.ip6.arpa': {
     PTR: 'mail.ietf.org',
   },
-}
+};
 
 class Connection {
   constructor(sock) {
-    this.sock = sock
-    this.size = -1
-    this.nof = new NoFilter()
-    this.sock.on('data', this._data.bind(this))
+    this.sock = sock;
+    this.size = -1;
+    this.nof = new NoFilter();
+    this.sock.on('data', this._data.bind(this));
   }
 
   _data(chunk) {
-    this.nof.write(chunk)
+    this.nof.write(chunk);
 
     while (this.nof.length > 0) {
       if (this.size === -1) {
         if (this.nof.length < 2) {
-          return
+          return;
         }
-        this.size = this.nof.readUInt16BE()
+        this.size = this.nof.readUInt16BE();
       }
       if (this.nof.length < this.size) {
-        return
+        return;
       }
-      const buf = this.nof.read(this.size)
-      this.size = -1
-      const pkt = packet.decode(buf)
+      const buf = this.nof.read(this.size);
+      this.size = -1;
+      const pkt = packet.decode(buf);
 
-      const [{name, type}] = pkt.questions
-      const domain = DNS[name]
-      const id = /badid/i.test(name) ? (pkt.id + 1) % 65536 : pkt.id
+      const [{name, type}] = pkt.questions;
+      const domain = DNS[name];
+      const id = /badid/i.test(name) ? (pkt.id + 1) % 65536 : pkt.id;
 
       if (domain) {
-        const data = domain[type]
+        const data = domain[type];
         if (data) {
           /** @type {packet.Packet} */
           const rp = {
@@ -90,32 +90,32 @@ class Connection {
               flags: 0,
               options: [],
             }],
-          }
+          };
           // Only pad if client said they support EDNS0
           if (pkt.additionals.find(a => a.type === 'OPT')) {
-            const unpadded = packet.encodingLength(rp)
+            const unpadded = packet.encodingLength(rp);
             rp.additionals[0].options.push({
               code: 'PADDING',
               length: (Math.ceil(unpadded / PAD_SIZE) * PAD_SIZE) -
                 unpadded - 4,
-            })
+            });
           }
 
-          const reply = packet.streamEncode(rp)
+          const reply = packet.streamEncode(rp);
           if (/chunky/.test(name)) {
             // Write in chunks, for testing reassembly
             // Avoid Nagle by going full-sync
             this.sock.write(reply.slice(0, 1), () => {
               this.sock.write(reply.slice(1, 2), () => {
                 this.sock.write(reply.slice(2, 7), () => {
-                  this.sock.write(reply.slice(7))
-                })
-              })
-            })
+                  this.sock.write(reply.slice(7));
+                });
+              });
+            });
           } else {
-            this.sock.write(reply)
+            this.sock.write(reply);
           }
-          return
+          return;
         }
       }
 
@@ -125,7 +125,7 @@ class Connection {
         type: 'response',
         flags: AA | rcodes.toRcode('NXDOMAIN'),
         questions: pkt.questions,
-      }))
+      }));
     }
   }
 }
@@ -138,10 +138,10 @@ class Connection {
  * @returns {MockTLSServer} The created server, already listening.
  */
 export function createServer(options = {}) {
-  const {port = 853, ...opts} = options
-  const server = new MockTLSServer(opts)
+  const {port = 853, ...opts} = options;
+  const server = new MockTLSServer(opts);
   server.listen(port, cli => {
-    cli[CONNECTION] = new Connection(cli)
-  })
-  return server
+    cli[CONNECTION] = new Connection(cli);
+  });
+  return server;
 }

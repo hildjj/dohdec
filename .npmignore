@@ -1,5 +1,4 @@
 .editorconfig
-.eslintrc.cjs
 .gitattributes
 .github/
 .jsdoc.conf
@@ -11,6 +10,7 @@
 ava.config.js
 coverage/
 docs/
+eslint.config.js
 node_modules/
 npm-debug.log
 test/
