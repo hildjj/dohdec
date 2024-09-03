@@ -6,6 +6,7 @@
   "types": "types/",
   "type": "module",
   "scripts": {
+    "docs": "typedoc",
     "test": "ava",
     "types": "tsc",
     "check": "npm pack --dry-run"

@@ -10,7 +10,9 @@ npm install --save dohdec
 
 ## Command Line Usage
 
-You must now install [`dohdec-cli`](../dohdec-cli) to use the command line:
+You must now install
+[`dohdec-cli`](https://github.com/hildjj/dohdec/tree/main/pkg/dohdec-cli)
+to use the command line:
 
 ```bash
 npm install -g dohdec-cli

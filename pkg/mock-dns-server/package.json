@@ -25,7 +25,7 @@
   "license": "MPL-2.0",
   "dependencies": {
     "dns-packet": "^5.6.1",
-    "mock-tls-server": "^1.0.0",
+    "mock-tls-server": "^1.0.1",
     "nofilter": "^5.0.0"
   },
   "devDependencies": {
