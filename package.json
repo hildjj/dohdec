@@ -10,10 +10,10 @@
   "scripts": {
     "lint": "eslint .",
     "test": "c8 ava",
-    "docs": "pnpm run -r docs",
     "release": "npm version patch && git push --follow-tags && npm publish",
     "preall:check": "npm run lint && npm run test && npm run all:types && npm run docs",
     "all:check": "pnpm run -r --stream check",
+    "all:docs": "pnpm run -r docs",
     "all:types": "pnpm run -r types",
     "all:install": "pnpm i -r",
     "clean": "rm -rf node_modules coverage pkg/*/node_modules pkg/*/coverage"
