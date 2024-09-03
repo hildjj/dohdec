@@ -24,7 +24,7 @@
   "contributors": [
     "Gus Narea <gnarea@users.noreply.github.com>"
   ],
-  "license": "MPL-2.0",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/hildjj/dohdec.git",
