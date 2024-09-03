@@ -6,6 +6,7 @@
   "types": "types/",
   "type": "module",
   "scripts": {
+    "docs": "typedoc",
     "test": "ava",
     "types": "tsc",
     "check": "npm pack --dry-run"
@@ -26,7 +27,7 @@
   "license": "MPL-2.0",
   "repository": {
     "type": "git",
-    "url": "http://github.com/hildjj/dohdec.git",
+    "url": "git+ssh://git@github.com/hildjj/dohdec.git",
     "directory": "pkg/dohdec"
   },
   "dependencies": {

@@ -9,6 +9,18 @@ import util from 'node:util';
 
 const PAD_SIZE = 128;
 
+/**
+ * @typedef {object} LookupOptions
+ * @property {string} [name] Name to look up.
+ * @property {string} [rrtype] The Resource Record type to retrive.
+ * @property {number} [id] The 2-byte unsigned integer for the request.
+ *   For DOH, should be 0 or undefined.
+ * @property {boolean} [json] Force JSON lookups for DOH.  Ignored for DOT.
+ * @property {boolean} [stream=false] Encode for streaming, with the packet
+ *   prefixed by a 2-byte big-endian integer of the number of bytes in the
+ *   packet.
+ */
+
 // Extracted from node source
 function stylizeWithColor(str, styleType) {
   const style = util.inspect.styles[styleType];
@@ -208,17 +220,6 @@ export class DNSutils extends EventEmitter {
     return packet.encode(dns);
   }
 
-  /**
-   * @typedef {object} LookupOptions
-   * @property {string} [name] Name to look up.
-   * @property {string} [rrtype] The Resource Record type to retrive.
-   * @property {number} [id] The 2-byte unsigned integer for the request.
-   *   For DOH, should be 0 or undefined.
-   * @property {boolean} [json] Force JSON lookups for DOH.  Ignored for DOT.
-   * @property {boolean} [stream=false] Encode for streaming, with the packet
-   *   prefixed by a 2-byte big-endian integer of the number of bytes in the
-   *   packet.
-   */
   /**
    * Normalize parameters into the lookup functions.
    *

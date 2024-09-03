@@ -10,10 +10,10 @@
   "scripts": {
     "lint": "eslint .",
     "test": "c8 ava",
-    "docs": "jsdoc -c .jsdoc.conf",
     "release": "npm version patch && git push --follow-tags && npm publish",
-    "preall:check": "npm run lint && npm run coverage && npm run all:types && npm run docs",
+    "preall:check": "npm run lint && npm run test && npm run all:types && npm run docs",
     "all:check": "pnpm run -r --stream check",
+    "all:docs": "pnpm run -r docs",
     "all:types": "pnpm run -r types",
     "all:install": "pnpm i -r",
     "clean": "rm -rf node_modules coverage pkg/*/node_modules pkg/*/coverage"
@@ -29,7 +29,10 @@
   ],
   "author": "Joe Hildebrand <joe-github@cursive.net>",
   "license": "MPL-2.0",
-  "repository": "github:hildjj/dohdec",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hildjj/dohdec.git"
+  },
   "devDependencies": {
     "@cto.af/eslint-config": "^4.1.6",
     "@types/ip": "1.1.3",
@@ -40,9 +43,7 @@
     "eslint-plugin-jsdoc": "^50.2.2",
     "eslint-plugin-markdown": "5.1.0",
     "eslint-plugin-node": "^11.1.0",
-    "jsdoc": "^4.0.3",
-    "minami": "^1.2.3",
-    "pnpm": "^9.9.0"
+    "typedoc": "0.26.6"
   },
   "packageManager": "pnpm@9.9.0",
   "engines": {
