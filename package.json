@@ -11,7 +11,7 @@
     "lint": "eslint .",
     "test": "c8 ava",
     "release": "npm version patch && git push --follow-tags && npm publish",
-    "preall:check": "npm run lint && npm run test && npm run all:types && npm run docs",
+    "preall:check": "npm run lint && npm run test && npm run all:types && npm run all:docs",
     "all:check": "pnpm run -r --stream check",
     "all:docs": "pnpm run -r docs",
     "all:types": "pnpm run -r types",
