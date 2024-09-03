@@ -29,7 +29,10 @@
   ],
   "author": "Joe Hildebrand <joe-github@cursive.net>",
   "license": "MPL-2.0",
-  "repository": "github:hildjj/dohdec",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hildjj/dohdec.git"
+  },
   "devDependencies": {
     "@cto.af/eslint-config": "^4.1.6",
     "@types/ip": "1.1.3",
