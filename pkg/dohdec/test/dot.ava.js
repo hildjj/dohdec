@@ -4,7 +4,23 @@ import {DNSoverTLS} from '../lib/dot.js';
 import crypto from 'node:crypto';
 import test from 'ava';
 
-const mockServer = createServer();
+let mockServer = null;
+
+test.before(() => {
+  mockServer = createServer();
+});
+
+test.after.always(() => new Promise((resolve, reject) => {
+  mockServer.close(er => {
+    mockServer = null;
+    if (er) {
+      reject(er);
+    } else {
+      resolve(true);
+    }
+  });
+}));
+
 function create(cliOpts, duplexOpts) {
   const socket = plainConnect({
     port: mockServer.port,
@@ -35,7 +51,7 @@ test('lookup', async t => {
   const buf = await dot.lookup('ietf.org', {decode: false});
   t.truthy(Buffer.isBuffer(buf));
   t.is(buf.length, 468, 'Check padding');
-  dot.close();
+  await dot.close();
 });
 
 test('close with in-flight requests', async t => {
@@ -57,8 +73,12 @@ test('immediate close', async t => {
   dot.on('error', e => {
     t.fail(`Should not get error: ${e.message}`);
   });
+  t.is(dot.socket, null);
   await dot.close();
   t.is(dot.socket, null);
+
+  // Clean up for shutdown
+  dot.opts.socket.end();
 });
 
 test('hash fail', async t => {

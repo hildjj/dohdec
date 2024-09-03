@@ -6,7 +6,22 @@ import stream from 'node:stream';
 import test from 'ava';
 
 prepNock(test, nock, import.meta.url);
-const mockServer = createServer();
+let mockServer = null;
+
+test.before(() => {
+  mockServer = createServer();
+});
+
+test.after.always(() => new Promise((resolve, reject) => {
+  mockServer.close(er => {
+    mockServer = null;
+    if (er) {
+      reject(er);
+    } else {
+      resolve(true);
+    }
+  });
+}));
 
 const HELP = `\
 Usage: dohdec [options] [name] [rrtype]
