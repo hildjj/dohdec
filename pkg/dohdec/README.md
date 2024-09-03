@@ -37,6 +37,14 @@ await dot.lookup('ietf.org');
 
 Full documents [here](https://hildjj.github.io/dohdec/)
 
+## More Features
+
+If you need a more full-featured replacement for
+[dnsPromises.Resolver]https://nodejs.org/api/dns.html#class-dnspromisesresolver),
+take a look at the
+[Tangerine](https://github.com/forwardemail/nodejs-dns-over-https-tangerine)
+project.
+
 ## Notes
 
 - All queries will be padded to the next multiple of 128 bytes (see [RFC 8467](https://datatracker.ietf.org/doc/html/rfc8467#section-4.1))
