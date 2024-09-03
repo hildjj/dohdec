@@ -33,8 +33,7 @@ Options:
   -b, --ecsSubnet <address>     Use this IP address for EDNS Client Subnet
                                 (ECS)
   -f, --full                    Full response, not just answers
-  -g, --get                     Force http GET for DNS-format lookups (default:
-                                true)
+  -g, --get                     Force http GET for DNS-format lookups
   -n, --no-decode               Do not decode JSON or DNS wire format
   -2, --no-http2                Disable http2 support
   -t, --tls                     Use DNS-over-TLS instead of DNS-over-HTTPS

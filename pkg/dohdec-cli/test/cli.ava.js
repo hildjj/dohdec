@@ -44,8 +44,7 @@ Options:
   -b, --ecsSubnet <address>     Use this IP address for EDNS Client Subnet
                                 (ECS)
   -f, --full                    Full response, not just answers
-  -g, --get                     Force http GET for DNS-format lookups (default:
-                                true)
+  -g, --get                     Force http GET for DNS-format lookups
   -n, --no-decode               Do not decode JSON or DNS wire format
   -2, --no-http2                Disable http2 support
   -t, --tls                     Use DNS-over-TLS instead of DNS-over-HTTPS
@@ -124,6 +123,13 @@ test('main', async t => {
   t.falsy(code);
   t.falsy(err);
   t.regex(out, /"data":\s*"2001:1900:3001:11::2c"/);
+});
+
+test('main get', async t => {
+  const {out, err, code} = await cliMain('-2g', 'ietf2.org', 'AAAA');
+  t.falsy(code);
+  t.falsy(err);
+  t.regex(out, /"data":\s*"2001:1900:3001:11::2d"/);
 });
 
 test('tls', async t => {

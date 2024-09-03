@@ -106,5 +106,59 @@
             "6987bf8a9db62723-DEN"
         ],
         "responseIsBinary": false
-    }
+    },
+    {
+      "scope": "https://cloudflare-dns.com:443",
+      "method": "GET",
+      "path": "/dns-query?name=ietf2.org&type=AAAA&random_padding=0",
+      "body": "",
+      "status": 200,
+      "response": {
+          "Status": 0,
+          "TC": false,
+          "RD": true,
+          "RA": true,
+          "AD": true,
+          "CD": false,
+          "Question": [
+              {
+                  "name": "ietf.org",
+                  "type": 28
+              }
+          ],
+          "Answer": [
+              {
+                  "name": "ietf.org",
+                  "type": 28,
+                  "TTL": 1097,
+                  "data": "2001:1900:3001:11::2d"
+              }
+          ]
+      },
+      "rawHeaders": [
+          "Date",
+          "Sun, 03 Oct 2021 17:04:11 GMT",
+          "Content-Type",
+          "application/dns-json",
+          "Content-Length",
+          "190",
+          "Connection",
+          "close",
+          "Report-To",
+          "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=eA6Tcm6kB6qgywcx%2Bm3%2B4Jp76ghzYt3cKQqPuoTC4gWPKUXPlI8U68HGJgANo%2BE8Mus3UrtvqE8%2FzmvCtQu6s89la9LCd006PshIDwSSMYd%2FrWoOKdbPjPkMMikAswazSJ%2B8lQ%3D%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+          "NEL",
+          "{\"report_to\":\"cf-nel\",\"max_age\":604800}",
+          "Access-Control-Allow-Origin",
+          "*",
+          "Expect-CT",
+          "max-age=604800, report-uri=\"https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct\"",
+          "Vary",
+          "Accept-Encoding",
+          "Server",
+          "cloudflare",
+          "CF-RAY",
+          "6987bf8a9db62723-DEN"
+      ],
+      "responseIsBinary": false
+  }
 ]
