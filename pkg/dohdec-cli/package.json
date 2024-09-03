@@ -32,7 +32,7 @@
   },
   "dependencies": {
     "commander": "^12.1.0",
-    "dohdec": "^5.0.3"
+    "dohdec": "link:../dohdec"
   },
   "devDependencies": {
     "@types/node": "^22.5.2",

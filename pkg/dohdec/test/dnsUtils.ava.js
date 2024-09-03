@@ -1,7 +1,13 @@
 import * as packet from 'dns-packet';
+import {
+  DNSError,
+  DNSutils,
+  printableString,
+  stylizeWithColor,
+} from '../lib/dnsUtils.js';
 import {Buf} from '../../../test/utils.js';
 import {Buffer} from 'node:buffer';
-import DNSutils from '../lib/dnsUtils.js';
+import {NoFilter} from 'nofilter';
 import test from 'ava';
 
 test('makePacket', t => {
@@ -194,4 +200,28 @@ test('reverse', t => {
   t.is(DNSutils.reverse('::1'), '1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa');
 
   t.throws(() => DNSutils.reverse('INVALID IP'));
+});
+
+test('stylizeWithColor', t => {
+  const f = stylizeWithColor('foo', '___INVALID___');
+  t.is(f, 'foo');
+});
+
+test('printableString', t => {
+  const str = new NoFilter();
+  printableString(str, [0xa1]);
+  t.is(str.read().toString(), '\xa1');
+});
+
+test('DNSError', t => {
+  let er = DNSError.getError({rcode: 'NXDOMAIN'});
+  t.truthy(er);
+  t.is(er.code, 'dns.NXDOMAIN');
+
+  er = DNSError.getError({Status: 5});
+  t.truthy(er);
+  t.is(er.code, 'dns.REFUSED');
+
+  er = DNSError.getError({});
+  t.falsy(er);
 });

@@ -214,9 +214,10 @@ Received: "${hash}"`);
       if (this.nof.length < this.size) {
         return;
       }
-      const buf = this.nof.read(this.size);
+
+      const buf = /** @type {Buffer} */(this.nof.read(this.size));
       this.verbose(1, 'RECV:');
-      this.hexDump(1, (typeof buf === 'string') ? Buffer.from(buf) : buf);
+      this.hexDump(1, buf);
 
       this.size = -1;
       const pkt = packet.decode(buf);

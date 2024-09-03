@@ -189,7 +189,6 @@ For more debug information:
         }
       }
       let resp = await this.transport.lookup(opts);
-
       if (this.argv.decode) {
         if (!this.argv.full) {
           const er = DNSError.getError(resp);
