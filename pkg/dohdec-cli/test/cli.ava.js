@@ -44,8 +44,7 @@ Options:
   -b, --ecsSubnet <address>     Use this IP address for EDNS Client Subnet
                                 (ECS)
   -f, --full                    Full response, not just answers
-  -g, --get                     Force http GET for DNS-format lookups (default:
-                                true)
+  -g, --get                     Force http GET for DNS-format lookups
   -n, --no-decode               Do not decode JSON or DNS wire format
   -2, --no-http2                Disable http2 support
   -t, --tls                     Use DNS-over-TLS instead of DNS-over-HTTPS
@@ -123,11 +122,18 @@ test('main', async t => {
   const {out, err, code} = await cliMain('-2n', 'ietf.org', 'AAAA');
   t.falsy(code);
   t.falsy(err);
-  t.regex(out, /"data":\s*"2001:1900:3001:11::2c"/);
+  t.regex(out, /"data":\s*"2606:4700::6810:2d63"/);
+});
+
+test('main get', async t => {
+  const {out, err, code} = await cliMain('-2g', 'tools.ietf.org', 'AAAA');
+  t.falsy(code);
+  t.falsy(err);
+  t.regex(out, /data:\s*'2606:4700::6810:2c63'/);
 });
 
 test('tls', async t => {
-  const {out, err, code} = await cliMainTLS('-t', 'ietf.org', 'AAAA');
+  const {out, err, code} = await cliMainTLS('-tg', 'ietf.org', 'AAAA');
   t.is(err, null);
   t.is(code, undefined);
   t.is(out, `\
@@ -156,17 +162,17 @@ test('bad args', async t => {
 });
 
 test('TLS NXDOMAIN', async t => {
-  const {code} = await cliMainTLS('-t', 'unknown.example');
+  const {code} = await cliMainTLS('-tg', 'unknown.example');
   t.is(code, 'dns.NXDOMAIN');
 });
 
 test('HTTPS NXDOMAIN', async t => {
-  const {code} = await cliMain('-2', 'unknown.example');
+  const {code} = await cliMain('-2g', 'unknown.example');
   t.is(code, 'dns.NXDOMAIN');
 });
 
 test('no decode', async t => {
-  const {out, code, err} = await cliMainTLS('-tnv', 'ietf.org');
+  const {out, code, err} = await cliMainTLS('-tnvg', 'ietf.org');
   t.is(code, undefined);
   t.false(out[out.length - 1] === '\n');
   t.true(err.length > 0);
@@ -233,4 +239,12 @@ test('reverse ipv6', async t => {
   }
 ]
 `);
+});
+
+test('bad format', async t => {
+  nock('http://moo.example')
+    .get(uri => uri.includes('badformat.example'))
+    .reply(200, {bad: 'format'});
+  const {out} = await cliMain('-g', '-u', 'http://moo.example/dns', 'badformat.example');
+  t.is(out, "{ bad: 'format' }\n");
 });

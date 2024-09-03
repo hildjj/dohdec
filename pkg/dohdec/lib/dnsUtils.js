@@ -21,8 +21,9 @@ const PAD_SIZE = 128;
  *   packet.
  */
 
-// Extracted from node source
-function stylizeWithColor(str, styleType) {
+// Extracted from node source.
+// Only exported for testing.
+export function stylizeWithColor(str, styleType) {
   const style = util.inspect.styles[styleType];
   if (style !== undefined) {
     const color = util.inspect.colors[style];
@@ -35,7 +36,8 @@ function styleStream(stream, str, styleType) {
   stream.write(stream.isTTY ? stylizeWithColor(str, styleType) : str);
 }
 
-function printableString(stream, buf) {
+// Exported for testing only
+export function printableString(stream, buf) {
   // Intent: each byte that is "printable" takes up one grapheme, and everything
   // else is replaced with '.'
 

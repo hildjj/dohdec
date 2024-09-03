@@ -2,60 +2,6 @@
     {
         "scope": "https://cloudflare-dns.com:443",
         "method": "GET",
-        "path": "/dns-query?name=unknown.example&type=A&random_padding=0",
-        "body": "",
-        "status": 200,
-        "response": {
-            "Status": 3,
-            "TC": false,
-            "RD": true,
-            "RA": true,
-            "AD": false,
-            "CD": false,
-            "Question": [
-                {
-                    "name": "unknown.example",
-                    "type": 1
-                }
-            ],
-            "Authority": [
-                {
-                    "name": "",
-                    "type": 6,
-                    "TTL": 86400,
-                    "data": "a.root-servers.net. nstld.verisign-grs.com. 2021100300 1800 900 604800 86400"
-                }
-            ]
-        },
-        "rawHeaders": [
-            "Date",
-            "Sun, 03 Oct 2021 17:04:11 GMT",
-            "Content-Type",
-            "application/dns-json",
-            "Content-Length",
-            "247",
-            "Connection",
-            "close",
-            "Report-To",
-            "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=mcKFuhqjy1Sn77cWoHLoWR8Eav29AnuW6XtndnbKG%2F%2FXIrHlfVx3yVmqyVOMbfCbaRHbSRuB5dnVE17DvXAxnU7QQXSy%2BoSPmpqqF6qG6gonMlWWNVmrr%2BNmdXX3189O%2BnjQdg%3D%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
-            "NEL",
-            "{\"report_to\":\"cf-nel\",\"max_age\":604800}",
-            "Access-Control-Allow-Origin",
-            "*",
-            "Expect-CT",
-            "max-age=604800, report-uri=\"https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct\"",
-            "Vary",
-            "Accept-Encoding",
-            "Server",
-            "cloudflare",
-            "CF-RAY",
-            "6987bf8a9b13c7c9-DEN"
-        ],
-        "responseIsBinary": false
-    },
-    {
-        "scope": "https://cloudflare-dns.com:443",
-        "method": "GET",
         "path": "/dns-query?name=ietf.org&type=AAAA&random_padding=0",
         "body": "",
         "status": 200,
@@ -76,34 +22,130 @@
                 {
                     "name": "ietf.org",
                     "type": 28,
-                    "TTL": 1097,
-                    "data": "2001:1900:3001:11::2c"
+                    "TTL": 255,
+                    "data": "2606:4700::6810:2d63"
+                },
+                {
+                    "name": "ietf.org",
+                    "type": 28,
+                    "TTL": 255,
+                    "data": "2606:4700::6810:2c63"
                 }
             ]
         },
         "rawHeaders": [
-            "Date",
-            "Sun, 03 Oct 2021 17:04:11 GMT",
-            "Content-Type",
-            "application/dns-json",
-            "Content-Length",
-            "190",
-            "Connection",
-            "close",
-            "Report-To",
-            "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=eA6Tcm6kB6qgywcx%2Bm3%2B4Jp76ghzYt3cKQqPuoTC4gWPKUXPlI8U68HGJgANo%2BE8Mus3UrtvqE8%2FzmvCtQu6s89la9LCd006PshIDwSSMYd%2FrWoOKdbPjPkMMikAswazSJ%2B8lQ%3D%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
-            "NEL",
-            "{\"report_to\":\"cf-nel\",\"max_age\":604800}",
-            "Access-Control-Allow-Origin",
-            "*",
-            "Expect-CT",
-            "max-age=604800, report-uri=\"https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct\"",
-            "Vary",
-            "Accept-Encoding",
             "Server",
             "cloudflare",
+            "Date",
+            "Tue, 03 Sep 2024 19:58:35 GMT",
+            "Content-Type",
+            "application/dns-json",
+            "Connection",
+            "keep-alive",
+            "Access-Control-Allow-Origin",
+            "*",
+            "Content-Length",
+            "258",
             "CF-RAY",
-            "6987bf8a9db62723-DEN"
+            "8bd850bcf93151fb-DEN"
+        ],
+        "responseIsBinary": false
+    },
+    {
+        "scope": "https://cloudflare-dns.com:443",
+        "method": "GET",
+        "path": "/dns-query?name=tools.ietf.org&type=AAAA&random_padding=0",
+        "body": "",
+        "status": 200,
+        "response": {
+            "Status": 0,
+            "TC": false,
+            "RD": true,
+            "RA": true,
+            "AD": true,
+            "CD": false,
+            "Question": [
+                {
+                    "name": "tools.ietf.org",
+                    "type": 28
+                }
+            ],
+            "Answer": [
+                {
+                    "name": "tools.ietf.org",
+                    "type": 28,
+                    "TTL": 191,
+                    "data": "2606:4700::6810:2c63"
+                },
+                {
+                    "name": "tools.ietf.org",
+                    "type": 28,
+                    "TTL": 191,
+                    "data": "2606:4700::6810:2d63"
+                }
+            ]
+        },
+        "rawHeaders": [
+            "Server",
+            "cloudflare",
+            "Date",
+            "Tue, 03 Sep 2024 19:58:35 GMT",
+            "Content-Type",
+            "application/dns-json",
+            "Connection",
+            "keep-alive",
+            "Access-Control-Allow-Origin",
+            "*",
+            "Content-Length",
+            "276",
+            "CF-RAY",
+            "8bd850bd081951e5-DEN"
+        ],
+        "responseIsBinary": false
+    },
+    {
+        "scope": "https://cloudflare-dns.com:443",
+        "method": "GET",
+        "path": "/dns-query?name=unknown.example&type=A&random_padding=0",
+        "body": "",
+        "status": 200,
+        "response": {
+            "Status": 3,
+            "TC": false,
+            "RD": true,
+            "RA": true,
+            "AD": true,
+            "CD": false,
+            "Question": [
+                {
+                    "name": "unknown.example",
+                    "type": 1
+                }
+            ],
+            "Authority": [
+                {
+                    "name": "",
+                    "type": 6,
+                    "TTL": 86400,
+                    "data": "a.root-servers.net. nstld.verisign-grs.com. 2024090300 1800 900 604800 86400"
+                }
+            ]
+        },
+        "rawHeaders": [
+            "Server",
+            "cloudflare",
+            "Date",
+            "Tue, 03 Sep 2024 19:58:35 GMT",
+            "Content-Type",
+            "application/dns-json",
+            "Connection",
+            "keep-alive",
+            "Access-Control-Allow-Origin",
+            "*",
+            "Content-Length",
+            "246",
+            "CF-RAY",
+            "8bd850bd0c197b00-DEN"
         ],
         "responseIsBinary": false
     }

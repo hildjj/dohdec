@@ -96,7 +96,7 @@ export class DnsCli extends Command {
         checkAddress
       )
       .option('-f, --full', 'Full response, not just answers')
-      .option('-g, --get', 'Force http GET for DNS-format lookups', true)
+      .option('-g, --get', 'Force http GET for DNS-format lookups')
       .option('-n, --no-decode', 'Do not decode JSON or DNS wire format')
       .option('-2, --no-http2', 'Disable http2 support')
       .option('-t, --tls', 'Use DNS-over-TLS instead of DNS-over-HTTPS')
@@ -189,7 +189,6 @@ For more debug information:
         }
       }
       let resp = await this.transport.lookup(opts);
-
       if (this.argv.decode) {
         if (!this.argv.full) {
           const er = DNSError.getError(resp);

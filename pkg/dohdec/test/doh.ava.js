@@ -18,7 +18,7 @@ test('dns put', async t => {
   r.answers.sort((a, b) => a.type.localeCompare(b.type, 'en'));
   t.is(r.answers[0].name, 'ietf.org');
   t.is(r.answers[0].type, 'A');
-  t.is(r.answers[1].type, 'RRSIG');
+  t.is(r.answers[2].type, 'RRSIG');
 });
 
 test('dns get', async t => {
@@ -44,12 +44,12 @@ test('dns get', async t => {
 
 test('json get', async t => {
   const doh = new DNSoverHTTPS({http2: false});
-  let r = await doh.lookup('ietf.org', {dnssec: true});
+  let r = await doh.lookup('datatracker.ietf.org', {dnssec: true});
   t.truthy(r);
   r.Answer.sort((a, b) => a.type - b.type);
-  t.is(r.Answer[0].name, 'ietf.org');
+  t.is(r.Answer[0].name, 'datatracker.ietf.org');
   t.is(r.Answer[0].type, 1);
-  t.is(r.Answer[1].type, 46);
+  t.is(r.Answer[2].type, 46);
 
   r = await doh.lookup('ietf.org', 'MX');
   t.truthy(r);
@@ -92,4 +92,22 @@ test('DNSSEC with cd=1', async t => {
   const r = await doh.lookup('ietf.org', {rrtype: 'MX', dnssec: true, dnssecCheckingDisabled: true});
   t.truthy(r);
   t.truthy(r.CD);
+});
+
+test('close', t => {
+  const doh = new DNSoverHTTPS();
+
+  // This is a no-op, but let's cover it in case it stops being one.
+  doh.close();
+  t.pass();
+});
+
+test('checkServerIdentity', t => {
+  const verboseStream = new Buf({encoding: 'utf8'});
+  const doh = new DNSoverHTTPS({verbose: 3, verboseStream});
+  const {checkServerIdentity} = doh._checkServerIdentity();
+  t.is(typeof checkServerIdentity, 'function');
+  t.truthy(checkServerIdentity('localhost', {}) instanceof Error);
+  const vstr = verboseStream.read().toString();
+  t.regex(vstr, /CERTIFICATE/);
 });
