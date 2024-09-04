@@ -2,7 +2,7 @@ import * as packet from 'dns-packet';
 import * as rcodes from 'dns-packet/rcodes.js';
 import {Buffer} from 'node:buffer';
 import {EventEmitter} from 'node:events';
-import ip from 'ip';
+import ip from 'ip-address';
 import net from 'node:net';
 import url from 'node:url';
 import util from 'node:util';
@@ -324,19 +324,8 @@ export class DNSutils extends EventEmitter {
    * @throws {Error} Invalid IP Address.
    */
   static reverse(addr) {
-    const buf = ip.toBuffer(addr);
-    Array.prototype.reverse.call(buf);
-
-    if (buf.length === 4) {
-      // IPv4
-      return `${Array.from(buf).join('.')}.in-addr.arpa`;
-    }
-    // IPv6
-    const bytes = Array.from(
-      buf,
-      b => `${(b & 0xf).toString(16)}.${(b >> 4).toString(16)}`
-    ).join('.');
-    return `${bytes}.ip6.arpa`;
+    const ai = net.isIPv4(addr) ? new ip.Address4(addr) : new ip.Address6(addr);
+    return ai.reverseForm();
   }
 }
 

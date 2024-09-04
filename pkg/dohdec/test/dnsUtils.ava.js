@@ -196,8 +196,8 @@ test('verbose', t => {
 });
 
 test('reverse', t => {
-  t.is(DNSutils.reverse('1.2.3.4'), '4.3.2.1.in-addr.arpa');
-  t.is(DNSutils.reverse('::1'), '1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa');
+  t.is(DNSutils.reverse('1.2.3.4'), '4.3.2.1.in-addr.arpa.');
+  t.is(DNSutils.reverse('::1'), '1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa.');
 
   t.throws(() => DNSutils.reverse('INVALID IP'));
 });

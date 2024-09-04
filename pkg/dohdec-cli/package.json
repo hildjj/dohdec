@@ -35,7 +35,7 @@
     "dohdec": "link:../dohdec"
   },
   "devDependencies": {
-    "@types/node": "^22.5.2",
+    "@types/node": "^22.5.3",
     "jsrsasign": "^11.1.0",
     "minami": "^1.2.3",
     "mock-dns-server": "link:../mock-dns-server",
