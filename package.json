@@ -16,7 +16,9 @@
     "all:docs": "pnpm run -r docs",
     "all:types": "pnpm run -r types",
     "all:install": "pnpm i -r",
-    "clean": "rm -rf node_modules coverage pkg/*/node_modules pkg/*/coverage"
+    "all:link": "pnpm run -r link",
+    "clean": "rm -rf node_modules coverage pkg/*/node_modules pkg/*/coverage",
+    "version": "ver=`npm pkg get version | sed -E 's/\"*([^\"]+)\"*/\\1/'` && npm pkg set -ws version=$ver && git add pkg/*/package.json"
   },
   "keywords": [
     "doh",
