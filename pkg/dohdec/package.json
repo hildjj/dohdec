@@ -38,8 +38,8 @@
     "nofilter": "^5.0.0"
   },
   "devDependencies": {
-    "@types/node": "^22.5.3",
-    "mock-dns-server": "link:../mock-dns-server",
+    "@types/node": "^22.5.4",
+    "mock-dns-server": "0.0.3",
     "nock": "^13.5.5",
     "typescript": "^5.5.4"
   },
