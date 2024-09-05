@@ -1,13 +1,7 @@
-name: Publish docs only
+name: Publish Package to npmjs
 on:
-  workflow_dispatch:
-    inputs:
-      branch:
-        type: choice
-        description: Which branch to deploy docs from
-        required: true
-        options:
-          - main
+  release:
+    types: [published]
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -22,7 +16,7 @@ jobs:
           node-version: '22.x'
           registry-url: 'https://registry.npmjs.org'
           cache: pnpm
-      - run: npm run all:link
+      - run: pnpm all:link
       - run: pnpm i -r
       - run: npm run all:check
       - name: Deploy Docs
@@ -32,3 +26,7 @@ jobs:
           publish_dir: docs
           publish_branch: gh-pages
           destination_dir: docs
+      - run: npm pkg delete devDependencies -ws
+      - run: npm publish --access public --provenance -ws
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

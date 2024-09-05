@@ -9,7 +9,8 @@
     "lint": "eslint . --ext js",
     "test": "ava",
     "types": "tsc",
-    "check": "npm pack --dry-run"
+    "check": "npm pack --dry-run",
+    "link": "pnpm link ../dohdec"
   },
   "keywords": [
     "doh",
@@ -32,7 +33,7 @@
   },
   "dependencies": {
     "commander": "^12.1.0",
-    "dohdec": "link:../dohdec"
+    "dohdec": "5.0.3"
   },
   "devDependencies": {
     "@types/node": "^22.5.4",

@@ -30,6 +30,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
+      - run: npm run all:link
       - run: pnpm i -r
       - run: npm run lint
       - run: npm run test

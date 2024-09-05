@@ -79,7 +79,7 @@ importers:
         specifier: ^12.1.0
         version: 12.1.0
       dohdec:
-        specifier: link:../dohdec
+        specifier: 5.0.3
         version: link:../dohdec
     devDependencies:
       '@types/node':
