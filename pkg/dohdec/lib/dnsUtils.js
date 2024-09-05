@@ -15,10 +15,14 @@ const PAD_SIZE = 128;
  * @property {string} [rrtype] The Resource Record type to retrive.
  * @property {number} [id] The 2-byte unsigned integer for the request.
  *   For DOH, should be 0 or undefined.
- * @property {boolean} [json] Force JSON lookups for DOH.  Ignored for DOT.
+ * @property {boolean} [decode=true] Decode the response, either into JSON
+ *   or an object representing the DNS format result.
  * @property {boolean} [stream=false] Encode for streaming, with the packet
  *   prefixed by a 2-byte big-endian integer of the number of bytes in the
  *   packet.
+ * @property {boolean} [dnssec=false] Request DNSSec records.  Currently
+ *   requires `json: false`.
+ * @property {boolean} [dnssecCheckingDisabled=false] Disable DNSSEC
  */
 
 // Extracted from node source.
@@ -236,7 +240,7 @@ export class DNSutils extends EventEmitter {
    */
   static normalizeArgs(name, opts, defaults) {
     /** @type {LookupOptions} */
-    let nopts = {};
+    let nopts = Object.create(null);
     if (name != null) {
       switch (typeof name) {
         case 'object':
