@@ -18,7 +18,7 @@
     "all:install": "pnpm i -r",
     "all:link": "pnpm run -r link",
     "clean": "rm -rf node_modules coverage pkg/*/node_modules pkg/*/coverage",
-    "version": "ver=`npm pkg get version | sed -E 's/\"*([^\"]+)\"*/\\1/'` && npm pkg set -ws version=$ver && git add pkg/*/package.json"
+    "version": "ver=`npm pkg get version | sed -E 's/\"*([^\"]+)\"*/\\1/'` && npm pkg set -ws version=$ver && npm pkg set dependencies.dohdec=$ver --workspace dohdec-cli && git add pkg/*/package.json"
   },
   "keywords": [
     "doh",
