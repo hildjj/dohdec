@@ -1,5 +1,6 @@
 import {createServer, plainConnect} from 'mock-dns-server';
 import {Buffer} from 'node:buffer';
+import {DNS} from '../../../test/zones.js';
 import {DNSoverTLS} from '../lib/dot.js';
 import crypto from 'node:crypto';
 import test from 'ava';
@@ -7,7 +8,7 @@ import test from 'ava';
 let mockServer = null;
 
 test.before(() => {
-  mockServer = createServer();
+  mockServer = createServer({zones: DNS});
 });
 
 test.after.always(() => new Promise((resolve, reject) => {
@@ -40,7 +41,7 @@ test('lookup', async t => {
   const [{name, type, data}] = res.answers;
   t.is(name, 'ietf.org');
   t.is(type, 'A');
-  t.is(data, '4.31.198.44');
+  t.is(data, '104.16.44.99');
   const srv = await dot.lookup('_xmpp-server._tcp.jabber.org', 'srv');
   t.deepEqual(srv.answers[0].data, {
     port: 5269,

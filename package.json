@@ -43,6 +43,7 @@
     "eslint-plugin-jsdoc": "^50.2.2",
     "eslint-plugin-markdown": "5.1.0",
     "eslint-plugin-node": "^11.1.0",
+    "mock-dns-server": "0.0.3",
     "typedoc": "0.26.6"
   },
   "packageManager": "pnpm@9.9.0",

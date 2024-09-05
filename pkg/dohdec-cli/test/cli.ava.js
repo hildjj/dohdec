@@ -1,5 +1,6 @@
 import {Buf, prepNock} from '../../../test/utils.js';
 import {createServer, plainConnect} from 'mock-dns-server';
+import {DNS} from '../../../test/zones.js';
 import {DnsCli} from '../lib/cli.js';
 import nock from 'nock';
 import stream from 'node:stream';
@@ -9,7 +10,7 @@ prepNock(test, nock, import.meta.url);
 let mockServer = null;
 
 test.before(() => {
-  mockServer = createServer();
+  mockServer = createServer({zones: DNS});
 });
 
 test.after.always(() => new Promise((resolve, reject) => {
