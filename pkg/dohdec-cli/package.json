@@ -1,6 +1,6 @@
 {
   "name": "dohdec-cli",
-  "version": "5.0.3",
+  "version": "6.0.0",
   "description": "DNS over HTTPS and DNS over TLS",
   "main": "./lib/cli.js",
   "types": "types/",
@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "commander": "^12.1.0",
-    "dohdec": "5.0.3"
+    "dohdec": "6.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.5.4",
