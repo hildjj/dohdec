@@ -6,6 +6,7 @@ import {default as DNSutils} from './dnsUtils.js';
 import {NoFilter} from 'nofilter';
 // eslint-disable-next-line no-unused-vars
 import {Writable} from 'node:stream';
+import assert from 'node:assert';
 import util from 'node:util';
 
 const randomBytes = util.promisify(crypto.randomBytes);
@@ -46,6 +47,20 @@ const DEFAULT_SERVER = '1.1.1.1';
  * certificate that the server will offer.
  */
 export class DNSoverTLS extends DNSutils {
+  size = -1;
+
+  /** @type {tls.TLSSocket|undefined} */
+  socket = undefined;
+
+  /** @type {Record<number, Pending>} */
+  pending = Object.create(null);
+
+  /** @type {NoFilter|undefined} */
+  nof = undefined;
+
+  /** @type {Buffer[]} */
+  bufs = [];
+
   /**
    * Construct a new DNSoverTLS.
    *
@@ -79,22 +94,13 @@ export class DNSoverTLS extends DNSutils {
       ...rest,
     };
     this.verbose(1, 'DNSoverTLS options:', this.opts);
-    this._reset();
   }
 
   _reset() {
     this.size = -1;
-
-    /** @type {tls.TLSSocket} */
-    this.socket = null;
-
-    /** @type {Object.<number, Pending>} */
-    this.pending = {};
-
-    /** @type {NoFilter} */
-    this.nof = null;
-
-    /** @type {Buffer[]} */
+    this.socket = undefined;
+    this.pending = Object.create(null);
+    this.nof = undefined;
     this.bufs = [];
   }
 
@@ -197,6 +203,7 @@ Received: "${hash}"`);
      * @event DNSoverTLS#receive
      */
     this.emit('receive', b);
+    assert(this.nof);
     this.nof.write(b);
 
     // There might be multiple results in one read.
@@ -219,6 +226,7 @@ Received: "${hash}"`);
 
       this.size = -1;
       const pkt = packet.decode(buf);
+      assert(pkt.id !== undefined, 'Invalid packet, no id');
       const pend = this.pending[pkt.id];
       if (!pend) {
         // Something bad happened, like an injection attack or a corrupted
@@ -302,8 +310,10 @@ Received: "${hash}"`);
         () => packet.decode(pkt, 2) // Skip length
       );
 
+      assert(nopts.id, 'Invalid ID');
       this.pending[nopts.id] = {resolve, reject, opts: nopts};
 
+      assert(this.socket);
       this.socket.write(pkt);
 
       /**
@@ -325,7 +335,7 @@ Received: "${hash}"`);
   close() {
     return new Promise((resolve, _reject) => {
       if (this.socket) {
-        this.socket.end(null, () => {
+        this.socket.end(() => {
           resolve();
         });
       } else {

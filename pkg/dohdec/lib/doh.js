@@ -3,6 +3,7 @@ import * as tls from 'node:tls';
 import DNSutils from './dnsUtils.js';
 // eslint-disable-next-line no-unused-vars
 import {Writable} from 'node:stream';
+import assert from 'node:assert';
 import cryptoRandomString from 'crypto-random-string';
 import fs from 'node:fs';
 import got from 'got';
@@ -94,6 +95,7 @@ export class DNSoverHTTPS extends DNSutils {
       {
         beforeRequest: [(/** @type {import('got').Options} */options) => {
           this.verbose(1, `HTTP ${options.method} headers:`, options.headers);
+          assert(options.url);
           this.verbose(1, `HTTP ${options.method} URL: ${options.url.toString()}`);
         }],
       } :
@@ -130,6 +132,8 @@ export class DNSoverHTTPS extends DNSutils {
 
     const pkt = DNSutils.makePacket(opts);
     let url = opts.url || this.opts.url;
+
+    /** @type {Buffer|undefined} */
     let body = pkt;
 
     this.verbose(1, 'REQUEST:', () => packet.decode(pkt));

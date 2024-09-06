@@ -5,6 +5,7 @@ import * as packet from 'dns-packet';
 import * as rcodes from 'dns-packet/rcodes.js';
 import {Buffer} from 'node:buffer';
 import {EventEmitter} from 'node:events';
+import assert from 'node:assert';
 import ip from 'ip-address';
 import net from 'node:net';
 import url from 'node:url';
@@ -45,6 +46,7 @@ export function stylizeWithColor(str, styleType) {
   const style = util.inspect.styles[styleType];
   if (style !== undefined) {
     const color = util.inspect.colors[style];
+    assert(color, style);
     return `\u001b[${color[0]}m${str}\u001b[${color[1]}m`;
   }
   return str;
@@ -231,6 +233,7 @@ export class DNSutils extends EventEmitter {
       }],
       additionals: [opt],
     };
+    assert(dns.flags !== undefined);
     if (opts.dnssec) {
       dns.flags |= packet.AUTHENTIC_DATA;
       opt.flags |= packet.DNSSEC_OK;
@@ -238,7 +241,10 @@ export class DNSutils extends EventEmitter {
     if (opts.dnssecCheckingDisabled) {
       dns.flags |= packet.CHECKING_DISABLED;
     }
-    if (opts.ecs != null || net.isIP(opts.ecsSubnet) !== 0) {
+    if (
+      (opts.ecs != null) ||
+      (opts.ecsSubnet && (net.isIP(opts.ecsSubnet) !== 0))
+    ) {
       // https://tools.ietf.org/html/rfc7871#section-11.1
       const prefix = (opts.ecsSubnet && net.isIPv4(opts.ecsSubnet)) ? 24 : 56;
       opt.options.push({
@@ -300,6 +306,7 @@ export class DNSutils extends EventEmitter {
       }
     }
 
+    assert(nopts.name, 'Name required');
     return {
       ...defaults,
       ...nopts,
@@ -316,6 +323,7 @@ export class DNSutils extends EventEmitter {
    */
   static base64urlEncode(buf) {
     const s = buf.toString('base64');
+    // @ts-expect-error This isn't worth getting type-safe
     return s.replace(/[=+/]/g, c => ({
       '=': '',
       '+': '-',
@@ -332,7 +340,7 @@ export class DNSutils extends EventEmitter {
    *   dependencies.
    * @returns {any} The converted object.
    */
-  static buffersToB64(o, circular = null) {
+  static buffersToB64(o, circular = undefined) {
     if (!circular) {
       circular = new WeakSet();
     }
@@ -381,10 +389,10 @@ export class DNSError extends Error {
   }
 
   /**
-   * Factory to extract DNS error from packet.
+   * Factory to extract DNS error from packet, if one exists.
    *
    * @param {packet.Packet} pkt
-   * @returns {DNSError}
+   * @returns {DNSError|undefined}
    */
   static getError(pkt) {
     if (Object.prototype.hasOwnProperty.call(pkt, 'rcode')) {
@@ -400,7 +408,7 @@ export class DNSError extends Error {
         return new DNSError(rcodes.toString(pkt.Status), pkt);
       }
     }
-    return null;
+    return undefined;
   }
 }
 

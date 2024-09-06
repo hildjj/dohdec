@@ -74,9 +74,9 @@ test('immediate close', async t => {
   dot.on('error', e => {
     t.fail(`Should not get error: ${e.message}`);
   });
-  t.is(dot.socket, null);
+  t.is(dot.socket, undefined);
   await dot.close();
-  t.is(dot.socket, null);
+  t.is(dot.socket, undefined);
 
   // Clean up for shutdown
   dot.opts.socket.end();
