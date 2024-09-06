@@ -1,6 +1,7 @@
 import {Command, InvalidArgumentError} from 'commander';
-import {DNSError, DNSutils} from 'dohdec/lib/dnsUtils.js';
-import {DNSoverHTTPS, DNSoverTLS} from 'dohdec';
+import {DNSError, DNSoverHTTPS, DNSoverTLS, DNSutils} from 'dohdec';
+import {Buffer} from 'node:buffer';
+import assert from 'node:assert';
 import net from 'node:net';
 import readline from 'node:readline';
 import util from 'node:util';
@@ -19,6 +20,28 @@ function myParseInt(value) {
     throw new InvalidArgumentError('Bad number');
   }
   return parsedValue;
+}
+
+/**
+ * @param {any} pkt
+ * @returns {asserts pkt is import('dns-packet').Packet}
+ * @private
+ */
+function assertIsPacket(pkt) {
+  assert(pkt);
+  assert(typeof pkt === 'object');
+  assert(!Buffer.isBuffer(pkt));
+  assert(!Array.isArray(pkt));
+}
+
+/**
+ * @param {any} er
+ * @returns {asserts er is Error}
+ */
+function assertIsError(er) {
+  assert(er);
+  assert(typeof er === 'object');
+  assert(Object.prototype.hasOwnProperty.call(er, 'message'));
 }
 
 /**
@@ -58,10 +81,10 @@ export class DnsCli extends Command {
   constructor(args, stdio) {
     super();
 
-    /** @type {DNSoverHTTPS|DNSoverTLS} */
-    this.transport = null;
+    /** @type {DNSoverHTTPS|DNSoverTLS|undefined} */
+    this.transport = undefined;
 
-    /** @type {Stdio} */
+    /** @type {Required<Stdio>} */
     this.std = {
       in: process.stdin,
       out: process.stdout,
@@ -158,6 +181,7 @@ For more debug information:
    * Run the CLI.
    */
   async main() {
+    assert(this.transport);
     try {
       if (this.argv.name) {
         await this.get(this.argv.name, this.argv.rrtype);
@@ -170,6 +194,10 @@ For more debug information:
     }
   }
 
+  /**
+   * @param {string} name
+   * @param {import('dns-packet').RecordType} rrtype
+   */
   async get(name, rrtype) {
     const opts = {
       name,
@@ -181,6 +209,7 @@ For more debug information:
       dnssec: this.argv.dnssec,
       dnssecCheckingDisabled: this.argv.dnssecCheckingDisabled,
     };
+    assert(this.transport);
     try {
       if (net.isIP(opts.name)) {
         opts.name = DNSutils.reverse(opts.name);
@@ -191,6 +220,7 @@ For more debug information:
       let resp = await this.transport.lookup(opts);
       if (this.argv.decode) {
         if (!this.argv.full) {
+          assertIsPacket(resp);
           const er = DNSError.getError(resp);
           if (er) {
             // This isn't ideal, since a) this is normal operation and
@@ -198,9 +228,10 @@ For more debug information:
             // this turned out to be easier to test.
             throw er;
           }
-          // Avoid typescript errors
-          // eslint-disable-next-line dot-notation
-          resp = resp['answers'] || resp['Answer'] || resp;
+          resp =
+            resp.answers ||
+            /** @type {Record<string, any>}*/ (resp).Answer ||
+            resp;
         }
         this.std.out.write(util.inspect(DNSutils.buffersToB64(resp), {
           depth: Infinity,
@@ -215,6 +246,7 @@ For more debug information:
         }
       }
     } catch (er) {
+      assertIsError(er);
       this.transport.verbose(1, er) ||
       this.transport.verbose(0, () => (er.message ? er.message : er));
       throw er;
@@ -222,6 +254,8 @@ For more debug information:
   }
 
   async prompt() {
+    assert(this.transport);
+
     let errors = 0;
     let total = 0;
     const rl = readline.createInterface({
@@ -235,7 +269,11 @@ For more debug information:
       if (line.length > 0) {
         total++;
         try {
-          await this.get(...line.split(/\s+/));
+          const [name, rrtype] = line.split(/\s+/);
+          await this.get(
+            name,
+            /** @type {import('dns-packet').RecordType} */(rrtype)
+          );
         } catch (ignored) {
           // Catches all errors.  get() printed them already
           errors++;

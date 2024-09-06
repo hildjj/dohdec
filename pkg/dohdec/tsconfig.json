@@ -1,5 +1,8 @@
 {
-  "include": ["lib/*.js"],
+  "include": [
+    "lib/*.js",
+    "typings.d.ts"
+  ],
 
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
@@ -9,9 +12,11 @@
     "emitDeclarationOnly": true,
     "moduleResolution": "node",
     "module": "es2020",
-    // "noImplicitAny": true,
+    "noImplicitAny": true,
+    "strict": true,
+    "skipLibCheck": true,
     "outDir": "types",
-    "target": "ES2020",
+    "target": "ES2022",
     "resolveJsonModule": true
   }
 }

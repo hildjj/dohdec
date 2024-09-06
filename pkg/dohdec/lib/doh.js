@@ -1,8 +1,7 @@
 import * as packet from 'dns-packet';
 import * as tls from 'node:tls';
 import DNSutils from './dnsUtils.js';
-// eslint-disable-next-line no-unused-vars
-import {Writable} from 'node:stream';
+import assert from 'node:assert';
 import cryptoRandomString from 'crypto-random-string';
 import fs from 'node:fs';
 import got from 'got';
@@ -32,10 +31,32 @@ const USER_AGENT = `${pkg.name} v${pkg.version}`;
  */
 
 /**
+ * @typedef {import('./dnsUtils.js').Writable} Writable
+ */
+
+/**
  * Request DNS information over HTTPS.  The [lookup]{@link DNSoverHTTPS#lookup}
  * function provides the easiest-to-use defaults.
  */
 export class DNSoverHTTPS extends DNSutils {
+  /**
+   * The user-agent used in HTTPS requests.
+   * @type {string}
+   */
+  static userAgent = USER_AGENT;
+
+  /**
+   * The running version of dohdec.
+   * @type {string}
+   */
+  static version = pkg.version;
+
+  /**
+   * Default URL for DNSoverHTTPS requests
+   * @type {string}
+   */
+  static defaultURL = CLOUDFLARE_API;
+
   /**
    * Create a DNSoverHTTPS instance.
    *
@@ -71,8 +92,9 @@ export class DNSoverHTTPS extends DNSutils {
 
     this.hooks = (this._verbose > 0) ?
       {
-        beforeRequest: [options => {
+        beforeRequest: [(/** @type {import('got').Options} */options) => {
           this.verbose(1, `HTTP ${options.method} headers:`, options.headers);
+          assert(options.url);
           this.verbose(1, `HTTP ${options.method} URL: ${options.url.toString()}`);
         }],
       } :
@@ -88,7 +110,10 @@ export class DNSoverHTTPS extends DNSutils {
   _checkServerIdentity() {
     return {
       // This doesn't fire in nock tests.
-      checkServerIdentity: (host, cert) => {
+      checkServerIdentity: (
+        /** @type {string} */host,
+        /** @type {tls.PeerCertificate} */cert
+      ) => {
         this.verbose(3, 'CERTIFICATE:', () => DNSutils.buffersToB64(cert));
         return tls.checkServerIdentity(host, cert);
       },
@@ -106,6 +131,8 @@ export class DNSoverHTTPS extends DNSutils {
 
     const pkt = DNSutils.makePacket(opts);
     let url = opts.url || this.opts.url;
+
+    /** @type {Buffer|undefined} */
     let body = pkt;
 
     this.verbose(1, 'REQUEST:', () => packet.decode(pkt));
@@ -194,7 +221,7 @@ export class DNSoverHTTPS extends DNSutils {
    *   if this is an object.
    * @param {DOH_LookupOptions|string} [opts={}] Options for the
    *   request.  If a string is given, it will be used as the rrtype.
-   * @returns {Promise<Buffer|string|object>} DNS result.
+   * @returns {Promise<Buffer|string|packet.Packet|object>} DNS result.
    */
   lookup(name, opts = {}) {
     const nopts = /** @type {Required<DOH_LookupOptions>} */ (
@@ -216,17 +243,5 @@ export class DNSoverHTTPS extends DNSutils {
     // No-op for now
   }
 }
-
-function setStatic(c) {
-  // Hide these from typescript
-  c.userAgent = USER_AGENT;
-  c.defaultURL = CLOUDFLARE_API;
-}
-
-/** @type {string} */
-DNSoverHTTPS.version = pkg.version;
-DNSoverHTTPS.userAgent = '';
-DNSoverHTTPS.defaultURL = '';
-setStatic(DNSoverHTTPS);
 
 export default DNSoverHTTPS;
