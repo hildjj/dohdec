@@ -15,15 +15,7 @@ const DEFAULT_SERVER = '1.1.1.1';
 /**
  * Options for doing DOT lookups.
  *
- * @typedef {object} DOT_LookupOptions
- * @property {string} [name] The DNS name to look up.
- * @property {string} [rrtype='A'] The Resource Record type
- *   to retrive.
- * @property {number} [id] 2-byte ID for the DNS packet.  Defaults to random.
- * @property {boolean} [decode=true] Decode the response, either into JSON
- *   or an object representing the DNS format result.
- * @property {boolean} [dnssec=false] Request DNSSec records.  Currently
- *   requires `json: false`.
+ * @typedef {import('./dnsUtils.js').LookupOptions} DOT_LookupOptions
  */
 
 /**

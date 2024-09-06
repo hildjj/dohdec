@@ -18,20 +18,17 @@ const USER_AGENT = `${pkg.name} v${pkg.version}`;
 /**
  * Options for doing DOH lookups.
  *
- * @typedef {object} DOH_LookupOptions
- * @property {string} [name] The DNS name to look up.
- * @property {string} [rrtype='A'] The Resource Record type
- *   to retrive.
- * @property {boolean} [json=true] Retrieve a JSON response.  If false,
- *   retrieve using DNS format.
- * @property {boolean} [decode=true] Decode the response, either into JSON
- *   or an object representing the DNS format result.
+ * @typedef {object} DOH_SpecificLookupOptions
  * @property {boolean} [preferPost=true] For DNS format requests, should
  *   the HTTP POST verb be used?  If false, uses GET.
- * @property {boolean} [dnssec=false] Request DNSSec records.  Currently
- *   requires `json: false`.
  * @property {string} [url=CLOUDFLARE_API] What DoH endpoint should be
  *   used?
+ * @property {boolean} [json=true] Force JSON lookups for DOH.
+ */
+
+/**
+ * @typedef {DOH_SpecificLookupOptions &
+ *   import('./dnsUtils.js').LookupOptions} DOH_LookupOptions
  */
 
 /**
@@ -200,13 +197,15 @@ export class DNSoverHTTPS extends DNSutils {
    * @returns {Promise<Buffer|string|object>} DNS result.
    */
   lookup(name, opts = {}) {
-    const nopts = DNSutils.normalizeArgs(name, opts, {
-      rrtype: 'A',
-      json: true,
-      decode: true,
-      dnssec: false,
-      dnssecCheckingDisabled: false,
-    });
+    const nopts = /** @type {Required<DOH_LookupOptions>} */ (
+      DNSutils.normalizeArgs(name, opts, {
+        rrtype: 'A',
+        json: true,
+        decode: true,
+        dnssec: false,
+        dnssecCheckingDisabled: false,
+      })
+    );
     this.verbose(1, 'DNSoverHTTPS.lookup options:', nopts);
 
     return nopts.json ? this.getJSON(nopts) : this.getDNS(nopts);
