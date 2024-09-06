@@ -79,7 +79,7 @@ importers:
         specifier: ^12.1.0
         version: 12.1.0
       dohdec:
-        specifier: 6.0.1
+        specifier: 6.0.2
         version: link:../dohdec
     devDependencies:
       '@types/dns-packet':
