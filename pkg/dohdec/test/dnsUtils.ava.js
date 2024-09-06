@@ -227,4 +227,7 @@ test('DNSError', t => {
 
   er = DNSError.getError({});
   t.falsy(er);
+
+  t.throws(() => DNSError.getError(null));
+  t.throws(() => DNSError.getError(4));
 });

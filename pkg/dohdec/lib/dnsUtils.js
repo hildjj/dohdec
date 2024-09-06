@@ -393,7 +393,7 @@ export class DNSError extends Error {
    * @returns {DNSError|undefined}
    */
   static getError(pkt) {
-    if ((typeof packet !== 'object') || !pkt) {
+    if ((typeof pkt !== 'object') || !pkt) {
       throw new TypeError('Invalid packet');
     }
     if (Object.prototype.hasOwnProperty.call(pkt, 'rcode')) {

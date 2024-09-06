@@ -35,6 +35,16 @@ function assertIsPacket(pkt) {
 }
 
 /**
+ * @param {any} er
+ * @returns {asserts er is Error}
+ */
+function assertIsError(er) {
+  assert(er);
+  assert(typeof er === 'object');
+  assert(Object.prototype.hasOwnProperty.call(er, 'message'));
+}
+
+/**
  * Parse an IPv4/IPv6 address or throw if invalid.
  *
  * @param {string} value Command line value.
@@ -71,10 +81,10 @@ export class DnsCli extends Command {
   constructor(args, stdio) {
     super();
 
-    /** @type {DNSoverHTTPS|DNSoverTLS} */
-    this.transport = null;
+    /** @type {DNSoverHTTPS|DNSoverTLS|undefined} */
+    this.transport = undefined;
 
-    /** @type {Stdio} */
+    /** @type {Required<Stdio>} */
     this.std = {
       in: process.stdin,
       out: process.stdout,
@@ -171,6 +181,7 @@ For more debug information:
    * Run the CLI.
    */
   async main() {
+    assert(this.transport);
     try {
       if (this.argv.name) {
         await this.get(this.argv.name, this.argv.rrtype);
@@ -198,6 +209,7 @@ For more debug information:
       dnssec: this.argv.dnssec,
       dnssecCheckingDisabled: this.argv.dnssecCheckingDisabled,
     };
+    assert(this.transport);
     try {
       if (net.isIP(opts.name)) {
         opts.name = DNSutils.reverse(opts.name);
@@ -234,6 +246,7 @@ For more debug information:
         }
       }
     } catch (er) {
+      assertIsError(er);
       this.transport.verbose(1, er) ||
       this.transport.verbose(0, () => (er.message ? er.message : er));
       throw er;
@@ -241,6 +254,8 @@ For more debug information:
   }
 
   async prompt() {
+    assert(this.transport);
+
     let errors = 0;
     let total = 0;
     const rl = readline.createInterface({
@@ -257,7 +272,7 @@ For more debug information:
           const [name, rrtype] = line.split(/\s+/);
           await this.get(
             name,
-            /** @type {import('dns-packet').RecordType | undefined} */(rrtype)
+            /** @type {import('dns-packet').RecordType} */(rrtype)
           );
         } catch (ignored) {
           // Catches all errors.  get() printed them already
