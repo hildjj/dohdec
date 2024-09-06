@@ -9,9 +9,10 @@
     "emitDeclarationOnly": true,
     "moduleResolution": "node",
     "module": "es2020",
-    // "noImplicitAny": true,
+    "noImplicitAny": true,
+    "skipLibCheck": true,
     "outDir": "types",
-    "target": "ES2020",
+    "target": "ES2022",
     "resolveJsonModule": true
   }
 }

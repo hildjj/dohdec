@@ -4,8 +4,6 @@ import * as tls from 'node:tls';
 import {Buffer} from 'node:buffer';
 import {default as DNSutils} from './dnsUtils.js';
 import {NoFilter} from 'nofilter';
-// eslint-disable-next-line no-unused-vars
-import {Writable} from 'node:stream';
 import assert from 'node:assert';
 import util from 'node:util';
 
@@ -17,6 +15,10 @@ const DEFAULT_SERVER = '1.1.1.1';
  * Options for doing DOT lookups.
  *
  * @typedef {import('./dnsUtils.js').LookupOptions} DOT_LookupOptions
+ */
+
+/**
+ * @typedef {import('./dnsUtils.js').Writable} Writable
  */
 
 /**
@@ -280,7 +282,7 @@ Received: "${hash}"`);
    *   if this is an object.
    * @param {DOT_LookupOptions|string} [opts={}] Options for the
    *   request.  If a string is given, it will be used as the rrtype.
-   * @returns {Promise<Buffer|object>} Response.
+   * @returns {Promise<Buffer|packet.Packet>} Response.
    */
   async lookup(name, opts = {}) {
     const nopts = DNSutils.normalizeArgs(name, opts, {

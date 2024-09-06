@@ -1,5 +1,8 @@
 {
-  "include": ["lib/*.js"],
+  "include": [
+    "lib/*.js",
+    "typings.d.ts"
+  ],
 
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,

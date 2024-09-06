@@ -1,7 +1,5 @@
-// @ts-expect-error These types are private
 import * as optioncodes from 'dns-packet/optioncodes.js';
 import * as packet from 'dns-packet';
-// @ts-expect-error These types are private
 import * as rcodes from 'dns-packet/rcodes.js';
 import {Buffer} from 'node:buffer';
 import {EventEmitter} from 'node:events';
@@ -391,20 +389,19 @@ export class DNSError extends Error {
   /**
    * Factory to extract DNS error from packet, if one exists.
    *
-   * @param {packet.Packet} pkt
+   * @param {Record<string,any>} pkt
    * @returns {DNSError|undefined}
    */
   static getError(pkt) {
+    if ((typeof packet !== 'object') || !pkt) {
+      throw new TypeError('Invalid packet');
+    }
     if (Object.prototype.hasOwnProperty.call(pkt, 'rcode')) {
-      // @ts-expect-error Types don't include rcode
       if (pkt.rcode !== 'NOERROR') {
-        // @ts-expect-error Types don't include rcode
         return new DNSError(pkt.rcode, pkt);
       }
     } else if (Object.prototype.hasOwnProperty.call(pkt, 'Status')) {
-      // @ts-expect-error Types don't include Status
       if (pkt.Status !== 0) {
-        // @ts-expect-error Types don't include Status
         return new DNSError(rcodes.toString(pkt.Status), pkt);
       }
     }

@@ -1,8 +1,6 @@
 import * as packet from 'dns-packet';
 import * as tls from 'node:tls';
 import DNSutils from './dnsUtils.js';
-// eslint-disable-next-line no-unused-vars
-import {Writable} from 'node:stream';
 import assert from 'node:assert';
 import cryptoRandomString from 'crypto-random-string';
 import fs from 'node:fs';
@@ -33,6 +31,10 @@ const USER_AGENT = `${pkg.name} v${pkg.version}`;
  */
 
 /**
+ * @typedef {import('./dnsUtils.js').Writable} Writable
+ */
+
+/**
  * Request DNS information over HTTPS.  The [lookup]{@link DNSoverHTTPS#lookup}
  * function provides the easiest-to-use defaults.
  */
@@ -40,21 +42,18 @@ export class DNSoverHTTPS extends DNSutils {
   /**
    * The user-agent used in HTTPS requests.
    * @type {string}
-   * @static
    */
   static userAgent = USER_AGENT;
 
   /**
    * The running version of dohdec.
    * @type {string}
-   * @static
    */
   static version = pkg.version;
 
   /**
    * Default URL for DNSoverHTTPS requests
    * @type {string}
-   * @static
    */
   static defaultURL = CLOUDFLARE_API;
 
@@ -222,7 +221,7 @@ export class DNSoverHTTPS extends DNSutils {
    *   if this is an object.
    * @param {DOH_LookupOptions|string} [opts={}] Options for the
    *   request.  If a string is given, it will be used as the rrtype.
-   * @returns {Promise<Buffer|string|object>} DNS result.
+   * @returns {Promise<Buffer|string|packet.Packet|object>} DNS result.
    */
   lookup(name, opts = {}) {
     const nopts = /** @type {Required<DOH_LookupOptions>} */ (
