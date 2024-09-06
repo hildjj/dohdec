@@ -33,6 +33,7 @@ jobs:
       - run: npm run all:link
       - run: pnpm i -r
       - run: npm run lint
+      - run: npm run all:types
       - run: npm run test
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4

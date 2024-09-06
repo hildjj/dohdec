@@ -14,10 +14,10 @@
     "preall:check": "npm run lint && npm run test && npm run all:types && npm run all:docs",
     "all:check": "pnpm run -r --stream check",
     "all:docs": "pnpm run -r docs",
-    "all:types": "pnpm run -r types",
+    "all:types": "pnpm run -C pkg/dohdec types && pnpm run -C pkg/dohdec-cli types",
     "all:install": "pnpm i -r",
     "all:link": "pnpm run -r link",
-    "clean": "rm -rf node_modules coverage pkg/*/node_modules pkg/*/coverage",
+    "clean": "rm -rf node_modules coverage pkg/*/node_modules pkg/*/coverage pkg/*/types",
     "version": "ver=`npm pkg get version | sed -E 's/\"*([^\"]+)\"*/\\1/'` && npm pkg set -ws version=$ver && npm pkg set dependencies.dohdec=$ver --workspace dohdec-cli && git add pkg/*/package.json"
   },
   "keywords": [
