@@ -126,6 +126,12 @@ export class DNSoverTLS extends DNSutils {
     });
   }
 
+  /**
+   * @param {string} host
+   * @param {tls.PeerCertificate} cert
+   * @returns {Error | undefined}
+   * @private
+   */
   _checkServerIdentity(host, cert) {
     // Same as cert.fingerprint256, but with hash agility
     const hash = DNSoverTLS.hashCert(cert, this.opts.hashAlg);
@@ -241,7 +247,7 @@ Received: "${hash}"`);
   /**
    * Hash a certificate using the given algorithm.
    *
-   * @param {Buffer|crypto.X509Certificate} cert The cert to hash.
+   * @param {Buffer|tls.PeerCertificate} cert The cert to hash.
    * @param {string} [hashAlg="sha256"] The hash algorithm to use.
    * @returns {string} Hex string.
    * @throws {Error} Unknown certificate type.

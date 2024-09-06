@@ -37,6 +37,27 @@ const USER_AGENT = `${pkg.name} v${pkg.version}`;
  */
 export class DNSoverHTTPS extends DNSutils {
   /**
+   * The user-agent used in HTTPS requests.
+   * @type {string}
+   * @static
+   */
+  static userAgent = USER_AGENT;
+
+  /**
+   * The running version of dohdec.
+   * @type {string}
+   * @static
+   */
+  static version = pkg.version;
+
+  /**
+   * Default URL for DNSoverHTTPS requests
+   * @type {string}
+   * @static
+   */
+  static defaultURL = CLOUDFLARE_API;
+
+  /**
    * Create a DNSoverHTTPS instance.
    *
    * @param {object} opts Options for all requests.
@@ -71,7 +92,7 @@ export class DNSoverHTTPS extends DNSutils {
 
     this.hooks = (this._verbose > 0) ?
       {
-        beforeRequest: [options => {
+        beforeRequest: [(/** @type {import('got').Options} */options) => {
           this.verbose(1, `HTTP ${options.method} headers:`, options.headers);
           this.verbose(1, `HTTP ${options.method} URL: ${options.url.toString()}`);
         }],
@@ -88,7 +109,10 @@ export class DNSoverHTTPS extends DNSutils {
   _checkServerIdentity() {
     return {
       // This doesn't fire in nock tests.
-      checkServerIdentity: (host, cert) => {
+      checkServerIdentity: (
+        /** @type {string} */host,
+        /** @type {tls.PeerCertificate} */cert
+      ) => {
         this.verbose(3, 'CERTIFICATE:', () => DNSutils.buffersToB64(cert));
         return tls.checkServerIdentity(host, cert);
       },
@@ -216,17 +240,5 @@ export class DNSoverHTTPS extends DNSutils {
     // No-op for now
   }
 }
-
-function setStatic(c) {
-  // Hide these from typescript
-  c.userAgent = USER_AGENT;
-  c.defaultURL = CLOUDFLARE_API;
-}
-
-/** @type {string} */
-DNSoverHTTPS.version = pkg.version;
-DNSoverHTTPS.userAgent = '';
-DNSoverHTTPS.defaultURL = '';
-setStatic(DNSoverHTTPS);
 
 export default DNSoverHTTPS;

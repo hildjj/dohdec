@@ -1,4 +1,7 @@
+// @ts-expect-error These types are private
+import * as optioncodes from 'dns-packet/optioncodes.js';
 import * as packet from 'dns-packet';
+// @ts-expect-error These types are private
 import * as rcodes from 'dns-packet/rcodes.js';
 import {Buffer} from 'node:buffer';
 import {EventEmitter} from 'node:events';
@@ -12,7 +15,7 @@ const PAD_SIZE = 128;
 /**
  * @typedef {object} LookupOptions
  * @property {string} [name] Name to look up.
- * @property {string} [rrtype] The Resource Record type to retrive.
+ * @property {packet.RecordType} [rrtype] The Resource Record type to retrive.
  * @property {number} [id] The 2-byte unsigned integer for the request.
  *   For DOH, should be 0 or undefined.
  * @property {boolean} [decode=true] Decode the response, either into JSON
@@ -25,8 +28,19 @@ const PAD_SIZE = 128;
  * @property {boolean} [dnssecCheckingDisabled=false] Disable DNSSEC
  */
 
-// Extracted from node source.
-// Only exported for testing.
+/**
+ * @typedef {import('stream').Writable & {isTTY?: boolean}} Writable
+ */
+
+/**
+ * Extracted from node source.
+ * Only exported for testing.
+ *
+ * @param {string} str
+ * @param {util.Style} styleType
+ * @returns {string}
+ * @private
+ */
 export function stylizeWithColor(str, styleType) {
   const style = util.inspect.styles[styleType];
   if (style !== undefined) {
@@ -36,11 +50,22 @@ export function stylizeWithColor(str, styleType) {
   return str;
 }
 
+/**
+ * @param {Writable} stream
+ * @param {string} str
+ * @param {util.Style} styleType
+ * @private
+ */
 function styleStream(stream, str, styleType) {
   stream.write(stream.isTTY ? stylizeWithColor(str, styleType) : str);
 }
 
-// Exported for testing only
+/**
+ * Exported for testing only
+ * @param {Writable} stream
+ * @param {Buffer} buf
+ * @returns {number}
+ */
 export function printableString(stream, buf) {
   // Intent: each byte that is "printable" takes up one grapheme, and everything
   // else is replaced with '.'
@@ -58,12 +83,15 @@ export function printableString(stream, buf) {
 }
 
 export class DNSutils extends EventEmitter {
+  /** @type {Writable} */
+  verboseStream;
+
   /**
    * Creates an instance of DNSutils.
    *
    * @param {object} [opts={}] Options.
    * @param {number} [opts.verbose=0] How verbose do you want your logging?
-   * @param {import('stream').Writable} [opts.verboseStream=process.stderr]
+   * @param {Writable} [opts.verboseStream=process.stderr]
    *   Where to write verbose output.
    */
   constructor(opts = {}) {
@@ -160,9 +188,9 @@ export class DNSutils extends EventEmitter {
    * Encode a DNS query packet to a buffer.
    *
    * @param {object} opts Options for the query.
-   * @param {number} [opts.id=0] ID for the query.  SHOULD be 0 for DOH.
    * @param {string} [opts.name] The name to look up.
-   * @param {string} [opts.rrtype="A"] The record type to look up.
+   * @param {number} [opts.id=0] ID for the query.  SHOULD be 0 for DOH.
+   * @param {packet.RecordType} [opts.rrtype="A"] The record type to look up.
    * @param {boolean} [opts.dnssec=false] Request DNSSec information?
    * @param {boolean} [opts.dnssecCheckingDisabled=false] Disable DNSSec
    *   validation?
@@ -175,6 +203,23 @@ export class DNSutils extends EventEmitter {
    * @returns {Buffer} The encoded packet.
    */
   static makePacket(opts) {
+    if (!opts?.name) {
+      throw new TypeError('Name is required');
+    }
+
+    /** @type {packet.OptAnswer} */
+    const opt = {
+      name: '.',
+      type: 'OPT',
+      udpPayloadSize: 4096,
+      extendedRcode: 0,
+      flags: 0,
+      flag_do: false, // Setting here has no effect
+      ednsVersion: 0,
+      options: [],
+    };
+
+    /** @type {packet.Packet} */
     const dns = {
       type: 'query',
       id: opts.id || 0,
@@ -184,19 +229,11 @@ export class DNSutils extends EventEmitter {
         class: 'IN',
         name: opts.name,
       }],
-      additionals: [{
-        name: '.',
-        type: 'OPT',
-        // @ts-ignore TS2339: types not up to date
-        udpPayloadSize: 4096,
-        flags: 0,
-        options: [],
-      }],
+      additionals: [opt],
     };
     if (opts.dnssec) {
       dns.flags |= packet.AUTHENTIC_DATA;
-      // @ts-ignore TS2339: types not up to date
-      dns.additionals[0].flags |= packet.DNSSEC_OK;
+      opt.flags |= packet.DNSSEC_OK;
     }
     if (opts.dnssecCheckingDisabled) {
       dns.flags |= packet.CHECKING_DISABLED;
@@ -204,23 +241,20 @@ export class DNSutils extends EventEmitter {
     if (opts.ecs != null || net.isIP(opts.ecsSubnet) !== 0) {
       // https://tools.ietf.org/html/rfc7871#section-11.1
       const prefix = (opts.ecsSubnet && net.isIPv4(opts.ecsSubnet)) ? 24 : 56;
-      // @ts-ignore TS2339: types not up to date
-      dns.additionals[0].options.push({
-        code: 'CLIENT_SUBNET',
+      opt.options.push({
+        code: optioncodes.toCode('CLIENT_SUBNET'),
         ip: opts.ecsSubnet || '0.0.0.0',
         sourcePrefixLength: (opts.ecs == null) ? prefix : opts.ecs,
       });
     }
     const unpadded = packet.encodingLength(dns);
-    // @ts-ignore TS2339: types not up to date
-    dns.additionals[0].options.push({
-      code: 'PADDING',
+    opt.options.push({
+      code: optioncodes.toCode('PADDING'),
       // Next pad size, minus what we already have, minus another 4 bytes for
       // the option header
       length: (Math.ceil(unpadded / PAD_SIZE) * PAD_SIZE) - unpadded - 4,
     });
     if (opts.stream) {
-      // @ts-ignore TS2339: types not up to date
       return packet.streamEncode(dns);
     }
     return packet.encode(dns);
@@ -259,7 +293,7 @@ export class DNSutils extends EventEmitter {
           nopts = {...opts, ...nopts};
           break;
         case 'string':
-          nopts = {...nopts, rrtype: opts};
+          nopts = {...nopts, rrtype: /** @type {packet.RecordType} */(opts)};
           break;
         default:
           throw new Error('Invalid type for opts');
@@ -270,7 +304,7 @@ export class DNSutils extends EventEmitter {
       ...defaults,
       ...nopts,
       name: url.domainToASCII(nopts.name),
-      rrtype: (nopts.rrtype || 'A').toUpperCase(),
+      rrtype: /** @type {packet.RecordType} */((nopts.rrtype || 'A').toUpperCase()),
     };
   }
 
@@ -313,6 +347,7 @@ export class DNSutils extends EventEmitter {
         return o.map(v => this.buffersToB64(v, circular));
       }
       return Object.entries(o).reduce((prev, [k, v]) => {
+        // @ts-expect-error Object.create(null) messes up output
         prev[k] = this.buffersToB64(v, circular);
         return prev;
       }, {});
@@ -334,19 +369,34 @@ export class DNSutils extends EventEmitter {
 }
 
 export class DNSError extends Error {
+  /**
+   * Create a DNS Error that wraps another error.
+   * @param {Error} er
+   * @param {packet.Packet} pkt
+   */
   constructor(er, pkt) {
-    super(`DNS error: ${er}`);
+    super(`DNS error: ${er}`, {cause: er});
     this.packet = pkt;
     this.code = `dns.${er}`;
   }
 
+  /**
+   * Factory to extract DNS error from packet.
+   *
+   * @param {packet.Packet} pkt
+   * @returns {DNSError}
+   */
   static getError(pkt) {
     if (Object.prototype.hasOwnProperty.call(pkt, 'rcode')) {
+      // @ts-expect-error Types don't include rcode
       if (pkt.rcode !== 'NOERROR') {
+        // @ts-expect-error Types don't include rcode
         return new DNSError(pkt.rcode, pkt);
       }
     } else if (Object.prototype.hasOwnProperty.call(pkt, 'Status')) {
+      // @ts-expect-error Types don't include Status
       if (pkt.Status !== 0) {
+        // @ts-expect-error Types don't include Status
         return new DNSError(rcodes.toString(pkt.Status), pkt);
       }
     }

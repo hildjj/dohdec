@@ -16,6 +16,9 @@ test('makePacket', t => {
   t.is(dns.id, 0);
   t.is(dns.questions[0].type, 'A');
   t.is(dns.questions[0].name, 'foo');
+
+  t.throws(() => DNSutils.makePacket());
+  t.throws(() => DNSutils.makePacket({}));
 });
 
 test('makePacket - subnet', t => {
