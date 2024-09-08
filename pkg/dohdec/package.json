@@ -9,7 +9,8 @@
     "docs": "typedoc",
     "test": "ava",
     "types": "tsc",
-    "check": "npm pack --dry-run"
+    "check": "npm pack --dry-run",
+    "version": "package-extract -so lib/pkg.js name version"
   },
   "keywords": [
     "doh",
