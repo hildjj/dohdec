@@ -6,7 +6,7 @@ import cryptoRandomString from 'crypto-random-string';
 import fs from 'node:fs';
 import got from 'got';
 
-const pkg = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
+const pkg = JSON.parse(fs.readFileSync('../package.json', 'utf8'));
 
 const PAD_SIZE = 128;
 const WF_DNS = 'application/dns-message';
