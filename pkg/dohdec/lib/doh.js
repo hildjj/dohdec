@@ -1,12 +1,10 @@
 import * as packet from 'dns-packet';
+import * as pkg from './pkg.js';
 import * as tls from 'node:tls';
 import DNSutils from './dnsUtils.js';
 import assert from 'node:assert';
 import cryptoRandomString from 'crypto-random-string';
-import fs from 'node:fs';
 import got from 'got';
-
-const pkg = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
 
 const PAD_SIZE = 128;
 const WF_DNS = 'application/dns-message';

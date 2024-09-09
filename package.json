@@ -18,7 +18,7 @@
     "all:install": "pnpm i -r",
     "all:link": "pnpm run -r link",
     "clean": "rm -rf node_modules coverage pkg/*/node_modules pkg/*/coverage pkg/*/types",
-    "version": "ver=`npm pkg get version | sed -E 's/\"*([^\"]+)\"*/\\1/'` && npm pkg set -ws version=$ver && npm pkg set dependencies.dohdec=$ver --workspace dohdec-cli && git add pkg/*/package.json"
+    "version": "ver=`npm pkg get version | sed -E 's/\"*([^\"]+)\"*/\\1/'` && npm pkg set -ws version=$ver && npm pkg set dependencies.dohdec=$ver --workspace dohdec-cli && pnpm run -r version && git add pkg/*/package.json && git add pkg/*/lib/pkg.js"
   },
   "keywords": [
     "doh",
@@ -45,6 +45,7 @@
     "eslint-plugin-markdown": "5.1.0",
     "eslint-plugin-node": "^11.1.0",
     "mock-dns-server": "0.0.3",
+    "package-extract": "2.0.2",
     "typedoc": "0.26.6"
   },
   "packageManager": "pnpm@9.9.0",

@@ -35,6 +35,9 @@ importers:
       mock-dns-server:
         specifier: 0.0.3
         version: 0.0.3(eslint@9.9.1)(typescript@5.5.4)
+      package-extract:
+        specifier: 2.0.2
+        version: 2.0.2
       typedoc:
         specifier: 0.26.6
         version: 0.26.6(typescript@5.5.4)
@@ -79,8 +82,8 @@ importers:
         specifier: ^12.1.0
         version: 12.1.0
       dohdec:
-        specifier: 6.0.2
-        version: link:../dohdec
+        specifier: 6.0.3
+        version: 6.0.3
     devDependencies:
       '@types/dns-packet':
         specifier: 5.6.5
@@ -616,6 +619,10 @@ packages:
   dns-packet@5.6.1:
     resolution: {integrity: sha512-l4gcSouhcgIKRvyy99RNVOgxXiicE+2jZoNmaNmZ6JXiGajBOJAesk1OBlJuM5k2c+eudGdLxDqXuPCKIj6kpw==}
     engines: {node: '>=6'}
+
+  dohdec@6.0.3:
+    resolution: {integrity: sha512-0CwZdEhZ3SpnL0AHrjiicb8CwJmnZR8B78iMGlWgM4IAEPlQitr11BcA/Gvxj/pbDuFbVXK1Ah8yS3FO7tHgSg==}
+    engines: {node: '>=18'}
 
   eastasianwidth@0.2.0:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
@@ -1287,6 +1294,11 @@ packages:
   package-config@5.0.0:
     resolution: {integrity: sha512-GYTTew2slBcYdvRHqjhwaaydVMvn/qrGC323+nKclYioNSLTDUM/lGgtGTgyHVtYcozb+XkE8CNhwcraOmZ9Mg==}
     engines: {node: '>=18'}
+
+  package-extract@2.0.2:
+    resolution: {integrity: sha512-aZosgc0hC+uPkAKlnTIaXZ5cR0zniFVGf6vVNZOpgEdpmgd/Caxlk6BJt23qe7uRGQhjro2yhO5XY7kLgv5Syg==}
+    engines: {node: '>=18'}
+    hasBin: true
 
   package-json-from-dist@1.0.0:
     resolution: {integrity: sha512-dATvCeZN/8wQsGywez1mzHtTlP22H8OEfPrVMLNr4/eGa+ijtLn/6M5f0dY8UKNrC2O9UCU6SSoG3qRKnt7STw==}
@@ -2289,6 +2301,14 @@ snapshots:
     dependencies:
       '@leichtgewicht/ip-codec': 2.0.5
 
+  dohdec@6.0.3:
+    dependencies:
+      crypto-random-string: 5.0.0
+      dns-packet: 5.6.1
+      got: 11.8.6
+      ip-address: 9.0.5
+      nofilter: 5.0.0
+
   eastasianwidth@0.2.0: {}
 
   emittery@1.0.3: {}
@@ -2970,6 +2990,10 @@ snapshots:
     dependencies:
       find-up-simple: 1.0.0
       load-json-file: 7.0.1
+
+  package-extract@2.0.2:
+    dependencies:
+      commander: 12.1.0
 
   package-json-from-dist@1.0.0: {}
 
