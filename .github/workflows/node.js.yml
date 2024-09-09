@@ -3,10 +3,9 @@ name: Tests
 
 on:
   push:
-    branches:
-      - '*'
+    branches: [main]
   pull_request:
-    branches: [master]
+    branches: [main]
 
 jobs:
   build:
@@ -15,12 +14,7 @@ jobs:
       matrix:
         node-version: [18, 20, 22]
         platform: [ubuntu-latest]
-
     runs-on: ${{ matrix.platform }}
-
-    env:
-      OS: ${{ matrix.os }}
-      NODE: ${{ matrix.node-version }}
     steps:
       - uses: actions/checkout@v4
       - name: Install pnpm
