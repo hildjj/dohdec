@@ -1,34 +1,35 @@
-import * as packet from 'dns-packet'
-import * as tls from 'tls'
-import DNSutils from './dnsUtils.js'
-import {Writable} from 'stream'
-import cryptoRandomString from 'crypto-random-string'
-import got from 'got'
+import * as packet from 'dns-packet';
+import * as tls from 'node:tls';
+import DNSutils from './dnsUtils.js';
+import assert from 'node:assert';
+import cryptoRandomString from 'crypto-random-string';
+import got from 'got';
 import {name as pkgName, version as pkgVersion} from '../package.json';
 
-const PAD_SIZE = 128
-const WF_DNS = 'application/dns-message'
-const WF_JSON = 'application/dns-json'
-const CLOUDFLARE_API = 'https://cloudflare-dns.com/dns-query'
-const USER_AGENT = `${pkgName} v${pkgVersion}`
+const PAD_SIZE = 128;
+const WF_DNS = 'application/dns-message';
+const WF_JSON = 'application/dns-json';
+const CLOUDFLARE_API = 'https://cloudflare-dns.com/dns-query';
+const USER_AGENT = `${pkgName} v${pkgVersion}`;
 
 /**
  * Options for doing DOH lookups.
  *
- * @typedef {object} DOH_LookupOptions
- * @property {string} [name] The DNS name to look up.
- * @property {string} [rrtype='A'] The Resource Record type
- *   to retrive.
- * @property {boolean} [json=true] Retrieve a JSON response.  If false,
- *   retrieve using DNS format.
- * @property {boolean} [decode=true] Decode the response, either into JSON
- *   or an object representing the DNS format result.
+ * @typedef {object} DOH_SpecificLookupOptions
  * @property {boolean} [preferPost=true] For DNS format requests, should
  *   the HTTP POST verb be used?  If false, uses GET.
- * @property {boolean} [dnssec=false] Request DNSSec records.  Currently
- *   requires `json: false`.
  * @property {string} [url=CLOUDFLARE_API] What DoH endpoint should be
  *   used?
+ * @property {boolean} [json=true] Force JSON lookups for DOH.
+ */
+
+/**
+ * @typedef {DOH_SpecificLookupOptions &
+ *   import('./dnsUtils.js').LookupOptions} DOH_LookupOptions
+ */
+
+/**
+ * @typedef {import('./dnsUtils.js').Writable} Writable
  */
 
 /**
@@ -36,6 +37,24 @@ const USER_AGENT = `${pkgName} v${pkgVersion}`
  * function provides the easiest-to-use defaults.
  */
 export class DNSoverHTTPS extends DNSutils {
+  /**
+   * The user-agent used in HTTPS requests.
+   * @type {string}
+   */
+  static userAgent = USER_AGENT;
+
+  /**
+   * The running version of dohdec.
+   * @type {string}
+   */
+  static version = pkgVersion;
+
+  /**
+   * Default URL for DNSoverHTTPS requests
+   * @type {string}
+   */
+  static defaultURL = CLOUDFLARE_API;
+
   /**
    * Create a DNSoverHTTPS instance.
    *
@@ -58,8 +77,8 @@ export class DNSoverHTTPS extends DNSutils {
       verbose,
       verboseStream,
       ...rest
-    } = opts
-    super({verbose, verboseStream})
+    } = opts;
+    super({verbose, verboseStream});
     this.opts = {
       userAgent: DNSoverHTTPS.userAgent,
       url: DNSoverHTTPS.defaultURL,
@@ -67,18 +86,19 @@ export class DNSoverHTTPS extends DNSutils {
       contentType: WF_DNS,
       http2: false,
       ...rest,
-    }
+    };
 
     this.hooks = (this._verbose > 0) ?
       {
-        beforeRequest: [options => {
-          this.verbose(1, `HTTP ${options.method} headers:`, options.headers)
-          this.verbose(1, `HTTP ${options.method} URL: ${options.url.toString()}`)
+        beforeRequest: [(/** @type {import('got').Options} */options) => {
+          this.verbose(1, `HTTP ${options.method} headers:`, options.headers);
+          assert(options.url);
+          this.verbose(1, `HTTP ${options.method} URL: ${options.url.toString()}`);
         }],
       } :
-      undefined
+      undefined;
 
-    this.verbose(1, 'DNSoverHTTPS options:', this.opts)
+    this.verbose(1, 'DNSoverHTTPS options:', this.opts);
   }
 
   /**
@@ -88,11 +108,14 @@ export class DNSoverHTTPS extends DNSutils {
   _checkServerIdentity() {
     return {
       // This doesn't fire in nock tests.
-      checkServerIdentity: (host, cert) => {
-        this.verbose(3, 'CERTIFICATE:', () => DNSutils.buffersToB64(cert))
-        return tls.checkServerIdentity(host, cert)
+      checkServerIdentity: (
+        /** @type {string} */host,
+        /** @type {tls.PeerCertificate} */cert
+      ) => {
+        this.verbose(3, 'CERTIFICATE:', () => DNSutils.buffersToB64(cert));
+        return tls.checkServerIdentity(host, cert);
       },
-    }
+    };
   }
 
   /**
@@ -102,25 +125,27 @@ export class DNSoverHTTPS extends DNSutils {
    * @returns {Promise<Buffer|object>} DNS result.
    */
   async getDNS(opts) {
-    this.verbose(1, 'DNSoverHTTPS.getDNS options:', opts)
+    this.verbose(1, 'DNSoverHTTPS.getDNS options:', opts);
 
-    const pkt = DNSutils.makePacket(opts)
-    let url = opts.url || this.opts.url
-    let body = pkt
+    const pkt = DNSutils.makePacket(opts);
+    let url = opts.url || this.opts.url;
 
-    this.verbose(1, 'REQUEST:', () => packet.decode(pkt))
-    this.hexDump(2, pkt)
+    /** @type {Buffer|undefined} */
+    let body = pkt;
+
+    this.verbose(1, 'REQUEST:', () => packet.decode(pkt));
+    this.hexDump(2, pkt);
 
     if (!this.opts.preferPost) {
-      url += `?dns=${DNSutils.base64urlEncode(pkt)}`
-      body = undefined
+      url += `?dns=${DNSutils.base64urlEncode(pkt)}`;
+      body = undefined;
     }
     const response = await got(url, {
       method: this.opts.preferPost ? 'POST' : 'GET',
       headers: {
         'Content-Type': this.opts.contentType,
         'User-Agent': this.opts.userAgent,
-        Accept: this.opts.contentType,
+        'Accept': this.opts.contentType,
       },
       body,
       https: this._checkServerIdentity(),
@@ -129,11 +154,11 @@ export class DNSoverHTTPS extends DNSutils {
       retry: {
         limit: 0,
       },
-    }).buffer()
-    this.hexDump(2, response)
-    this.verbose(1, 'RESPONSE:', () => packet.decode(response))
+    }).buffer();
+    this.hexDump(2, response);
+    this.verbose(1, 'RESPONSE:', () => packet.decode(response));
 
-    return opts.decode ? packet.decode(response) : response
+    return opts.decode ? packet.decode(response) : response;
   }
 
   /**
@@ -144,28 +169,33 @@ export class DNSoverHTTPS extends DNSutils {
    * @param {string} [opts.rrtype="A"] The record type to look up.
    * @param {boolean} [opts.decode=true] Parse the returned JSON?
    * @param {boolean} [opts.dnssec=false] Request DNSSEC records.
+   * @param {boolean} [opts.dnssecCheckingDisabled=false] Disable DNSSEC
+   *   validation.
    * @returns {Promise<string|object>} DNS result.
    */
   getJSON(opts) {
-    this.verbose(1, 'DNSoverHTTPS.getJSON options: ', opts)
+    this.verbose(1, 'DNSoverHTTPS.getJSON options: ', opts);
 
-    const rrtype = opts.rrtype || 'A'
-    let req = `${this.opts.url}?name=${opts.name}&type=${rrtype}`
+    const rrtype = opts.rrtype || 'A';
+    let req = `${this.opts.url}?name=${opts.name}&type=${rrtype}`;
     if (opts.dnssec) {
-      req += '&do=1'
+      req += '&do=1';
     }
-    req += '&random_padding='
+    if (opts.dnssecCheckingDisabled) {
+      req += '&cd=1';
+    }
+    req += '&random_padding=';
     req += cryptoRandomString({
       length: (Math.ceil(req.length / PAD_SIZE) * PAD_SIZE) - req.length,
       type: 'url-safe',
-    })
-    this.verbose(1, 'REQUEST:', req)
+    });
+    this.verbose(1, 'REQUEST:', req);
 
     const r = got(
       req, {
         headers: {
           'User-Agent': this.opts.userAgent,
-          Accept: WF_JSON,
+          'Accept': WF_JSON,
         },
         https: this._checkServerIdentity(),
         http2: this.opts.http2,
@@ -174,12 +204,12 @@ export class DNSoverHTTPS extends DNSutils {
           limit: 0,
         },
       }
-    )
+    );
 
     const decode = Object.prototype.hasOwnProperty.call(opts, 'decode') ?
       opts.decode :
-      true
-    return decode ? r.json() : r.text()
+      true;
+    return decode ? r.json() : r.text();
   }
 
   /**
@@ -189,18 +219,21 @@ export class DNSoverHTTPS extends DNSutils {
    *   if this is an object.
    * @param {DOH_LookupOptions|string} [opts={}] Options for the
    *   request.  If a string is given, it will be used as the rrtype.
-   * @returns {Promise<Buffer|string|object>} DNS result.
+   * @returns {Promise<Buffer|string|packet.Packet|object>} DNS result.
    */
   lookup(name, opts = {}) {
-    const nopts = DNSutils.normalizeArgs(name, opts, {
-      rrtype: 'A',
-      json: true,
-      decode: true,
-      dnssec: false,
-    })
-    this.verbose(1, 'DNSoverHTTPS.lookup options:', nopts)
+    const nopts = /** @type {Required<DOH_LookupOptions>} */ (
+      DNSutils.normalizeArgs(name, opts, {
+        rrtype: 'A',
+        json: true,
+        decode: true,
+        dnssec: false,
+        dnssecCheckingDisabled: false,
+      })
+    );
+    this.verbose(1, 'DNSoverHTTPS.lookup options:', nopts);
 
-    return nopts.json ? this.getJSON(nopts) : this.getDNS(nopts)
+    return nopts.json ? this.getJSON(nopts) : this.getDNS(nopts);
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -209,16 +242,4 @@ export class DNSoverHTTPS extends DNSutils {
   }
 }
 
-function setStatic(c) {
-  // Hide these from typescript
-  c.userAgent = USER_AGENT
-  c.defaultURL = CLOUDFLARE_API
-}
-
-/** @type {string} */
-DNSoverHTTPS.version = pkgVersion
-DNSoverHTTPS.userAgent = ''
-DNSoverHTTPS.defaultURL = ''
-setStatic(DNSoverHTTPS)
-
-export default DNSoverHTTPS
+export default DNSoverHTTPS;
