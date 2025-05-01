@@ -80,7 +80,7 @@ async function cliMain(...args) {
   }
 
   try {
-    const cli = new DnsCli([process.execPath, 'dohdec', ...args], {in: inp, out, err});
+    const cli = new DnsCli([process.execPath, 'dohdec', ...args], {in: inp, out, err, helpWidth: 79});
 
     for (const s of setup) {
       await s(cli);
