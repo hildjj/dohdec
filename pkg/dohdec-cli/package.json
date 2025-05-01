@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "commander": "^13.1.0",
-    "dohdec": "6.0.4"
+    "dohdec": "7.0.0"
   },
   "devDependencies": {
     "@types/dns-packet": "5.6.5",
