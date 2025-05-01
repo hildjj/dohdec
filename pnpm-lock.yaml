@@ -12,8 +12,8 @@ importers:
         specifier: ^6.0.1
         version: 6.0.1(eslint@9.25.1)(typescript@5.8.3)
       '@cto.af/monopub':
-        specifier: 1.0.0
-        version: 1.0.0
+        specifier: 1.1.0
+        version: 1.1.0
       '@eslint/markdown':
         specifier: 6.4.0
         version: 6.4.0
@@ -85,8 +85,8 @@ importers:
         specifier: ^13.1.0
         version: 13.1.0
       dohdec:
-        specifier: 6.0.4
-        version: 6.0.4
+        specifier: 7.0.0
+        version: 7.0.0
     devDependencies:
       '@types/dns-packet':
         specifier: 5.6.5
@@ -124,8 +124,8 @@ packages:
     resolution: {integrity: sha512-CwIHYeOdsvHibujkrwSrYdBQ4EBEFLUXBKBEqLhxA5o4Cl38gJ6ljOi6oeIYFYtK5FPCEpeiyJF8689mfEAphw==}
     engines: {node: '>=20'}
 
-  '@cto.af/monopub@1.0.0':
-    resolution: {integrity: sha512-7/plelsjNwgYlVn3ieRVhiNmk1COhZZjPLaMCwz1NMmzSOv8plmSx80m7D8L8TYJFRu/cs0EruzG4mnGZ43ODQ==}
+  '@cto.af/monopub@1.1.0':
+    resolution: {integrity: sha512-glmxFHrfp2y7uIzEeMKgAzw2QfZfAsCpOUXo9cjQWk92vZ0Ud3Dj2Scahyl3wYebG1pKFcXOeykzXG6msS1q7A==}
     engines: {node: '>=20'}
     hasBin: true
 
@@ -745,9 +745,9 @@ packages:
     resolution: {integrity: sha512-l4gcSouhcgIKRvyy99RNVOgxXiicE+2jZoNmaNmZ6JXiGajBOJAesk1OBlJuM5k2c+eudGdLxDqXuPCKIj6kpw==}
     engines: {node: '>=6'}
 
-  dohdec@6.0.4:
-    resolution: {integrity: sha512-lOirhqDJpSmHSfQaeEoWRY/NgW6giLjCV3tDmf2hmCzrS8foPkcK4TG546pTbx2dGSlsOSPSwHSZuO8SkAZ5pA==}
-    engines: {node: '>=18'}
+  dohdec@7.0.0:
+    resolution: {integrity: sha512-uHOSqkp5QWwSm3RTGUE3WR9KOHcfskVXybh45h20g6tO5EKAKui5XfRwzKNlwHa1QWFw6M8tH22gwq8nKAZQog==}
+    engines: {node: '>=20'}
 
   eastasianwidth@0.2.0:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
@@ -1113,10 +1113,6 @@ packages:
     resolution: {integrity: sha512-NWv9YLW4PoW2B7xtzaS3NCot75m6nK7Icdv0o3lfMceJVRfSoQwqD4wEH5rLwoKJwUiZ/rfpiVBhnaF0FK4HoA==}
     engines: {node: '>= 12'}
 
-  ip-address@9.0.5:
-    resolution: {integrity: sha512-zHtQzGojZXTwZTHQqra+ETKd4Sn3vgi7uBmlPoXVWZqYvuKmtI0l/VZTjqGmJY9x88GGOaZ9+G9ES8hC4T4X8g==}
-    engines: {node: '>= 12'}
-
   irregular-plurals@3.5.0:
     resolution: {integrity: sha512-1ANGLZ+Nkv1ptFb2pa8oG8Lem4krflKuX/gINiHJHjJUKaJHk/SXk5x6K3J+39/p0h1RQ2saROclJJ+QLvETCQ==}
     engines: {node: '>=8'}
@@ -1188,9 +1184,6 @@ packages:
   js-yaml@4.1.0:
     resolution: {integrity: sha512-wpxZs9NoxZaJESJGIZTyDEaYpl0FKSA+FB9aJiyemKhMwkxQg63h4T1KJgUGHpTqPDNRcmmYLugrRjJlBtWvRA==}
     hasBin: true
-
-  jsbn@1.1.0:
-    resolution: {integrity: sha512-4bYVV3aAMtDTTu4+xsDYa6sy9GyJ69/amsu9sYF2zqjiEoZA5xJi3BrfX3uY+/IekIu7MwdObdbDWpoZdBv3/A==}
 
   jsdoc-type-pratt-parser@4.1.0:
     resolution: {integrity: sha512-Hicd6JK5Njt2QB6XYFS7ok9e37O8AYk3jTcppG4YVQnYjOemymvTcmc7OWsmq/Qqj5TdRFO5/x/tIPmBeRtGHg==}
@@ -1727,9 +1720,6 @@ packages:
   sprintf-js@1.0.3:
     resolution: {integrity: sha512-D9cPgkvLlV3t3IzL0D0YLvGA9Ahk4PcvVwUbN0dSGr1aP0Nrt4AEnTUbuGvquEC0mA64Gqt1fzirlRs5ibXx8g==}
 
-  sprintf-js@1.1.3:
-    resolution: {integrity: sha512-Oo+0REFV59/rz3gfJNKQiBlwfHaSESl1pcGyABQsnnIfWOFt6JNj5gCog2U6MLZ//IGYD+nA8nI+mTShREReaA==}
-
   stack-utils@2.0.6:
     resolution: {integrity: sha512-XlkWvfIm6RmsWtNJx+uqtKLS8eqFbxUg0ZzLXqY0caEy9l7hruX8IpiDnjsLavoBgqCCR71TqWO8MaXYheJ3RQ==}
     engines: {node: '>=10'}
@@ -1962,7 +1952,7 @@ snapshots:
       - supports-color
       - typescript
 
-  '@cto.af/monopub@1.0.0':
+  '@cto.af/monopub@1.1.0':
     dependencies:
       commander: 13.1.0
       fast-glob: 3.3.3
@@ -2699,13 +2689,13 @@ snapshots:
     dependencies:
       '@leichtgewicht/ip-codec': 2.0.5
 
-  dohdec@6.0.4:
+  dohdec@7.0.0:
     dependencies:
       crypto-random-string: 5.0.0
       dns-packet: 5.6.1
       got: 11.8.6
-      ip-address: 9.0.5
-      nofilter: 5.0.0
+      ip-address: 10.0.1
+      nofilter: 6.0.0
 
   eastasianwidth@0.2.0: {}
 
@@ -3101,11 +3091,6 @@ snapshots:
 
   ip-address@10.0.1: {}
 
-  ip-address@9.0.5:
-    dependencies:
-      jsbn: 1.1.0
-      sprintf-js: 1.1.3
-
   irregular-plurals@3.5.0: {}
 
   is-core-module@2.16.1:
@@ -3163,8 +3148,6 @@ snapshots:
   js-yaml@4.1.0:
     dependencies:
       argparse: 2.0.1
-
-  jsbn@1.1.0: {}
 
   jsdoc-type-pratt-parser@4.1.0: {}
 
@@ -3817,8 +3800,6 @@ snapshots:
   spdx-license-ids@3.0.21: {}
 
   sprintf-js@1.0.3: {}
-
-  sprintf-js@1.1.3: {}
 
   stack-utils@2.0.6:
     dependencies:
