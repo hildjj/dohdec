@@ -1,6 +1,6 @@
 {
   "name": "dohdec-monorepo",
-  "version": "7.0.0",
+  "version": "7.0.1",
   "description": "DNS over HTTPS and DNS over TLS",
   "private": true,
   "type": "module",
