@@ -1,2 +1,4 @@
 packages:
   - pkg/*
+overrides:
+  dohdec: link:pkg/dohdec

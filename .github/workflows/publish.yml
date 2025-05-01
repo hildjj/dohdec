@@ -16,7 +16,6 @@ jobs:
           node-version: 22
           registry-url: 'https://registry.npmjs.org'
           cache: pnpm
-      - run: pnpm all:link
       - run: pnpm i -r
       - run: npm run all:check
       - name: Deploy Docs
