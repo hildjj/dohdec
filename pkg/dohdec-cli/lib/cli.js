@@ -68,6 +68,11 @@ function checkAddress(value) {
  */
 
 /**
+ * @typedef {object} HelpWidth
+ * @property {number} [helpWidth] Width of help, in columns, for testing.
+ */
+
+/**
  * Command Line Interface for dohdec.
  */
 export class DnsCli extends Command {
@@ -76,7 +81,8 @@ export class DnsCli extends Command {
    *
    * @param {string[]} args Arguments from the command line
    *   (usually process.argv).
-   * @param {Stdio} [stdio] Replacement streams for stdio, for testing.
+   * @param {Stdio & HelpWidth} [stdio] Replacement streams for stdio,
+   *   for testing.
    */
   constructor(args, stdio) {
     super();
@@ -96,7 +102,11 @@ export class DnsCli extends Command {
       .configureOutput({
         writeOut: c => this.std.out.write(c),
         writeErr: c => this.std.err.write(c),
-      })
+      });
+    if (stdio?.helpWidth) {
+      this.configureHelp({helpWidth: stdio.helpWidth});
+    }
+    this
       .version(DNSoverHTTPS.version)
       .argument('[name]', 'DNS name to look up (e.g. domain name) or IP address to reverse lookup.  If not specified, a read-execute-print loop (REPL) is started.')
       .argument('[rrtype]', 'Resource record name or number', 'A')

@@ -32,19 +32,19 @@
     "dohdec": "bin/dohdec.js"
   },
   "dependencies": {
-    "commander": "^12.1.0",
+    "commander": "^13.1.0",
     "dohdec": "6.0.4"
   },
   "devDependencies": {
     "@types/dns-packet": "5.6.5",
-    "@types/node": "^22.5.4",
+    "@types/node": "^22.15.3",
     "jsrsasign": "^11.1.0",
     "minami": "^1.2.3",
     "mock-dns-server": "0.0.3",
-    "nock": "^13.5.5",
-    "typescript": "^5.5.4"
+    "nock": "^14.0.4",
+    "typescript": "^5.8.3"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   }
 }
