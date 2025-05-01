@@ -1,6 +1,6 @@
 {
   "name": "dohdec",
-  "version": "7.0.1",
+  "version": "7.0.2",
   "description": "DNS over HTTPS and DNS over TLS",
   "main": "./lib/index.js",
   "types": "types/",
