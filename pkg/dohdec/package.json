@@ -10,7 +10,7 @@
     "test": "ava",
     "types": "tsc",
     "check": "npm pack --dry-run",
-    "version": "package-extract -so lib/pkg.js name version"
+    "version": "package-extract -so lib/pkg.js name version && git add lib/pkg.js"
   },
   "keywords": [
     "doh",
