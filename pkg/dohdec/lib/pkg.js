@@ -2,4 +2,4 @@
 // Do not modify by hand.
 
 export const name = 'dohdec';
-export const version = '7.0.2';
+export const version = '7.0.3';
