@@ -274,6 +274,13 @@ For more debug information:
       prompt: 'domain (rrtype)> ',
     });
     rl.prompt();
+
+    // Fix node v24.2 issue with close timing.
+    // See https://github.com/nodejs/node/issues/58784
+    const oclose = rl.close;
+    rl.close = (...args) => {
+      setTimeout(() => oclose.apply(rl, args), 50);
+    };
     for await (const line of rl) {
       this.transport.verbose(1, 'LINE', line);
       if (line.length > 0) {
