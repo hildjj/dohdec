@@ -12,6 +12,7 @@ await fetch('').catch(() => {
 });
 
 /** @import {Agent as UAgent} from  'undici-types' */
+
 /**
  * @typedef {{readonly [unidiciGlobalDispatcherSymbol]: UAgent}} DispatchGlobal
  */

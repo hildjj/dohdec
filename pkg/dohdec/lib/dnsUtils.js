@@ -24,7 +24,7 @@ const PAD_SIZE = 128;
  *   packet.
  * @property {boolean} [dnssec=false] Request DNSSec records.  Currently
  *   requires `json: false`.
- * @property {boolean} [dnssecCheckingDisabled=false] Disable DNSSEC
+ * @property {boolean} [dnssecCheckingDisabled=false] Disable DNSSEC.
  */
 
 /**
@@ -35,9 +35,9 @@ const PAD_SIZE = 128;
  * Extracted from node source.
  * Only exported for testing.
  *
- * @param {string} str
- * @param {util.Style} styleType
- * @returns {string}
+ * @param {string} str String to stylize.
+ * @param {util.Style} styleType Which style?
+ * @returns {string} Stylized string.
  * @private
  */
 export function stylizeWithColor(str, styleType) {
@@ -51,9 +51,9 @@ export function stylizeWithColor(str, styleType) {
 }
 
 /**
- * @param {Writable} stream
- * @param {string} str
- * @param {util.Style} styleType
+ * @param {Writable} stream Stream to modify.
+ * @param {string} str String to stylize.
+ * @param {util.Style} styleType Style to use.
  * @private
  */
 function styleStream(stream, str, styleType) {
@@ -61,10 +61,11 @@ function styleStream(stream, str, styleType) {
 }
 
 /**
- * Exported for testing only
- * @param {Writable} stream
- * @param {Buffer} buf
- * @returns {number}
+ * Exported for testing only.
+ *
+ * @param {Writable} stream Stream to print to.
+ * @param {Buffer} buf Buffer to print.
+ * @returns {number} Number of bytes in the buffer.
  */
 export function printableString(stream, buf) {
   // Intent: each byte that is "printable" takes up one grapheme, and everything
@@ -108,7 +109,7 @@ export class DNSutils extends EventEmitter {
    * Output verbose logging information, if this.verbose is true.
    *
    * @param {number} level Print at this verbosity level or higher.
-   * @param {any[]} args Same as onsole.log parameters.
+   * @param {unknown[]} args Same as console.log parameters.
    * @returns {boolean} True if output was written.
    */
   verbose(level, ...args) {
@@ -201,6 +202,7 @@ export class DNSutils extends EventEmitter {
    *   prefixed by a 2-byte big-endian integer of the number of bytes in the
    *   packet.
    * @returns {Buffer} The encoded packet.
+   * @throws {TypeError} Name is required.
    */
   static makePacket(opts) {
     if (!opts?.name) {
@@ -333,10 +335,10 @@ export class DNSutils extends EventEmitter {
    * Recursively traverse an object, turning all of its properties that have
    * Buffer values into base64 representations of the buffer.
    *
-   * @param {any} o The object to traverse.
+   * @param {unknown} o The object to traverse.
    * @param {WeakSet<object>} [circular] WeakMap to prevent circular
    *   dependencies.
-   * @returns {any} The converted object.
+   * @returns {unknown} The converted object.
    */
   static buffersToB64(o, circular = undefined) {
     if (!circular) {
@@ -377,11 +379,12 @@ export class DNSutils extends EventEmitter {
 export class DNSError extends Error {
   /**
    * Create a DNS Error that wraps another error.
-   * @param {Error} er
-   * @param {packet.Packet} pkt
+   *
+   * @param {string} er Error.
+   * @param {packet.Packet} pkt Packet.
    */
   constructor(er, pkt) {
-    super(`DNS error: ${er}`, {cause: er});
+    super(`DNS error: ${er}`);
     this.packet = pkt;
     this.code = `dns.${er}`;
   }
@@ -389,8 +392,9 @@ export class DNSError extends Error {
   /**
    * Factory to extract DNS error from packet, if one exists.
    *
-   * @param {Record<string,any>} pkt
-   * @returns {DNSError|undefined}
+   * @param {Record<string,unknown>} pkt Packet.
+   * @returns {DNSError|undefined} Error, if it exists.
+   * @throws {TypeError} Invalid packet.
    */
   static getError(pkt) {
     if ((typeof pkt !== 'object') || !pkt) {
@@ -398,7 +402,7 @@ export class DNSError extends Error {
     }
     if (Object.prototype.hasOwnProperty.call(pkt, 'rcode')) {
       if (pkt.rcode !== 'NOERROR') {
-        return new DNSError(pkt.rcode, pkt);
+        return new DNSError(/** @type {string} */ (pkt.rcode), pkt);
       }
     } else if (Object.prototype.hasOwnProperty.call(pkt, 'Status')) {
       if (pkt.Status !== 0) {

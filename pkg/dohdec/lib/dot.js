@@ -120,8 +120,8 @@ export class DNSoverTLS extends DNSutils {
       /**
        * Fired right before connection is attempted.
        *
-       * @event DNSoverTLS#connect
        * @property {object} cert [lookup]{@link DNSoverTLS#lookup} options.
+       * @event DNSoverTLS#connect
        */
       this.emit('connect', this.opts);
       this.verbose(1, 'CONNECT:', this.opts);
@@ -135,9 +135,9 @@ export class DNSoverTLS extends DNSutils {
   }
 
   /**
-   * @param {string} host
-   * @param {tls.PeerCertificate} cert
-   * @returns {Error | undefined}
+   * @param {string} host Host name.
+   * @param {tls.PeerCertificate} cert Certificate.
+   * @returns {Error | undefined} Error, or undefined on success.
    * @private
    */
   _checkServerIdentity(host, cert) {
@@ -147,13 +147,13 @@ export class DNSoverTLS extends DNSutils {
     /**
      * Fired on connection when the server sends a certificate.
      *
-     * @event DNSoverTLS#certificate
      * @property {crypto.Certificate} cert
      *   A [crypto.Certificate]{@link https://nodejs.org/api/crypto.html#crypto_class_certificate}
      *   from the server.
      * @property {string} host The hostname the client thinks it is
      *   connecting to.
      * @property {string} hash The hash computed over the cert.
+     * @event DNSoverTLS#certificate
      */
     this.emit('certificate', cert, host, hash);
 

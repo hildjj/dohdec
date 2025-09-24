@@ -13,6 +13,9 @@ const WF_JSON = 'application/dns-json';
 const CLOUDFLARE_API = 'https://cloudflare-dns.com/dns-query';
 const USER_AGENT = `${pkg.name} v${pkg.version}`;
 
+/** @import {LookupOptions, Writable} from './dnsUtils.js' */
+/** @import {Dispatcher} from 'undici-types' */
+
 /**
  * Options for doing DOH lookups.
  *
@@ -25,12 +28,7 @@ const USER_AGENT = `${pkg.name} v${pkg.version}`;
  */
 
 /**
- * @typedef {DOH_SpecificLookupOptions &
- *   import('./dnsUtils.js').LookupOptions} DOH_LookupOptions
- */
-
-/**
- * @typedef {import('./dnsUtils.js').Writable} Writable
+ * @typedef {DOH_SpecificLookupOptions & LookupOptions} DOH_LookupOptions
  */
 
 /**
@@ -51,7 +49,7 @@ export class DNSoverHTTPS extends DNSutils {
   static version = pkg.version;
 
   /**
-   * Default URL for DNSoverHTTPS requests
+   * Default URL for DNSoverHTTPS requests.
    * @type {string}
    */
   static defaultURL = CLOUDFLARE_API;
@@ -71,9 +69,12 @@ export class DNSoverHTTPS extends DNSutils {
    * @param {number} [opts.verbose=0] How verbose do you want your logging?
    * @param {Writable} [opts.verboseStream=process.stderr] Where to write
    *   verbose output.
-   * @param {boolean} [opts.http2=false] Use http/2 if it is available.
+   * @param {boolean} [opts.http2=true] Use http/2 if it is available.
    * @param {typeof fetch} [opts.customFetch=fetch] Custom `fetch`
    *   implementation.  Defaults to fetch.
+   * @param {Dispatcher} [opts.agent] Undici agent for HTTPS requests.  If used,
+   *   the http2 option is ignored, and the certificate information is never
+   *   output, unless the specified agent makes that happen.
    */
   constructor(opts = {}) {
     const {
@@ -87,10 +88,18 @@ export class DNSoverHTTPS extends DNSutils {
       url: DNSoverHTTPS.defaultURL,
       preferPost: true,
       contentType: WF_DNS,
-      http2: false,
+      http2: true,
       customFetch: fetch,
+      agent: undefined,
       ...rest,
     };
+
+    this.opts.agent ??= new Agent({
+      allowH2: this.opts.http2,
+      connect: {
+        checkServerIdentity: this._checkServerIdentity.bind(this),
+      },
+    });
 
     this.hooks = (this._verbose > 0) ?
       {
@@ -106,10 +115,12 @@ export class DNSoverHTTPS extends DNSutils {
   }
 
   /**
+   * Output certificate information in verbose mode.
+   *
+   * @param {string} host Host name.
+   * @param {tls.PeerCertificate} cert Certificate.
+   * @returns {Error | undefined} Error, or undefined on success.
    * @private
-   * @ignore
-   * @param {string} host
-   * @param {tls.PeerCertificate} cert
    */
   _checkServerIdentity(host, cert) {
     this.verbose(3, 'CERTIFICATE:', () => DNSutils.buffersToB64(cert));
@@ -139,6 +150,8 @@ export class DNSoverHTTPS extends DNSutils {
       body = undefined;
     }
     const r = await this.#fetch(url, {
+      // @ts-expect-error Node RequestInit (with dispatcher) != Web RequestInit
+      dispatcher: this.opts.agent,
       method: this.opts.preferPost ? 'POST' : 'GET',
       headers: {
         'Content-Type': this.opts.contentType,
@@ -186,6 +199,8 @@ export class DNSoverHTTPS extends DNSutils {
     this.verbose(1, 'REQUEST:', req);
 
     const r = await this.#fetch(req, {
+      // @ts-expect-error Node RequestInit (with dispatcher) != Web RequestInit
+      dispatcher: this.opts.agent,
       headers: {
         'User-Agent': this.opts.userAgent,
         'Accept': WF_JSON,
@@ -230,21 +245,12 @@ export class DNSoverHTTPS extends DNSutils {
   /**
    * Internal call to fetch a buffer.
    *
-   * @param {string} url
-   * @param {RequestInit} opts
-   * @returns {Promise<Response>}
+   * @param {string} url URL.
+   * @param {RequestInit} opts Options.
+   * @returns {Promise<Response>} The fetch response.
    */
   #fetch(url, opts) {
-    const request = new Request(url, {
-      // @ts-expect-error Node RequestInit (with dispatcher) != Web RequestInit
-      dispatcher: new Agent({
-        allowH2: this.opts.http2,
-        connect: {
-          checkServerIdentity: this._checkServerIdentity.bind(this),
-        },
-      }),
-      ...opts,
-    });
+    const request = new Request(url, opts);
     for (const hook of this.hooks?.beforeRequest ?? []) {
       hook(request);
     }

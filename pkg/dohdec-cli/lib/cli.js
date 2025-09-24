@@ -22,9 +22,11 @@ function myParseInt(value) {
   return parsedValue;
 }
 
+/** @import {Packet, RecordType} from 'dns-packet' */
+
 /**
- * @param {any} pkt
- * @returns {asserts pkt is import('dns-packet').Packet}
+ * @param {unknown} pkt Potential packet.
+ * @returns {asserts pkt is Packet} Throws if not packet.
  * @private
  */
 function assertIsPacket(pkt) {
@@ -35,8 +37,10 @@ function assertIsPacket(pkt) {
 }
 
 /**
- * @param {any} er
- * @returns {asserts er is Error}
+ * Is this an error?
+ *
+ * @param {unknown} er Potential Error.
+ * @returns {asserts er is Error} Throws if not Error.
  */
 function assertIsError(er) {
   assert(er);
@@ -205,8 +209,10 @@ For more debug information:
   }
 
   /**
-   * @param {string} name
-   * @param {import('dns-packet').RecordType} rrtype
+   * Get the given record for the given name.
+   *
+   * @param {string} name Name to query.
+   * @param {RecordType} rrtype RR Type.
    */
   async get(name, rrtype) {
     const opts = {
@@ -240,7 +246,7 @@ For more debug information:
           }
           resp =
             resp.answers ||
-            /** @type {Record<string, any>}*/ (resp).Answer ||
+            /** @type {Record<string, unknown>}*/ (resp).Answer ||
             resp;
         }
         this.std.out.write(util.inspect(DNSutils.buffersToB64(resp), {
@@ -258,7 +264,7 @@ For more debug information:
     } catch (er) {
       assertIsError(er);
       this.transport.verbose(1, er) ||
-      this.transport.verbose(0, () => (er.message ? er.message : er));
+      this.transport.verbose(0, () => er.message);
       throw er;
     }
   }
@@ -289,7 +295,7 @@ For more debug information:
           const [name, rrtype] = line.split(/\s+/);
           await this.get(
             name,
-            /** @type {import('dns-packet').RecordType} */(rrtype)
+            /** @type {RecordType} */(rrtype)
           );
         } catch (ignored) {
           // Catches all errors.  get() printed them already

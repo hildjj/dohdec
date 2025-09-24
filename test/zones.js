@@ -1,6 +1,5 @@
-/**
- * @type {import('mock-dns-server').Zones}
- */
+/** @import {Zones} from 'mock-dns-server' */
+/** @type {Zones} */
 export const DNS = {
   'ietf.org': {
     A: ['104.16.44.99', '104.16.45.99'],

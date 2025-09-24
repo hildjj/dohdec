@@ -1,6 +1,7 @@
 'use strict';
 
-/** @type {import('typedoc').TypeDocOptions} */
+/** @import {TypeDocOptions} from 'typedoc' */
+/** @type {TypeDocOptions} */
 module.exports = {
   entryPoints: ['lib/index.js', 'lib/doh.js', 'lib/dot.js', 'lib/dnsUtils.js'],
   out: '../../docs',
