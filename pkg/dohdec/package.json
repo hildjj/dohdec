@@ -34,16 +34,16 @@
   "dependencies": {
     "crypto-random-string": "^5.0.0",
     "dns-packet": "^5.6.1",
-    "got": "^11.8.2",
     "ip-address": "10.0.1",
     "nofilter": "^6.0.2"
   },
   "devDependencies": {
     "@types/dns-packet": "5.6.5",
-    "@types/node": "^24.3.0",
-    "mock-dns-server": "0.0.3",
+    "@types/node": "^24.5.2",
+    "mock-dns-server": "1.0.2",
     "nock": "^14.0.10",
-    "typescript": "5.9.2"
+    "typescript": "5.9.2",
+    "undici-types": "7.16.0"
   },
   "engines": {
     "node": ">=20"

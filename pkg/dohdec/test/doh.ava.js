@@ -105,7 +105,7 @@ test('close', t => {
 test('checkServerIdentity', t => {
   const verboseStream = new Buf({encoding: 'utf8'});
   const doh = new DNSoverHTTPS({verbose: 3, verboseStream});
-  const {checkServerIdentity} = doh._checkServerIdentity();
+  const checkServerIdentity = doh._checkServerIdentity.bind(doh);
   t.is(typeof checkServerIdentity, 'function');
   t.truthy(checkServerIdentity('localhost', {}) instanceof Error);
   const vstr = verboseStream.read().toString();

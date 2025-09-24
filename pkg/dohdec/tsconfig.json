@@ -11,7 +11,7 @@
     "declaration": true,
     "emitDeclarationOnly": true,
     "moduleResolution": "node",
-    "module": "es2020",
+    "module": "es2022",
     "noImplicitAny": true,
     "strict": true,
     "skipLibCheck": true,

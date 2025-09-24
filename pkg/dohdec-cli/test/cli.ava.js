@@ -61,7 +61,7 @@ Options:
 
 For more debug information:
 
-  $ NODE_DEBUG=http,https,http2 dohdec -v [arguments]
+  $ NODE_DEBUG=fetch dohdec -v [arguments]
 `;
 
 async function cliMain(...args) {

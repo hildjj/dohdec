@@ -158,7 +158,7 @@ export class DnsCli extends Command {
       .addHelpText('after', `
 For more debug information:
 
-  $ NODE_DEBUG=http,https,http2 dohdec -v [arguments]`);
+  $ NODE_DEBUG=fetch dohdec -v [arguments]`);
     // END CLI CONFIG
 
     if (stdio && (Object.keys(stdio).length > 0)) {

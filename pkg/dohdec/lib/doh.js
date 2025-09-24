@@ -1,10 +1,11 @@
 import * as packet from 'dns-packet';
 import * as pkg from './pkg.js';
 import * as tls from 'node:tls';
+import {Agent} from './agent.js';
+import {Buffer} from 'node:buffer';
 import DNSutils from './dnsUtils.js';
 import assert from 'node:assert';
 import cryptoRandomString from 'crypto-random-string';
-import got from 'got';
 
 const PAD_SIZE = 128;
 const WF_DNS = 'application/dns-message';
@@ -71,6 +72,8 @@ export class DNSoverHTTPS extends DNSutils {
    * @param {Writable} [opts.verboseStream=process.stderr] Where to write
    *   verbose output.
    * @param {boolean} [opts.http2=false] Use http/2 if it is available.
+   * @param {typeof fetch} [opts.customFetch=fetch] Custom `fetch`
+   *   implementation.  Defaults to fetch.
    */
   constructor(opts = {}) {
     const {
@@ -85,12 +88,13 @@ export class DNSoverHTTPS extends DNSutils {
       preferPost: true,
       contentType: WF_DNS,
       http2: false,
+      customFetch: fetch,
       ...rest,
     };
 
     this.hooks = (this._verbose > 0) ?
       {
-        beforeRequest: [(/** @type {import('got').Options} */options) => {
+        beforeRequest: [(/** @type {Request} */options) => {
           this.verbose(1, `HTTP ${options.method} headers:`, options.headers);
           assert(options.url);
           this.verbose(1, `HTTP ${options.method} URL: ${options.url.toString()}`);
@@ -104,18 +108,12 @@ export class DNSoverHTTPS extends DNSutils {
   /**
    * @private
    * @ignore
+   * @param {string} host
+   * @param {tls.PeerCertificate} cert
    */
-  _checkServerIdentity() {
-    return {
-      // This doesn't fire in nock tests.
-      checkServerIdentity: (
-        /** @type {string} */host,
-        /** @type {tls.PeerCertificate} */cert
-      ) => {
-        this.verbose(3, 'CERTIFICATE:', () => DNSutils.buffersToB64(cert));
-        return tls.checkServerIdentity(host, cert);
-      },
-    };
+  _checkServerIdentity(host, cert) {
+    this.verbose(3, 'CERTIFICATE:', () => DNSutils.buffersToB64(cert));
+    return tls.checkServerIdentity(host, cert);
   }
 
   /**
@@ -140,21 +138,17 @@ export class DNSoverHTTPS extends DNSutils {
       url += `?dns=${DNSutils.base64urlEncode(pkt)}`;
       body = undefined;
     }
-    const response = await got(url, {
+    const r = await this.#fetch(url, {
       method: this.opts.preferPost ? 'POST' : 'GET',
       headers: {
         'Content-Type': this.opts.contentType,
         'User-Agent': this.opts.userAgent,
         'Accept': this.opts.contentType,
       },
-      body,
-      https: this._checkServerIdentity(),
-      http2: this.opts.http2,
-      hooks: this.hooks,
-      retry: {
-        limit: 0,
-      },
-    }).buffer();
+      body: body ? new Uint8Array(body) : undefined,
+    });
+
+    const response = Buffer.from(await r.bytes());
     this.hexDump(2, response);
     this.verbose(1, 'RESPONSE:', () => packet.decode(response));
 
@@ -173,7 +167,7 @@ export class DNSoverHTTPS extends DNSutils {
    *   validation.
    * @returns {Promise<string|object>} DNS result.
    */
-  getJSON(opts) {
+  async getJSON(opts) {
     this.verbose(1, 'DNSoverHTTPS.getJSON options: ', opts);
 
     const rrtype = opts.rrtype || 'A';
@@ -191,20 +185,12 @@ export class DNSoverHTTPS extends DNSutils {
     });
     this.verbose(1, 'REQUEST:', req);
 
-    const r = got(
-      req, {
-        headers: {
-          'User-Agent': this.opts.userAgent,
-          'Accept': WF_JSON,
-        },
-        https: this._checkServerIdentity(),
-        http2: this.opts.http2,
-        hooks: this.hooks,
-        retry: {
-          limit: 0,
-        },
-      }
-    );
+    const r = await this.#fetch(req, {
+      headers: {
+        'User-Agent': this.opts.userAgent,
+        'Accept': WF_JSON,
+      },
+    });
 
     const decode = Object.prototype.hasOwnProperty.call(opts, 'decode') ?
       opts.decode :
@@ -239,6 +225,30 @@ export class DNSoverHTTPS extends DNSutils {
   // eslint-disable-next-line class-methods-use-this
   close() {
     // No-op for now
+  }
+
+  /**
+   * Internal call to fetch a buffer.
+   *
+   * @param {string} url
+   * @param {RequestInit} opts
+   * @returns {Promise<Response>}
+   */
+  #fetch(url, opts) {
+    const request = new Request(url, {
+      // @ts-expect-error Node RequestInit (with dispatcher) != Web RequestInit
+      dispatcher: new Agent({
+        allowH2: this.opts.http2,
+        connect: {
+          checkServerIdentity: this._checkServerIdentity.bind(this),
+        },
+      }),
+      ...opts,
+    });
+    for (const hook of this.hooks?.beforeRequest ?? []) {
+      hook(request);
+    }
+    return this.opts.customFetch(request);
   }
 }
 
