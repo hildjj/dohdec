@@ -1,7 +1,7 @@
 import ava from '@cto.af/eslint-config/ava.js';
-import base from '@cto.af/eslint-config';
+import es6 from '@cto.af/eslint-config/es6.js';
+import jsdoc from '@cto.af/eslint-config/jsdoc.js';
 import markdown from '@cto.af/eslint-config/markdown.js';
-import mod from '@cto.af/eslint-config/module.js';
 
 export default [
   {
@@ -9,8 +9,14 @@ export default [
       '**/*.d.ts',
     ],
   },
-  ...base,
-  ...mod,
+  ...es6,
+  ...jsdoc,
   ...markdown,
   ...ava,
+  {
+    files: ['**/*.js'],
+    rules: {
+      'jsdoc/valid-types': 'off', // Let TS check.
+    },
+  },
 ];

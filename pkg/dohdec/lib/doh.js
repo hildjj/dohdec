@@ -1,16 +1,20 @@
 import * as packet from 'dns-packet';
 import * as pkg from './pkg.js';
 import * as tls from 'node:tls';
+import {Agent} from './agent.js';
+import {Buffer} from 'node:buffer';
 import DNSutils from './dnsUtils.js';
 import assert from 'node:assert';
 import cryptoRandomString from 'crypto-random-string';
-import got from 'got';
 
 const PAD_SIZE = 128;
 const WF_DNS = 'application/dns-message';
 const WF_JSON = 'application/dns-json';
 const CLOUDFLARE_API = 'https://cloudflare-dns.com/dns-query';
 const USER_AGENT = `${pkg.name} v${pkg.version}`;
+
+/** @import {LookupOptions, Writable} from './dnsUtils.js' */
+/** @import {Dispatcher} from 'undici-types' */
 
 /**
  * Options for doing DOH lookups.
@@ -24,12 +28,7 @@ const USER_AGENT = `${pkg.name} v${pkg.version}`;
  */
 
 /**
- * @typedef {DOH_SpecificLookupOptions &
- *   import('./dnsUtils.js').LookupOptions} DOH_LookupOptions
- */
-
-/**
- * @typedef {import('./dnsUtils.js').Writable} Writable
+ * @typedef {DOH_SpecificLookupOptions & LookupOptions} DOH_LookupOptions
  */
 
 /**
@@ -50,7 +49,7 @@ export class DNSoverHTTPS extends DNSutils {
   static version = pkg.version;
 
   /**
-   * Default URL for DNSoverHTTPS requests
+   * Default URL for DNSoverHTTPS requests.
    * @type {string}
    */
   static defaultURL = CLOUDFLARE_API;
@@ -70,7 +69,12 @@ export class DNSoverHTTPS extends DNSutils {
    * @param {number} [opts.verbose=0] How verbose do you want your logging?
    * @param {Writable} [opts.verboseStream=process.stderr] Where to write
    *   verbose output.
-   * @param {boolean} [opts.http2=false] Use http/2 if it is available.
+   * @param {boolean} [opts.http2=true] Use http/2 if it is available.
+   * @param {typeof fetch} [opts.customFetch=fetch] Custom `fetch`
+   *   implementation.  Defaults to fetch.
+   * @param {Dispatcher} [opts.agent] Undici agent for HTTPS requests.  If used,
+   *   the http2 option is ignored, and the certificate information is never
+   *   output, unless the specified agent makes that happen.
    */
   constructor(opts = {}) {
     const {
@@ -84,13 +88,22 @@ export class DNSoverHTTPS extends DNSutils {
       url: DNSoverHTTPS.defaultURL,
       preferPost: true,
       contentType: WF_DNS,
-      http2: false,
+      http2: true,
+      customFetch: fetch,
+      agent: undefined,
       ...rest,
     };
 
+    this.opts.agent ??= new Agent({
+      allowH2: this.opts.http2,
+      connect: {
+        checkServerIdentity: this._checkServerIdentity.bind(this),
+      },
+    });
+
     this.hooks = (this._verbose > 0) ?
       {
-        beforeRequest: [(/** @type {import('got').Options} */options) => {
+        beforeRequest: [(/** @type {Request} */options) => {
           this.verbose(1, `HTTP ${options.method} headers:`, options.headers);
           assert(options.url);
           this.verbose(1, `HTTP ${options.method} URL: ${options.url.toString()}`);
@@ -102,20 +115,16 @@ export class DNSoverHTTPS extends DNSutils {
   }
 
   /**
+   * Output certificate information in verbose mode.
+   *
+   * @param {string} host Host name.
+   * @param {tls.PeerCertificate} cert Certificate.
+   * @returns {Error | undefined} Error, or undefined on success.
    * @private
-   * @ignore
    */
-  _checkServerIdentity() {
-    return {
-      // This doesn't fire in nock tests.
-      checkServerIdentity: (
-        /** @type {string} */host,
-        /** @type {tls.PeerCertificate} */cert
-      ) => {
-        this.verbose(3, 'CERTIFICATE:', () => DNSutils.buffersToB64(cert));
-        return tls.checkServerIdentity(host, cert);
-      },
-    };
+  _checkServerIdentity(host, cert) {
+    this.verbose(3, 'CERTIFICATE:', () => DNSutils.buffersToB64(cert));
+    return tls.checkServerIdentity(host, cert);
   }
 
   /**
@@ -140,21 +149,19 @@ export class DNSoverHTTPS extends DNSutils {
       url += `?dns=${DNSutils.base64urlEncode(pkt)}`;
       body = undefined;
     }
-    const response = await got(url, {
+    const r = await this.#fetch(url, {
+      // @ts-expect-error Node RequestInit (with dispatcher) != Web RequestInit
+      dispatcher: this.opts.agent,
       method: this.opts.preferPost ? 'POST' : 'GET',
       headers: {
         'Content-Type': this.opts.contentType,
         'User-Agent': this.opts.userAgent,
         'Accept': this.opts.contentType,
       },
-      body,
-      https: this._checkServerIdentity(),
-      http2: this.opts.http2,
-      hooks: this.hooks,
-      retry: {
-        limit: 0,
-      },
-    }).buffer();
+      body: body ? new Uint8Array(body) : undefined,
+    });
+
+    const response = Buffer.from(await r.bytes());
     this.hexDump(2, response);
     this.verbose(1, 'RESPONSE:', () => packet.decode(response));
 
@@ -173,7 +180,7 @@ export class DNSoverHTTPS extends DNSutils {
    *   validation.
    * @returns {Promise<string|object>} DNS result.
    */
-  getJSON(opts) {
+  async getJSON(opts) {
     this.verbose(1, 'DNSoverHTTPS.getJSON options: ', opts);
 
     const rrtype = opts.rrtype || 'A';
@@ -191,20 +198,14 @@ export class DNSoverHTTPS extends DNSutils {
     });
     this.verbose(1, 'REQUEST:', req);
 
-    const r = got(
-      req, {
-        headers: {
-          'User-Agent': this.opts.userAgent,
-          'Accept': WF_JSON,
-        },
-        https: this._checkServerIdentity(),
-        http2: this.opts.http2,
-        hooks: this.hooks,
-        retry: {
-          limit: 0,
-        },
-      }
-    );
+    const r = await this.#fetch(req, {
+      // @ts-expect-error Node RequestInit (with dispatcher) != Web RequestInit
+      dispatcher: this.opts.agent,
+      headers: {
+        'User-Agent': this.opts.userAgent,
+        'Accept': WF_JSON,
+      },
+    });
 
     const decode = Object.prototype.hasOwnProperty.call(opts, 'decode') ?
       opts.decode :
@@ -239,6 +240,21 @@ export class DNSoverHTTPS extends DNSutils {
   // eslint-disable-next-line class-methods-use-this
   close() {
     // No-op for now
+  }
+
+  /**
+   * Internal call to fetch a buffer.
+   *
+   * @param {string} url URL.
+   * @param {RequestInit} opts Options.
+   * @returns {Promise<Response>} The fetch response.
+   */
+  #fetch(url, opts) {
+    const request = new Request(url, opts);
+    for (const hook of this.hooks?.beforeRequest ?? []) {
+      hook(request);
+    }
+    return this.opts.customFetch(request);
   }
 }
 

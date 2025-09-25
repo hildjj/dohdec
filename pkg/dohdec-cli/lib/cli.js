@@ -6,6 +6,8 @@ import net from 'node:net';
 import readline from 'node:readline';
 import util from 'node:util';
 
+/** @import {GenericPacket} from 'dohdec/lib/dnsUtils.js' */
+
 /**
  * Parse an int or throw if invalid.
  *
@@ -22,9 +24,11 @@ function myParseInt(value) {
   return parsedValue;
 }
 
+/** @import {Answer, Packet, RecordType} from 'dns-packet' */
+
 /**
- * @param {any} pkt
- * @returns {asserts pkt is import('dns-packet').Packet}
+ * @param {unknown} pkt Potential packet.
+ * @returns {asserts pkt is GenericPacket} Throws if not packet.
  * @private
  */
 function assertIsPacket(pkt) {
@@ -35,8 +39,10 @@ function assertIsPacket(pkt) {
 }
 
 /**
- * @param {any} er
- * @returns {asserts er is Error}
+ * Is this an error?
+ *
+ * @param {unknown} er Potential Error.
+ * @returns {asserts er is Error} Throws if not Error.
  */
 function assertIsError(er) {
   assert(er);
@@ -158,7 +164,7 @@ export class DnsCli extends Command {
       .addHelpText('after', `
 For more debug information:
 
-  $ NODE_DEBUG=http,https,http2 dohdec -v [arguments]`);
+  $ NODE_DEBUG=fetch dohdec -v [arguments]`);
     // END CLI CONFIG
 
     if (stdio && (Object.keys(stdio).length > 0)) {
@@ -205,8 +211,10 @@ For more debug information:
   }
 
   /**
-   * @param {string} name
-   * @param {import('dns-packet').RecordType} rrtype
+   * Get the given record for the given name.
+   *
+   * @param {string} name Name to query.
+   * @param {RecordType} rrtype RR Type.
    */
   async get(name, rrtype) {
     const opts = {
@@ -238,10 +246,11 @@ For more debug information:
             // this turned out to be easier to test.
             throw er;
           }
-          resp =
-            resp.answers ||
-            /** @type {Record<string, any>}*/ (resp).Answer ||
-            resp;
+          if ('answers' in resp && resp.answers) {
+            resp = resp.answers;
+          } else if ('Answer' in resp && resp.Answer) {
+            resp = resp.Answer;
+          }
         }
         this.std.out.write(util.inspect(DNSutils.buffersToB64(resp), {
           depth: Infinity,
@@ -258,7 +267,7 @@ For more debug information:
     } catch (er) {
       assertIsError(er);
       this.transport.verbose(1, er) ||
-      this.transport.verbose(0, () => (er.message ? er.message : er));
+      this.transport.verbose(0, () => er.message);
       throw er;
     }
   }
@@ -289,7 +298,7 @@ For more debug information:
           const [name, rrtype] = line.split(/\s+/);
           await this.get(
             name,
-            /** @type {import('dns-packet').RecordType} */(rrtype)
+            /** @type {RecordType} */(rrtype)
           );
         } catch (ignored) {
           // Catches all errors.  get() printed them already

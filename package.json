@@ -36,20 +36,19 @@
     "url": "git+https://github.com/hildjj/dohdec.git"
   },
   "devDependencies": {
-    "@cto.af/eslint-config": "^6.0.13",
+    "@cto.af/eslint-config": "^6.0.15",
     "@cto.af/monopub": "1.2.2",
-    "@eslint/markdown": "7.1.0",
+    "@eslint/markdown": "7.3.0",
     "ava": "^6.4.1",
     "c8": "^10.1.3",
-    "eslint": "^9.33.0",
+    "eslint": "^9.36.0",
     "eslint-plugin-ava": "^15.1.0",
-    "eslint-plugin-jsdoc": "^54.1.1",
-    "eslint-plugin-node": "^11.1.0",
-    "mock-dns-server": "0.0.3",
+    "eslint-plugin-jsdoc": "^60.3.1",
+    "mock-dns-server": "1.0.2",
     "package-extract": "3.1.3",
-    "typedoc": "0.28.10"
+    "typedoc": "0.28.13"
   },
-  "packageManager": "pnpm@10.15.0",
+  "packageManager": "pnpm@10.17.1",
   "engines": {
     "node": ">=20"
   }

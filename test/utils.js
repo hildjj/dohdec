@@ -23,11 +23,14 @@ export class Buf extends Transform {
   }
 }
 
+/** @import {ExecutionContext} from 'ava' */
+/** @import Nock from 'nock' */
+
 /**
  * Prepare the test environment for using nock.
  *
- * @param {any} test The AVA test suite.
- * @param {any} nock The nock instance.
+ * @param {ExecutionContext} test The AVA test suite.
+ * @param {Nock} nock The nock instance.
  * @param {URL} metaUrl The import.meta.url of the calling module.
  */
 export function prepNock(test, nock, metaUrl) {
