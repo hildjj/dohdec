@@ -6,6 +6,8 @@ import net from 'node:net';
 import readline from 'node:readline';
 import util from 'node:util';
 
+/** @import {GenericPacket} from 'dohdec/lib/dnsUtils.js' */
+
 /**
  * Parse an int or throw if invalid.
  *
@@ -22,11 +24,11 @@ function myParseInt(value) {
   return parsedValue;
 }
 
-/** @import {Packet, RecordType} from 'dns-packet' */
+/** @import {Answer, Packet, RecordType} from 'dns-packet' */
 
 /**
  * @param {unknown} pkt Potential packet.
- * @returns {asserts pkt is Packet} Throws if not packet.
+ * @returns {asserts pkt is GenericPacket} Throws if not packet.
  * @private
  */
 function assertIsPacket(pkt) {
@@ -244,10 +246,11 @@ For more debug information:
             // this turned out to be easier to test.
             throw er;
           }
-          resp =
-            resp.answers ||
-            /** @type {Record<string, unknown>}*/ (resp).Answer ||
-            resp;
+          if ('answers' in resp && resp.answers) {
+            resp = resp.answers;
+          } else if ('Answer' in resp && resp.Answer) {
+            resp = resp.Answer;
+          }
         }
         this.std.out.write(util.inspect(DNSutils.buffersToB64(resp), {
           depth: Infinity,

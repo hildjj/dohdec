@@ -1,5 +1,7 @@
+// @ts-ignore No type info
 import * as optioncodes from 'dns-packet/optioncodes.js';
 import * as packet from 'dns-packet';
+// @ts-ignore No type info
 import * as rcodes from 'dns-packet/rcodes.js';
 import {Buffer} from 'node:buffer';
 import {EventEmitter} from 'node:events';
@@ -10,6 +12,40 @@ import url from 'node:url';
 import util from 'node:util';
 
 const PAD_SIZE = 128;
+
+/**
+ * @typedef {{rcode: string}} StatusPacket
+ */
+
+/**
+ * Types in @types/dns-packet aren't right.
+ *
+ * @typedef {StatusPacket & packet.Packet} DNSPacket
+ */
+
+/**
+ * @typedef {object} JSONrr
+ * @property {string} name Name.
+ * @property {number} type RR type.
+ * @property {number} [TTL] Time to live.
+ * @property {string} [data] Data.
+ */
+
+/**
+ * @typedef {object} JSONPacket
+ * @property {number} Status Numerical rcode.
+ * @property {boolean} TC Truncation.
+ * @property {boolean} RD Recursion Desired.
+ * @property {boolean} RA Recursion Available.
+ * @property {boolean} AD Authentic Data.
+ * @property {boolean} CD Checking Disabled.
+ * @property {JSONrr[]} Question Questions.
+ * @property {JSONrr[]} Answer Answers.
+ */
+
+/**
+ * @typedef {DNSPacket | JSONPacket} GenericPacket
+ */
 
 /**
  * @typedef {object} LookupOptions
@@ -381,7 +417,7 @@ export class DNSError extends Error {
    * Create a DNS Error that wraps another error.
    *
    * @param {string} er Error.
-   * @param {packet.Packet} pkt Packet.
+   * @param {GenericPacket} pkt Packet.
    */
   constructor(er, pkt) {
     super(`DNS error: ${er}`);
@@ -392,7 +428,7 @@ export class DNSError extends Error {
   /**
    * Factory to extract DNS error from packet, if one exists.
    *
-   * @param {Record<string,unknown>} pkt Packet.
+   * @param {GenericPacket} pkt Packet.
    * @returns {DNSError|undefined} Error, if it exists.
    * @throws {TypeError} Invalid packet.
    */
@@ -400,14 +436,12 @@ export class DNSError extends Error {
     if ((typeof pkt !== 'object') || !pkt) {
       throw new TypeError('Invalid packet');
     }
-    if (Object.prototype.hasOwnProperty.call(pkt, 'rcode')) {
+    if ('rcode' in pkt) {
       if (pkt.rcode !== 'NOERROR') {
-        return new DNSError(/** @type {string} */ (pkt.rcode), pkt);
+        return new DNSError(pkt.rcode, pkt);
       }
-    } else if (Object.prototype.hasOwnProperty.call(pkt, 'Status')) {
-      if (pkt.Status !== 0) {
-        return new DNSError(rcodes.toString(pkt.Status), pkt);
-      }
+    } else if (pkt.Status) { // Ignore 0 intentionally
+      return new DNSError(rcodes.toString(pkt.Status), pkt);
     }
     return undefined;
   }
