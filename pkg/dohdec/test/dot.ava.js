@@ -127,5 +127,8 @@ test('chunked reads', async t => {
 
 test('bad id', async t => {
   const dot = create();
+  let er = 0;
+  dot.on('error', () => er++);
   await t.throwsAsync(dot.lookup('badid.example'));
+  t.is(er, 1);
 });

@@ -231,3 +231,14 @@ test('DNSError', t => {
   t.throws(() => DNSError.getError(null));
   t.throws(() => DNSError.getError(4));
 });
+
+test('abstract', async t => {
+  const du = new DNSutils();
+  let er = 0;
+  du.on('error', () => er++);
+
+  t.throws(() => du._send());
+  await t.throwsAsync(() => du._connect());
+  du._recv(Buffer.alloc(0));
+  t.is(er, 1);
+});

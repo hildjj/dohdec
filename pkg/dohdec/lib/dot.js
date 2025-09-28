@@ -1,42 +1,11 @@
 import * as crypto from 'node:crypto';
-import * as packet from 'dns-packet';
 import * as tls from 'node:tls';
+import {DEFAULT_SERVER, DNSutils} from './dnsUtils.js';
 import {Buffer} from 'node:buffer';
-import {default as DNSutils} from './dnsUtils.js';
 import {NoFilter} from 'nofilter';
 import assert from 'node:assert';
-import util from 'node:util';
 
-const randomBytes = util.promisify(crypto.randomBytes);
-
-const DEFAULT_SERVER = '1.1.1.1';
-
-/**
- * Options for doing DOT lookups.
- *
- * @typedef {import('./dnsUtils.js').LookupOptions} DOT_LookupOptions
- */
-
-/**
- * @typedef {import('./dnsUtils.js').Writable} Writable
- */
-
-/**
- * @callback pendingResolve
- * @param {Buffer|object} results The results of the DNS query.
- */
-
-/**
- * @callback pendingError
- * @param {Error} error The error that occurred.
- */
-
-/**
- * @typedef {object} Pending
- * @property {pendingResolve} resolve Callback for success.
- * @property {pendingError} reject Callback for error.
- * @property {DOT_LookupOptions} opts The original options for the request.
- */
+/** @import {LookupOptions, Writable} from './dnsUtils.js' */
 
 /**
  * A class that manages a connection to a DNS-over-TLS server.  The first time
@@ -50,12 +19,6 @@ const DEFAULT_SERVER = '1.1.1.1';
  */
 export class DNSoverTLS extends DNSutils {
   size = -1;
-
-  /** @type {tls.TLSSocket|undefined} */
-  socket = undefined;
-
-  /** @type {Record<number, Pending>} */
-  pending = Object.create(null);
 
   /** @type {NoFilter|undefined} */
   nof = undefined;
@@ -89,7 +52,7 @@ export class DNSoverTLS extends DNSutils {
     super({verbose, verboseStream});
     this.opts = {
       host: DNSoverTLS.server,
-      port: 853,
+      port: DNSoverTLS.port,
       hashAlg: 'sha256',
       rejectUnauthorized: true,
       checkServerIdentity: this._checkServerIdentity.bind(this),
@@ -98,17 +61,22 @@ export class DNSoverTLS extends DNSutils {
     this.verbose(1, 'DNSoverTLS options:', this.opts);
   }
 
+  /**
+   * Reset state.
+   * @protected
+   */
   _reset() {
+    super._reset();
     this.size = -1;
-    this.socket = undefined;
-    this.pending = Object.create(null);
     this.nof = undefined;
     this.bufs = [];
   }
 
   /**
+   * Connect to server.
+   *
    * @returns {Promise<void>}
-   * @private
+   * @protected
    */
   _connect() {
     return new Promise((resolve, reject) => {
@@ -130,7 +98,7 @@ export class DNSoverTLS extends DNSutils {
       this.socket = tls.connect(this.opts, resolve);
       this.socket.on('data', this._data.bind(this));
       this.socket.on('error', reject);
-      this.socket.on('end', this._disconnected.bind(this));
+      this.socket.on('close', this._disconnected.bind(this));
     });
   }
 
@@ -177,9 +145,6 @@ Received: "${hash}"`);
    * @private
    */
   _disconnected() {
-    for (const {reject, opts} of Object.values(this.pending)) {
-      reject(new Error(`Timeout looking up "${opts.name}":${opts.rrtype}`));
-    }
     this._reset();
 
     /**
@@ -223,35 +188,9 @@ Received: "${hash}"`);
       }
 
       const buf = /** @type {Buffer} */(this.nof.read(this.size));
-      this.verbose(1, 'RECV:');
-      this.hexDump(1, buf);
-
+      this._recv(buf);
       this.size = -1;
-      const pkt = packet.decode(buf);
-      assert(pkt.id !== undefined, 'Invalid packet, no id');
-      const pend = this.pending[pkt.id];
-      if (!pend) {
-        // Something bad happened, like an injection attack or a corrupted
-        // result. Abandon everything pending.
-        this.close();
-        return;
-      }
-      pend.resolve(pend.opts.decode ? pkt : buf);
     }
-  }
-
-  /**
-   * Generate a currently-unused random ID.
-   *
-   * @returns {Promise<number>} A random 2-byte ID number.
-   * @private
-   */
-  async _id() {
-    let id = null;
-    do {
-      id = (await randomBytes(2)).readUInt16BE();
-    } while (this.pending[id]);
-    return id;
   }
 
   /**
@@ -276,76 +215,17 @@ Received: "${hash}"`);
   }
 
   /**
-   * Look up a name in the DNS, over TLS.
+   * Send a packet.
    *
-   * @param {DOT_LookupOptions|string} name The DNS name to look up, or opts
-   *   if this is an object.
-   * @param {DOT_LookupOptions|string} [opts={}] Options for the
-   *   request.  If a string is given, it will be used as the rrtype.
-   * @returns {Promise<Buffer|packet.Packet>} Response.
+   * @param {Buffer} pkt Packet.
+   * @protected
    */
-  async lookup(name, opts = {}) {
-    const nopts = DNSutils.normalizeArgs(name, opts, {
-      rrtype: 'A',
-      dnsssec: false,
-      dnssecCheckingDisabled: false,
-      decode: true,
-      stream: true,
-    });
-    this.verbose(1, 'DNSoverTLS.lookup options:', nopts);
-
-    await this._connect();
-    if (!nopts.id) {
-      // eslint-disable-next-line require-atomic-updates
-      nopts.id = await this._id();
-    }
-
-    return new Promise((resolve, reject) => {
-      const pkt = DNSutils.makePacket(nopts);
-
-      this.verbose(1, 'REQUEST:');
-      this.hexDump(2, pkt);
-      this.verbose(
-        1,
-        'Length:',
-        () => pkt.readUInt16BE(0),
-        () => packet.decode(pkt, 2) // Skip length
-      );
-
-      assert(nopts.id, 'Invalid ID');
-      this.pending[nopts.id] = {resolve, reject, opts: nopts};
-
-      assert(this.socket);
-      this.socket.write(pkt);
-
-      /**
-       * A buffer of data has been sent to the server.  Useful for
-       * verbose logging, e.g.
-       *
-       * @event DNSoverTLS#send
-       */
-      this.emit('send', pkt);
-      this.verbose(2, 'REQUEST:', pkt);
-    });
-  }
-
-  /**
-   * Close the socket.
-   *
-   * @returns {Promise<void>} Resolved on socket close.
-   */
-  close() {
-    return new Promise((resolve, _reject) => {
-      if (this.socket) {
-        this.socket.end(() => {
-          resolve();
-        });
-      } else {
-        resolve();
-      }
-    });
+  _send(pkt) {
+    const ts = /** @type {tls.TLSSocket} */ (this.socket);
+    ts.write(pkt);
   }
 }
 DNSoverTLS.server = DEFAULT_SERVER;
+DNSoverTLS.port = 853;
 
 export default DNSoverTLS;

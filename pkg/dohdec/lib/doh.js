@@ -13,7 +13,12 @@ const WF_JSON = 'application/dns-json';
 const CLOUDFLARE_API = 'https://cloudflare-dns.com/dns-query';
 const USER_AGENT = `${pkg.name} v${pkg.version}`;
 
-/** @import {LookupOptions, Writable} from './dnsUtils.js' */
+/**
+ * @import {
+ *   GenericPacket, JSONPacket, LookupOptions, Writable
+ * } from './dnsUtils.js'
+ */
+
 /** @import {Dispatcher} from 'undici-types' */
 
 /**
@@ -131,7 +136,7 @@ export class DNSoverHTTPS extends DNSutils {
    * Get a DNS-format response.
    *
    * @param {DOH_LookupOptions} opts Options for the request.
-   * @returns {Promise<Buffer|object>} DNS result.
+   * @returns {Promise<Buffer|packet.DecodedPacket>} DNS result.
    */
   async getDNS(opts) {
     this.verbose(1, 'DNSoverHTTPS.getDNS options:', opts);
@@ -178,7 +183,7 @@ export class DNSoverHTTPS extends DNSutils {
    * @param {boolean} [opts.dnssec=false] Request DNSSEC records.
    * @param {boolean} [opts.dnssecCheckingDisabled=false] Disable DNSSEC
    *   validation.
-   * @returns {Promise<string|object>} DNS result.
+   * @returns {Promise<string|JSONPacket>} DNS result.
    */
   async getJSON(opts) {
     this.verbose(1, 'DNSoverHTTPS.getJSON options: ', opts);
@@ -220,7 +225,7 @@ export class DNSoverHTTPS extends DNSutils {
    *   if this is an object.
    * @param {DOH_LookupOptions|string} [opts={}] Options for the
    *   request.  If a string is given, it will be used as the rrtype.
-   * @returns {Promise<Buffer|string|packet.Packet|object>} DNS result.
+   * @returns {Promise<GenericPacket|Buffer|string>} DNS result.
    */
   lookup(name, opts = {}) {
     const nopts = /** @type {Required<DOH_LookupOptions>} */ (
@@ -237,9 +242,14 @@ export class DNSoverHTTPS extends DNSutils {
     return nopts.json ? this.getJSON(nopts) : this.getDNS(nopts);
   }
 
-  // eslint-disable-next-line class-methods-use-this
+  /**
+   * Close any remaining keep-alive sockets.
+   *
+   * @returns {Promise<void>}
+   */
   close() {
-    // No-op for now
+    assert(this.opts.agent);
+    return this.opts.agent.close().then(() => this._reset());
   }
 
   /**
