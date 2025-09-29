@@ -36,12 +36,13 @@ export class DNSoverTCP extends DNSutils {
    */
   constructor(opts = {}) {
     const {
+      timeout,
       verbose,
       verboseStream,
       ...rest
     } = opts;
 
-    super({verbose, verboseStream});
+    super({timeout, verbose, verboseStream});
     this.opts = {
       host: /** @type {typeof DNSoverTCP} */(this.constructor).server,
       port: /** @type {typeof DNSoverTCP} */(this.constructor).port,

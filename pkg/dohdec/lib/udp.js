@@ -30,6 +30,7 @@ export class DNSoverUDP extends DNSutils {
    */
   constructor(opts = {}) {
     const {
+      timeout,
       verbose,
       verboseStream,
       host = DNSoverUDP.server,
@@ -37,7 +38,7 @@ export class DNSoverUDP extends DNSutils {
       ...rest
     } = opts;
 
-    super({verbose, verboseStream});
+    super({timeout, verbose, verboseStream});
 
     this.host = host;
     this.port = port;

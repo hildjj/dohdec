@@ -37,7 +37,7 @@ test('udp errors', async t => {
   await t.throwsAsync(() => badPort.lookup('ietf.org'));
 });
 
-test('AbortController', async t => {
+test('udp AbortController', async t => {
   const aco = new AbortController();
   const ac = new AbortController();
   const udp = new DNSoverUDP({host: '127.0.0.1', signal: aco.signal});
@@ -48,6 +48,17 @@ test('AbortController', async t => {
   }, 50);
   await t.throwsAsync(() => p);
 
+  await t.throwsAsync(() => udp.lookup({name: 'ietf.org', signal: AbortSignal.abort()}));
+
   // Shutdown is proof this worked.
   aco.abort();
+});
+
+test('udp timeout', async t => {
+  const udp = new DNSoverUDP({host: '127.0.0.1', timeout: -1});
+  await t.throwsAsync(() => udp.lookup({name: 'ietf.org'}));
+  udp.timeout = 100;
+  await t.throwsAsync(() => udp.lookup({name: 'ietf.org'}));
+  await t.throwsAsync(() => udp.lookup({name: 'ietf.org', signal: AbortSignal.abort()}));
+  udp.close();
 });

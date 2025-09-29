@@ -15,7 +15,7 @@ const USER_AGENT = `${pkg.name} v${pkg.version}`;
 
 /**
  * @import {
- *   GenericPacket, JSONPacket, LookupOptions, Writable
+ *   GenericPacket, JSONPacket, LookupOptions, VerboseOptions, Writable
  * } from './dnsUtils.js'
  */
 
@@ -34,6 +34,27 @@ const USER_AGENT = `${pkg.name} v${pkg.version}`;
 
 /**
  * @typedef {DOH_SpecificLookupOptions & LookupOptions} DOH_LookupOptions
+ */
+
+/**
+ * Options that apply to all requests through a DNSoverHTTPS instance.
+ *
+ * @typedef {object} DOHoptions
+ * @property {string} [userAgent="packageName version"] User Agent for HTTP
+ *   request.
+ * @property {string} [url="https://cloudflare-dns.com/dns-query"] Base URL
+ *   for all HTTP requests.
+ * @property {boolean} [preferPost=true] Should POST be preferred to Get for
+ *   DNS-format queries?
+ * @property {string} [contentType="application/dns-udpwireformat"] MIME type
+ *   for POST.
+ * @property {boolean} [http2=true] Use http/2 if it is available.
+ * @property {typeof fetch} [customFetch=fetch] Custom `fetch` implementation.
+ *   Defaults to fetch.
+ * @property {Dispatcher|null} [agent] Undici agent for HTTPS requests.  If
+ *   used, the http2 option is ignored, and the certificate information is
+ *   never output, unless the specified agent makes that happen.
+ * @property {AbortSignal|null} [signal] Used to cancel execution.
  */
 
 /**
@@ -59,35 +80,22 @@ export class DNSoverHTTPS extends DNSutils {
    */
   static defaultURL = CLOUDFLARE_API;
 
+  /** @type {Required<DOHoptions>} */
+  opts;
+
   /**
    * Create a DNSoverHTTPS instance.
    *
-   * @param {object} opts Options for all requests.
-   * @param {string} [opts.userAgent="packageName version"] User Agent for
-   *   HTTP request.
-   * @param {string} [opts.url="https://cloudflare-dns.com/dns-query"] Base URL
-   *   for all HTTP requests.
-   * @param {boolean} [opts.preferPost=true] Should POST be preferred to Get
-   *   for DNS-format queries?
-   * @param {string} [opts.contentType="application/dns-udpwireformat"]
-   *   MIME type for POST.
-   * @param {number} [opts.verbose=0] How verbose do you want your logging?
-   * @param {Writable} [opts.verboseStream=process.stderr] Where to write
-   *   verbose output.
-   * @param {boolean} [opts.http2=true] Use http/2 if it is available.
-   * @param {typeof fetch} [opts.customFetch=fetch] Custom `fetch`
-   *   implementation.  Defaults to fetch.
-   * @param {Dispatcher} [opts.agent] Undici agent for HTTPS requests.  If used,
-   *   the http2 option is ignored, and the certificate information is never
-   *   output, unless the specified agent makes that happen.
+   * @param {DOHoptions & VerboseOptions} [opts] Options for all requests.
    */
   constructor(opts = {}) {
     const {
       verbose,
       verboseStream,
+      timeout,
       ...rest
     } = opts;
-    super({verbose, verboseStream});
+    super({timeout, verbose, verboseStream});
     this.opts = {
       userAgent: DNSoverHTTPS.userAgent,
       url: DNSoverHTTPS.defaultURL,
@@ -95,7 +103,8 @@ export class DNSoverHTTPS extends DNSutils {
       contentType: WF_DNS,
       http2: true,
       customFetch: fetch,
-      agent: undefined,
+      agent: null,
+      signal: null,
       ...rest,
     };
 
@@ -260,6 +269,21 @@ export class DNSoverHTTPS extends DNSutils {
    * @returns {Promise<Response>} The fetch response.
    */
   #fetch(url, opts) {
+    let s = this.opts.signal;
+    if (typeof this.timeout === 'number') {
+      if (s) {
+        s = AbortSignal.any([s, AbortSignal.timeout(this.timeout)]);
+      } else {
+        s = AbortSignal.timeout(this.timeout);
+      }
+    }
+    if (s) {
+      if (s.aborted) {
+        return Promise.reject(new Error('Signal aborted'));
+      }
+      opts.signal = s;
+    }
+
     const request = new Request(url, opts);
     for (const hook of this.hooks?.beforeRequest ?? []) {
       hook(request);

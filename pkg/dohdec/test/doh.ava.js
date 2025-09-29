@@ -112,3 +112,14 @@ test('checkServerIdentity', t => {
   const vstr = verboseStream.read().toString();
   t.regex(vstr, /CERTIFICATE/);
 });
+
+test('doh AbortSignal', async t => {
+  const doh = new DNSoverHTTPS({signal: AbortSignal.abort()});
+  await t.throwsAsync(() => doh.lookup('ietf.org'));
+  doh.opts.signal = AbortSignal.timeout(0);
+  await t.throwsAsync(() => doh.lookup('ietf.org'));
+  doh.timeout = 0;
+  await t.throwsAsync(() => doh.lookup('ietf.org'));
+  doh.opts.signal = null;
+  await t.throwsAsync(() => doh.lookup('ietf.org'));
+});
