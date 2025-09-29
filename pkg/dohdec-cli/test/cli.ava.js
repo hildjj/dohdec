@@ -259,7 +259,7 @@ test('deprecated options', async t => {
 });
 
 test('udp', async t => {
-  const {err, out, code} = await cliMain('--udp', '-v', 'ietf.org', 'MX');
+  const {out, code} = await cliMain('--udp', '-v', 'ietf.org', 'MX');
   t.is(code, undefined);
   t.regex(out, /name: 'ietf.org'/);
 });
