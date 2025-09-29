@@ -90,6 +90,7 @@ const randomBytes = util.promisify(crypto.randomBytes);
  * @property {number} [verbose=0] How verbose do you want your logging?
  * @property {Writable} [verboseStream=process.stderr]
  *   Where to write verbose output.
+ * @property {number|null} [timeout=null] Timeout for requests.
  */
 
 /**
@@ -157,6 +158,9 @@ export class DNSutils extends EventEmitter {
   /** Is this socket in streaming mode?  False for UDP. */
   stream = true;
 
+  /** @type {number|null} */
+  timeout = null;
+
   /**
    * Creates an instance of DNSutils.
    *
@@ -168,8 +172,9 @@ export class DNSutils extends EventEmitter {
       throw new Error('Bad verbose level');
     }
 
-    this._verbose = opts.verbose || 0;
+    this._verbose = opts.verbose ?? 0;
     this.verboseStream = opts.verboseStream || process.stderr;
+    this.timeout = opts.timeout ?? null;
   }
 
   /**
@@ -279,6 +284,19 @@ export class DNSutils extends EventEmitter {
 
     await this._connect();
     return new Promise((resolve, reject) => {
+      let sig = nopts.signal;
+      if (typeof this.timeout === 'number') {
+        if (sig) {
+          sig = AbortSignal.any([sig, AbortSignal.timeout(this.timeout)]);
+        } else {
+          sig = AbortSignal.timeout(this.timeout);
+        }
+      }
+      if (sig?.aborted) {
+        reject(new Error('Signal aborted'));
+        return;
+      }
+
       const pkt = DNSutils.makePacket(nopts);
 
       this.verbose(1, 'REQUEST:');
@@ -293,7 +311,7 @@ export class DNSutils extends EventEmitter {
       const {id} = nopts;
       assert(id, 'Invalid ID');
       this.pending.set(id, {resolve, reject, opts: nopts});
-      nopts.signal?.addEventListener('abort', () => {
+      sig?.addEventListener('abort', () => {
         reject(new Error('Aborted lookup'));
         this.pending.delete(id);
       });
