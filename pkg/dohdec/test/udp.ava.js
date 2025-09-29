@@ -36,3 +36,18 @@ test('udp errors', async t => {
   const badPort = new DNSoverUDP({host: '::1', port: -1});
   await t.throwsAsync(() => badPort.lookup('ietf.org'));
 });
+
+test('AbortController', async t => {
+  const aco = new AbortController();
+  const ac = new AbortController();
+  const udp = new DNSoverUDP({host: '127.0.0.1', signal: aco.signal});
+
+  const p = udp.lookup({name: 'ietf.org', signal: ac.signal});
+  setTimeout(() => {
+    ac.abort();
+  }, 50);
+  await t.throwsAsync(() => p);
+
+  // Shutdown is proof this worked.
+  aco.abort();
+});

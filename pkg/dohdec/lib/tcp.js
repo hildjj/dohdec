@@ -3,12 +3,10 @@ import {DEFAULT_SERVER, DNSutils} from './dnsUtils.js';
 import {NoFilter} from 'nofilter';
 import assert from 'node:assert';
 
-/** @import {Writable} from './dnsUtils.js' */
+/** @import {VerboseOptions, Writable} from './dnsUtils.js' */
 
 /**
- * @typedef {object} TCPoptions
- * @property {string} host Hostname or IP address.
- * @property {number} port Port number.
+ * @typedef {VerboseOptions & Partial<net.NetConnectOpts>} TCPoptions
  */
 
 /**
@@ -27,19 +25,14 @@ export class DNSoverTCP extends DNSutils {
   bufs = [];
 
   /**
-   * @type {TCPoptions & {[key: string]: unknown}}
+   * @type {net.NetConnectOpts}
    */
   opts;
 
   /**
    * Construct a new DNSoverTCP.
    *
-   * @param {object} opts Options.
-   * @param {string} [opts.host='1.1.1.1'] Server to connect to.
-   * @param {number} [opts.port=53] TCP port number for server.
-   * @param {number} [opts.verbose=0] How verbose do you want your logging?
-   * @param {Writable} [opts.verboseStream=process.stderr] Where to write
-   *   verbose output.
+   * @param {TCPoptions} [opts = {host: '1.1.1.1', port: 53}] Options.
    */
   constructor(opts = {}) {
     const {
