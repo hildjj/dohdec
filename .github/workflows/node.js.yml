@@ -24,7 +24,8 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
-      - run: npm run all:link
+      - name: Setup WARP
+        uses: fscarmen/warp-on-actions@v1.4
       - run: pnpm i -r
       - run: npm run lint
       - run: npm run all:types

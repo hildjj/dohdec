@@ -282,7 +282,7 @@ export class DNSutils extends EventEmitter {
         1,
         'Length:',
         () => pkt.length,
-        () => packet.decode(pkt, 2) // Skip length
+        () => packet.decode(pkt, this.stream ? 2 : 0) // Skip length
       );
 
       assert(nopts.id, 'Invalid ID');
