@@ -3,30 +3,46 @@ import * as net from 'node:net';
 import {DEFAULT_SERVER, DNSutils} from './dnsUtils.js';
 
 /** @import {Buffer} from 'node:buffer' */
-/** @import {LookupOptions, Writable} from './dnsUtils.js' */
+/** @import {VerboseOptions} from './dnsUtils.js' */
+
+/**
+ * @typedef {object} ConnectOptions
+ * @property {string} [host] Hostname.
+ * @property {number} [port] Port number.
+ */
+
+/**
+ * @typedef {VerboseOptions &
+ *   ConnectOptions & Partial<dgram.SocketOptions>} UDPoptions
+ */
 
 export class DNSoverUDP extends DNSutils {
+  /** @type {dgram.SocketOptions} */
+  opts;
+
+  host;
+  port;
+
   /**
    * Construct a new DNSoverUDP.
    *
-   * @param {object} opts Options.
-   * @param {string} [opts.host='1.1.1.1'] Server to connect to.
-   * @param {number} [opts.port=53] TCP port number for server.
-   * @param {number} [opts.verbose=0] How verbose do you want your logging?
-   * @param {Writable} [opts.verboseStream=process.stderr] Where to write
-   *   verbose output.
+   * @param {UDPoptions} [opts = {host: '1.1.1.1', port: 53}] Options.
    */
   constructor(opts = {}) {
     const {
       verbose,
       verboseStream,
+      host = DNSoverUDP.server,
+      port = DNSoverUDP.port,
       ...rest
     } = opts;
 
     super({verbose, verboseStream});
+
+    this.host = host;
+    this.port = port;
     this.opts = {
-      host: DNSoverUDP.server,
-      port: DNSoverUDP.port,
+      type: (net.isIP(host) === 6) ? 'udp6' : 'udp4',
       ...rest,
     };
     this.stream = false;
@@ -54,19 +70,8 @@ export class DNSoverUDP extends DNSutils {
       this.verbose(1, 'CONNECT:', this.opts);
 
       try {
-        const typ = net.isIP(this.opts.host);
-        switch (typ) {
-          case 4:
-            this.socket = dgram.createSocket('udp4');
-            break;
-          case 6:
-            this.socket = dgram.createSocket('udp6');
-            break;
-          default:
-            reject(new TypeError(`Invalid server, not v4 or v6: ${this.opts.host}`));
-            return;
-        }
-        this.socket.connect(this.opts.port, this.opts.host, resolve);
+        this.socket = dgram.createSocket(this.opts);
+        this.socket.connect(this.port, this.host, resolve);
         this.socket.on('message', this._message.bind(this));
         this.socket.on('error', reject);
         this.socket.on('close', this._close.bind(this));

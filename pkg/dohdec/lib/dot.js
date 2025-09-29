@@ -5,14 +5,18 @@ import {Buffer} from 'node:buffer';
 import {DNSoverTCP} from './tcp.js';
 import {NoFilter} from 'nofilter';
 
-/** @import {LookupOptions, Writable} from './dnsUtils.js' */
+/** @import {VerboseOptions, Writable} from './dnsUtils.js' */
 /** @import {TCPoptions} from './tcp.js' */
 
 /**
- * @typedef {object} TLSoptions
+ * @typedef {object} HashOptions
  * @property {string} [hash] Hex-encoded hash of the DER-encoded cert
  *   expected from the server.
- * @property {string} hashAlg Hash algorithm.
+ * @property {string} [hashAlg = 'sha256'] Hash algorithm.
+ */
+
+/**
+ * @typedef {VerboseOptions & HashOptions & tls.ConnectionOptions} TLSoptions
  */
 
 /**
@@ -26,37 +30,28 @@ import {NoFilter} from 'nofilter';
  * certificate that the server will offer.
  */
 export class DNSoverTLS extends DNSoverTCP {
-  /** @type {TCPoptions & TLSoptions & {[key: string]: unknown}} */
+  /** @type {tls.ConnectionOptions} */
   tlsOpts;
+
+  hashAlg;
+  hash;
 
   /**
    * Construct a new DNSoverTLS.
    *
-   * @param {object} opts Options.
-   * @param {string} [opts.host='1.1.1.1'] Server to connect to.
-   * @param {number} [opts.port=853] TCP port number for server.
-   * @param {string} [opts.hash] Hex-encoded hash of the DER-encoded cert
-   *   expected from the server.  If not specified, no pinning checks are
-   *   performed.
-   * @param {string} [opts.hashAlg='sha256'] Hash algorithm for cert pinning.
-   * @param {boolean} [opts.rejectUnauthorized=true] Should the server
-   *   certificate even be checked using the normal TLS approach?
-   * @param {number} [opts.verbose=0] How verbose do you want your logging?
-   * @param {Writable} [opts.verboseStream=process.stderr] Where to write
-   *   verbose output.
+   * @param {TLSoptions} [opts = {host: '1.1.1.1', port: 853}] Options.
    */
   constructor(opts = {}) {
-    super({
-      hashAlg: 'sha256',
-      rejectUnauthorized: true,
-      ...opts,
-    });
+    super(opts);
+
+    const {hash, hashAlg = 'sha256', ...rest} = /** @type {HashOptions} */(this.opts);
+    this.hash = hash;
+    this.hashAlg = hashAlg;
 
     this.tlsOpts = {
-      hashAlg: 'sha256',
       rejectUnauthorized: true,
       checkServerIdentity: this._checkServerIdentity.bind(this),
-      ...this.opts,
+      ...rest,
     };
     this.verbose(1, 'DNSoverTLS options:', this.opts);
   }
@@ -110,7 +105,7 @@ export class DNSoverTLS extends DNSoverTCP {
    */
   _checkServerIdentity(host, cert) {
     // Same as cert.fingerprint256, but with hash agility
-    const hash = DNSoverTLS.hashCert(cert, this.tlsOpts.hashAlg);
+    const hash = DNSoverTLS.hashCert(cert, this.hashAlg);
 
     /**
      * Fired on connection when the server sends a certificate.
@@ -128,12 +123,12 @@ export class DNSoverTLS extends DNSoverTCP {
     this.verbose(2, 'CERTIFICATE:', () => DNSutils.buffersToB64(cert));
     const err = tls.checkServerIdentity(host, cert);
     if (!err) {
-      if (this.tlsOpts.hash && (this.tlsOpts.hash !== hash)) {
-        return new Error(`Invalid cert hash for ${this.opts.host}:${this.opts.port}.
-Expected: "${this.tlsOpts.hash}"
+      if (this.hash && (this.hash !== hash)) {
+        return new Error(`Invalid cert hash for ${this.tlsOpts.host}:${this.tlsOpts.port}.
+Expected: "${this.hash}"
 Received: "${hash}"`);
       }
-    } else if (this.tlsOpts.hash !== hash) {
+    } else if (this.hash !== hash) {
       return err;
     }
     return undefined;

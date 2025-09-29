@@ -59,6 +59,7 @@ const randomBytes = util.promisify(crypto.randomBytes);
  * @property {boolean} [dnssec=false] Request DNSSec records.  Currently
  *   requires `json: false`.
  * @property {boolean} [dnssecCheckingDisabled=false] Disable DNSSEC.
+ * @property {AbortSignal} [signal] Abort signal to cancel just this lookup.
  */
 
 /**
@@ -82,6 +83,13 @@ const randomBytes = util.promisify(crypto.randomBytes);
  * @property {pendingResolve} resolve Callback for success.
  * @property {pendingError} reject Callback for error.
  * @property {LookupOptions} opts The original options for the request.
+ */
+
+/**
+ * @typedef {object} VerboseOptions
+ * @property {number} [verbose=0] How verbose do you want your logging?
+ * @property {Writable} [verboseStream=process.stderr]
+ *   Where to write verbose output.
  */
 
 /**
@@ -152,10 +160,7 @@ export class DNSutils extends EventEmitter {
   /**
    * Creates an instance of DNSutils.
    *
-   * @param {object} [opts={}] Options.
-   * @param {number} [opts.verbose=0] How verbose do you want your logging?
-   * @param {Writable} [opts.verboseStream=process.stderr]
-   *   Where to write verbose output.
+   * @param {VerboseOptions} [opts={}] Options.
    */
   constructor(opts = {}) {
     super();
@@ -285,8 +290,13 @@ export class DNSutils extends EventEmitter {
         () => packet.decode(pkt, this.stream ? 2 : 0) // Skip length
       );
 
-      assert(nopts.id, 'Invalid ID');
-      this.pending.set(nopts.id, {resolve, reject, opts: nopts});
+      const {id} = nopts;
+      assert(id, 'Invalid ID');
+      this.pending.set(id, {resolve, reject, opts: nopts});
+      nopts.signal?.addEventListener('abort', () => {
+        reject(new Error('Aborted lookup'));
+        this.pending.delete(id);
+      });
 
       assert(this.socket);
       this._send(pkt);
