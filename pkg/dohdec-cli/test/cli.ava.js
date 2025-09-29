@@ -55,6 +55,7 @@ Options:
                                 TLS (default: 53)
   -u, --url <URL>               The URL of the DoH service (default:
                                 "https://cloudflare-dns.com/dns-query")
+  -T, --tcp                     Use plaintext TCP for query
   -U, --udp                     Use UDP for query
   -v, --verbose                 Increase verbosity of debug information.  May be
                                 specified multiple times.
@@ -101,9 +102,9 @@ async function cliMain(...args) {
 async function cliMainTLS(...args) {
   const res = await cliMain(cli => {
     const m = plainConnect(mockServer.port);
-    cli.transport.opts.socket = m;
-    cli.transport.opts.ca = mockServer.ca;
-    cli.transport.opts.host = 'localhost';
+    cli.transport.tlsOpts.socket = m;
+    cli.transport.tlsOpts.ca = mockServer.ca;
+    cli.transport.tlsOpts.host = 'localhost';
   }, ...args);
   return res;
 }
@@ -259,6 +260,13 @@ test('deprecated options', async t => {
 
 test('udp', async t => {
   const {err, out, code} = await cliMain('--udp', 'ietf.org', 'MX');
+  t.is(err, null);
+  t.is(code, undefined);
+  t.regex(out, /name: 'ietf.org'/);
+});
+
+test('tcp', async t => {
+  const {err, out, code} = await cliMain('--tcp', 'ietf.org', 'MX');
   t.is(err, null);
   t.is(code, undefined);
   t.regex(out, /name: 'ietf.org'/);

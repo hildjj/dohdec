@@ -2,10 +2,18 @@ import * as crypto from 'node:crypto';
 import * as tls from 'node:tls';
 import {DEFAULT_SERVER, DNSutils} from './dnsUtils.js';
 import {Buffer} from 'node:buffer';
+import {DNSoverTCP} from './tcp.js';
 import {NoFilter} from 'nofilter';
-import assert from 'node:assert';
 
 /** @import {LookupOptions, Writable} from './dnsUtils.js' */
+/** @import {TCPoptions} from './tcp.js' */
+
+/**
+ * @typedef {object} TLSoptions
+ * @property {string} [hash] Hex-encoded hash of the DER-encoded cert
+ *   expected from the server.
+ * @property {string} hashAlg Hash algorithm.
+ */
 
 /**
  * A class that manages a connection to a DNS-over-TLS server.  The first time
@@ -17,14 +25,9 @@ import assert from 'node:assert';
  * `hashAlg` options are set correctly to a hash of the DER-encoded
  * certificate that the server will offer.
  */
-export class DNSoverTLS extends DNSutils {
-  size = -1;
-
-  /** @type {NoFilter|undefined} */
-  nof = undefined;
-
-  /** @type {Buffer[]} */
-  bufs = [];
+export class DNSoverTLS extends DNSoverTCP {
+  /** @type {TCPoptions & TLSoptions & {[key: string]: unknown}} */
+  tlsOpts;
 
   /**
    * Construct a new DNSoverTLS.
@@ -43,20 +46,17 @@ export class DNSoverTLS extends DNSutils {
    *   verbose output.
    */
   constructor(opts = {}) {
-    const {
-      verbose,
-      verboseStream,
-      ...rest
-    } = opts;
+    super({
+      hashAlg: 'sha256',
+      rejectUnauthorized: true,
+      ...opts,
+    });
 
-    super({verbose, verboseStream});
-    this.opts = {
-      host: DNSoverTLS.server,
-      port: DNSoverTLS.port,
+    this.tlsOpts = {
       hashAlg: 'sha256',
       rejectUnauthorized: true,
       checkServerIdentity: this._checkServerIdentity.bind(this),
-      ...rest,
+      ...this.opts,
     };
     this.verbose(1, 'DNSoverTLS options:', this.opts);
   }
@@ -95,7 +95,7 @@ export class DNSoverTLS extends DNSutils {
       this.verbose(1, 'CONNECT:', this.opts);
 
       this.nof = new NoFilter();
-      this.socket = tls.connect(this.opts, resolve);
+      this.socket = tls.connect(this.tlsOpts, resolve);
       this.socket.on('data', this._data.bind(this));
       this.socket.on('error', reject);
       this.socket.on('close', this._disconnected.bind(this));
@@ -110,7 +110,7 @@ export class DNSoverTLS extends DNSutils {
    */
   _checkServerIdentity(host, cert) {
     // Same as cert.fingerprint256, but with hash agility
-    const hash = DNSoverTLS.hashCert(cert, this.opts.hashAlg);
+    const hash = DNSoverTLS.hashCert(cert, this.tlsOpts.hashAlg);
 
     /**
      * Fired on connection when the server sends a certificate.
@@ -128,69 +128,15 @@ export class DNSoverTLS extends DNSutils {
     this.verbose(2, 'CERTIFICATE:', () => DNSutils.buffersToB64(cert));
     const err = tls.checkServerIdentity(host, cert);
     if (!err) {
-      if (this.opts.hash && (this.opts.hash !== hash)) {
+      if (this.tlsOpts.hash && (this.tlsOpts.hash !== hash)) {
         return new Error(`Invalid cert hash for ${this.opts.host}:${this.opts.port}.
-Expected: "${this.opts.hash}"
+Expected: "${this.tlsOpts.hash}"
 Received: "${hash}"`);
       }
-    } else if (this.opts.hash !== hash) {
+    } else if (this.tlsOpts.hash !== hash) {
       return err;
     }
     return undefined;
-  }
-
-  /**
-   * Server socket was disconnected.  Clean up any pending requests.
-   *
-   * @private
-   */
-  _disconnected() {
-    this._reset();
-
-    /**
-     * Server disconnected.  All pending requests will have failed.
-     *
-     * @event DNSoverTLS#disconnect
-     */
-    this.emit('disconnect');
-    this.verbose(1, 'DISCONNECT');
-  }
-
-  /**
-   * Parse data if enough is available.
-   *
-   * @param {Buffer} b Data read from socket.
-   * @private
-   */
-  _data(b) {
-    /**
-     * A buffer of data has been received from the server.  Useful for
-     * verbose logging, e.g.
-     *
-     * @event DNSoverTLS#receive
-     */
-    this.emit('receive', b);
-    assert(this.nof);
-    this.nof.write(b);
-
-    // There might be multiple results in one read.
-    while (this.nof.length > 0) {
-      // No size read yet
-      if (this.size === -1) {
-        if (this.nof.length < 2) {
-          return;
-        }
-
-        this.size = this.nof.readUInt16BE();
-      }
-      if (this.nof.length < this.size) {
-        return;
-      }
-
-      const buf = /** @type {Buffer} */(this.nof.read(this.size));
-      this._recv(buf);
-      this.size = -1;
-    }
   }
 
   /**
@@ -212,17 +158,6 @@ Received: "${hash}"`);
     }
 
     return hash.digest('hex');
-  }
-
-  /**
-   * Send a packet.
-   *
-   * @param {Buffer} pkt Packet.
-   * @protected
-   */
-  _send(pkt) {
-    const ts = /** @type {tls.TLSSocket} */ (this.socket);
-    ts.write(pkt);
   }
 }
 DNSoverTLS.server = DEFAULT_SERVER;

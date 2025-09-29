@@ -1,5 +1,5 @@
 import {Command, InvalidArgumentError, Option} from 'commander';
-import {DNSError, DNSoverHTTPS, DNSoverTLS, DNSoverUDP, DNSutils} from 'dohdec';
+import {DNSError, DNSoverHTTPS, DNSoverTCP, DNSoverTLS, DNSoverUDP, DNSutils} from 'dohdec';
 import {Buffer} from 'node:buffer';
 import assert from 'node:assert';
 import net from 'node:net';
@@ -139,7 +139,7 @@ export class DnsCli extends Command {
       .option('-2, --no-http2', 'Disable http2 support')
       .addOption(
         new Option('-t, --tls', 'Use DNS-over-TLS instead of DNS-over-HTTPS')
-          .conflicts(['contentType', 'dnsPort', 'get', 'no-http2', 'udp', 'url'])
+          .conflicts(['contentType', 'dnsPort', 'get', 'no-http2', 'tcp', 'udp', 'url'])
       )
       .option(
         '-i, --host <serverIP>',
@@ -169,8 +169,12 @@ export class DnsCli extends Command {
         DNSoverHTTPS.defaultURL
       )
       .addOption(
+        new Option('-T, --tcp', 'Use plaintext TCP for query')
+          .conflicts(['contentType', 'get', 'no-http2', 'tls', 'tlsPort', 'udp', 'url'])
+      )
+      .addOption(
         new Option('-U, --udp', 'Use UDP for query')
-          .conflicts(['contentType', 'get', 'no-http2', 'tls', 'tlsPort', 'url'])
+          .conflicts(['contentType', 'get', 'no-http2', 'tcp', 'tls', 'tlsPort', 'url'])
       )
       .option(
         '-v, --verbose',
@@ -194,6 +198,13 @@ For more debug information:
 
     if (this.argv.udp) {
       this.transport = new DNSoverUDP({
+        host: this.argv.host,
+        port: this.argv.dnsPort,
+        verbose: this.argv.verbose,
+        verboseStream: this.std.err,
+      });
+    } else if (this.argv.tcp) {
+      this.transport = new DNSoverTCP({
         host: this.argv.host,
         port: this.argv.dnsPort,
         verbose: this.argv.verbose,
