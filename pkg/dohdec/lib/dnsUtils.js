@@ -1,3 +1,4 @@
+import * as crypto from 'node:crypto';
 // @ts-ignore No type info
 import * as optioncodes from 'dns-packet/optioncodes.js';
 import * as packet from 'dns-packet';
@@ -11,17 +12,14 @@ import net from 'node:net';
 import url from 'node:url';
 import util from 'node:util';
 
+/** @import dgram from 'node:dgram' */
+
+export const DEFAULT_SERVER = '1.1.1.1';
 const PAD_SIZE = 128;
+const randomBytes = util.promisify(crypto.randomBytes);
 
-/**
- * @typedef {{rcode: string}} StatusPacket
- */
-
-/**
- * Types in @types/dns-packet aren't right.
- *
- * @typedef {StatusPacket & packet.Packet} DNSPacket
- */
+/** @import * as PD from './packet.d.ts' */
+/** @import {DecodedPacket} from 'dns-packet' */
 
 /**
  * @typedef {object} JSONrr
@@ -44,7 +42,7 @@ const PAD_SIZE = 128;
  */
 
 /**
- * @typedef {DNSPacket | JSONPacket} GenericPacket
+ * @typedef {DecodedPacket | JSONPacket} GenericPacket
  */
 
 /**
@@ -65,6 +63,25 @@ const PAD_SIZE = 128;
 
 /**
  * @typedef {import('stream').Writable & {isTTY?: boolean}} Writable
+ */
+
+/**
+ * @callback pendingResolve
+ * @param {GenericPacket|Buffer|string} results The results of the DNS query.
+ */
+
+/**
+ * @callback pendingError
+ * @param {Error} error The error that occurred.
+ */
+
+/** @import {LookupOptions} from './dnsUtils.js' */
+
+/**
+ * @typedef {object} Pending
+ * @property {pendingResolve} resolve Callback for success.
+ * @property {pendingError} reject Callback for error.
+ * @property {LookupOptions} opts The original options for the request.
  */
 
 /**
@@ -120,8 +137,17 @@ export function printableString(stream, buf) {
 }
 
 export class DNSutils extends EventEmitter {
+  /** @type {Map<number, Pending>} */
+  pending = new Map();
+
   /** @type {Writable} */
   verboseStream;
+
+  /** @type {net.Socket | dgram.Socket | undefined} */
+  socket = undefined;
+
+  /** Is this socket in streaming mode?  False for UDP. */
+  stream = true;
 
   /**
    * Creates an instance of DNSutils.
@@ -222,6 +248,157 @@ export class DNSutils extends EventEmitter {
   }
 
   /**
+   * Look up a name in the DNS, over TLS.
+   *
+   * @param {LookupOptions | string} name The DNS name to look up, or opts
+   *   if this is an object.
+   * @param {LookupOptions | string} [opts={}] Options for the
+   *   request.  If a string is given, it will be used as the rrtype.
+   * @returns {Promise<GenericPacket|Buffer|string>}
+   *   Response.
+   */
+  async lookup(name, opts = {}) {
+    const nopts = DNSutils.normalizeArgs(name, opts, {
+      rrtype: 'A',
+      dnsssec: false,
+      dnssecCheckingDisabled: false,
+      decode: true,
+      stream: this.stream,
+    });
+    this.verbose(1, () => this.constructor.name, '.lookup options:', nopts);
+
+    if (!nopts.id) {
+      // eslint-disable-next-line require-atomic-updates
+      nopts.id = await this._id();
+    }
+
+    await this._connect();
+    return new Promise((resolve, reject) => {
+      const pkt = DNSutils.makePacket(nopts);
+
+      this.verbose(1, 'REQUEST:');
+      this.hexDump(2, pkt);
+      this.verbose(
+        1,
+        'Length:',
+        () => pkt.length,
+        () => packet.decode(pkt, this.stream ? 2 : 0) // Skip length
+      );
+
+      assert(nopts.id, 'Invalid ID');
+      this.pending.set(nopts.id, {resolve, reject, opts: nopts});
+
+      assert(this.socket);
+      this._send(pkt);
+
+      /**
+       * A buffer of data has been sent to the server.  Useful for
+       * verbose logging, e.g.
+       *
+       * @event DNSoverTLS#send
+       */
+      this.emit('send', pkt);
+      this.verbose(2, 'REQUEST:', pkt);
+    });
+  }
+
+  /**
+   * Send a packet.
+   *
+   * @abstract
+   * @param {Buffer} _pkt Packet to send.
+   * @protected
+   */
+  // eslint-disable-next-line class-methods-use-this
+  _send(_pkt) {
+    throw new Error('Abstract');
+  }
+
+  /**
+   * Connect to server.
+   *
+   * @abstract
+   * @returns {Promise<void>}
+   * @protected
+   */
+  // eslint-disable-next-line class-methods-use-this
+  _connect() {
+    return Promise.reject(new Error('Abstract'));
+  }
+
+  /**
+   * Receive a packet.
+   *
+   * @param {Buffer} msg Binary message received.
+   * @protected
+   */
+  _recv(msg) {
+    this.verbose(1, 'RECV:');
+    this.hexDump(1, msg);
+
+    try {
+      const pkt = packet.decode(msg);
+      assert(pkt.id);
+      const pend = this.pending.get(pkt.id);
+      if (!pend) {
+        this.emit('error', new Error(`Unexpected id: ${pkt.id}`));
+        this.close();
+        return;
+      }
+      pend.resolve(pend.opts.decode ? pkt : msg);
+    } catch (er) {
+      this.emit('error', er);
+    }
+  }
+
+  /**
+   * Reject all remaining queries.
+   *
+   * @param {Error} [er] Error, if not timeout.
+   * @protected
+   */
+  _reset(er) {
+    for (const [_id, {reject, opts}] of this.pending) {
+      reject(er || new Error(`Timeout looking up "${opts.name}":${opts.rrtype}`));
+    }
+    this.pending = new Map();
+  }
+
+  /**
+   * Close socket.
+   *
+   * @returns {Promise<void>} Resolves when close complete.
+   */
+  close() {
+    return new Promise((resolve, _reject) => {
+      if (this.socket) {
+        if (this.socket instanceof net.Socket) {
+          this.socket.end(resolve);
+        } else {
+          this.socket.close(resolve);
+        }
+        this.socket = undefined;
+      } else {
+        resolve();
+      }
+    });
+  }
+
+  /**
+   * Generate a currently-unused random ID.
+   *
+   * @returns {Promise<number>} A random 2-byte ID number.
+   * @protected
+   */
+  async _id() {
+    let id = null;
+    do {
+      id = (await randomBytes(2)).readUInt16BE();
+    } while (this.pending.has(id));
+    return id;
+  }
+
+  /**
    * Encode a DNS query packet to a buffer.
    *
    * @param {object} opts Options for the query.
@@ -259,6 +436,7 @@ export class DNSutils extends EventEmitter {
 
     /** @type {packet.Packet} */
     const dns = {
+      rcode: 'NOERROR',
       type: 'query',
       id: opts.id || 0,
       flags: packet.RECURSION_DESIRED,

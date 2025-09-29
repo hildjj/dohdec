@@ -40,6 +40,7 @@ test('dns get', async t => {
   const vres = verboseStream.read();
   t.is(typeof vres, 'string');
   t.truthy(vres.length > 0);
+  await doh.close();
 });
 
 test('json get', async t => {

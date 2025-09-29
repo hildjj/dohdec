@@ -22,8 +22,9 @@ jobs:
           node-version: 22
           registry-url: 'https://registry.npmjs.org'
           cache: pnpm
-      - run: npm run all:link
       - run: pnpm i -r
+      - name: Setup WARP
+        uses: fscarmen/warp-on-actions@v1.4
       - run: npm run all:check
       - name: Deploy Docs
         uses: peaceiris/actions-gh-pages@v4

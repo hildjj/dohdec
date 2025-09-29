@@ -37,26 +37,28 @@ Options:
   -V, --version                 output the version number
   -c, --contentType <type>      MIME type for POST (default:
                                 "application/dns-message")
-  -d, --dns                     Use DNS format instead of JSON (ignored for
-                                TLS)
+  -d, --dns                     Use DNS format instead of JSON (ignored for TLS)
   -s, --dnssec                  Request DNSsec records
   -k, --dnssecCheckingDisabled  Disable DNSsec validation
   -e, --ecs <number>            Use this many bits for EDNS Client Subnet (ECS)
-  -b, --ecsSubnet <address>     Use this IP address for EDNS Client Subnet
-                                (ECS)
+  -b, --ecsSubnet <address>     Use this IP address for EDNS Client Subnet (ECS)
   -f, --full                    Full response, not just answers
   -g, --get                     Force http GET for DNS-format lookups
   -n, --no-decode               Do not decode JSON or DNS wire format
   -2, --no-http2                Disable http2 support
   -t, --tls                     Use DNS-over-TLS instead of DNS-over-HTTPS
-  -i, --tlsServer <serverIP>    Connect to this DNS-over-TLS server (default:
-                                "1.1.1.1")
+  -i, --host <serverIP>         Connect to this server when not using HTTP
+                                (default: "1.1.1.1")
   -p, --tlsPort <number>        Connect to this TCP port for DNS-over-TLS
                                 (default: 853)
+  -P, --dnsPort <number>        Connect to this UDP or TCP port when not using
+                                TLS (default: 53)
   -u, --url <URL>               The URL of the DoH service (default:
                                 "https://cloudflare-dns.com/dns-query")
-  -v, --verbose                 Increase verbosity of debug information.  May
-                                be specified multiple times.
+  -T, --tcp                     Use plaintext TCP for query
+  -U, --udp                     Use UDP for query
+  -v, --verbose                 Increase verbosity of debug information.  May be
+                                specified multiple times.
   -h, --help                    display help for command
 
 For more debug information:
@@ -80,7 +82,7 @@ async function cliMain(...args) {
   }
 
   try {
-    const cli = new DnsCli([process.execPath, 'dohdec', ...args], {in: inp, out, err, helpWidth: 79});
+    const cli = new DnsCli([process.execPath, 'dohdec', ...args], {in: inp, out, err, helpWidth: 80});
 
     for (const s of setup) {
       await s(cli);
@@ -100,9 +102,9 @@ async function cliMain(...args) {
 async function cliMainTLS(...args) {
   const res = await cliMain(cli => {
     const m = plainConnect(mockServer.port);
-    cli.transport.opts.socket = m;
-    cli.transport.opts.ca = mockServer.ca;
-    cli.transport.opts.host = 'localhost';
+    cli.transport.tlsOpts.socket = m;
+    cli.transport.tlsOpts.ca = mockServer.ca;
+    cli.transport.tlsOpts.host = 'localhost';
   }, ...args);
   return res;
 }
@@ -134,7 +136,7 @@ test('main get', async t => {
 });
 
 test('tls', async t => {
-  const {out, err, code} = await cliMainTLS('-tg', 'ietf.org', 'AAAA');
+  const {out, err, code} = await cliMainTLS('-t', 'ietf.org', 'AAAA');
   t.is(err, null);
   t.is(code, undefined);
   t.is(out, `\
@@ -163,7 +165,7 @@ test('bad args', async t => {
 });
 
 test('TLS NXDOMAIN', async t => {
-  const {code} = await cliMainTLS('-tg', 'unknown.example');
+  const {code} = await cliMainTLS('-t', 'unknown.example');
   t.is(code, 'dns.NXDOMAIN');
 });
 
@@ -173,7 +175,7 @@ test('HTTPS NXDOMAIN', async t => {
 });
 
 test('no decode', async t => {
-  const {out, code, err} = await cliMainTLS('-tnvg', 'ietf.org');
+  const {out, code, err} = await cliMainTLS('-tnv', 'ietf.org');
   t.is(code, undefined);
   t.false(out[out.length - 1] === '\n');
   t.true(err.length > 0);
@@ -248,4 +250,23 @@ test('bad format', async t => {
     .reply(200, {bad: 'format'});
   const {out} = await cliMain('-g', '-u', 'http://moo.example/dns', 'badformat.example');
   t.is(out, "{ bad: 'format' }\n");
+});
+
+test('deprecated options', async t => {
+  const {err, code} = await cliMain('--tlsServer', '1.1.1.1');
+  t.is(err, "error: option '--tlsServer <serverIP>' argument '1.1.1.1' is invalid. Use '--host 1.1.1.1' instead\n");
+  t.is(code, 'commander.invalidArgument');
+});
+
+test('udp', async t => {
+  const {out, code} = await cliMain('--udp', '-v', 'ietf.org', 'MX');
+  t.is(code, undefined);
+  t.regex(out, /name: 'ietf.org'/);
+});
+
+test('tcp', async t => {
+  const {err, out, code} = await cliMain('--tcp', 'ietf.org', 'MX');
+  t.is(err, null);
+  t.is(code, undefined);
+  t.regex(out, /name: 'ietf.org'/);
 });

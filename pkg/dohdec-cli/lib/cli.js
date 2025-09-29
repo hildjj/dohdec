@@ -1,12 +1,13 @@
-import {Command, InvalidArgumentError} from 'commander';
-import {DNSError, DNSoverHTTPS, DNSoverTLS, DNSutils} from 'dohdec';
+import {Command, InvalidArgumentError, Option} from 'commander';
+import {DNSError, DNSoverHTTPS, DNSoverTCP, DNSoverTLS, DNSoverUDP, DNSutils} from 'dohdec';
 import {Buffer} from 'node:buffer';
 import assert from 'node:assert';
 import net from 'node:net';
 import readline from 'node:readline';
 import util from 'node:util';
 
-/** @import {GenericPacket} from 'dohdec/lib/dnsUtils.js' */
+/** @import {GenericPacket, JSONrr} from 'dohdec/lib/dnsUtils.js' */
+/** @import {Answer, RecordType} from 'dns-packet' */
 
 /**
  * Parse an int or throw if invalid.
@@ -23,8 +24,6 @@ function myParseInt(value) {
   }
   return parsedValue;
 }
-
-/** @import {Answer, Packet, RecordType} from 'dns-packet' */
 
 /**
  * @param {unknown} pkt Potential packet.
@@ -82,6 +81,9 @@ function checkAddress(value) {
  * Command Line Interface for dohdec.
  */
 export class DnsCli extends Command {
+  /** @type {DNSutils} */
+  transport;
+
   /**
    * Create a CLI environment.
    *
@@ -92,9 +94,6 @@ export class DnsCli extends Command {
    */
   constructor(args, stdio) {
     super();
-
-    /** @type {DNSoverHTTPS|DNSoverTLS|undefined} */
-    this.transport = undefined;
 
     /** @type {Required<Stdio>} */
     this.std = {
@@ -138,22 +137,44 @@ export class DnsCli extends Command {
       .option('-g, --get', 'Force http GET for DNS-format lookups')
       .option('-n, --no-decode', 'Do not decode JSON or DNS wire format')
       .option('-2, --no-http2', 'Disable http2 support')
-      .option('-t, --tls', 'Use DNS-over-TLS instead of DNS-over-HTTPS')
-      .option(
-        '-i, --tlsServer <serverIP>',
-        'Connect to this DNS-over-TLS server',
-        '1.1.1.1'
+      .addOption(
+        new Option('-t, --tls', 'Use DNS-over-TLS instead of DNS-over-HTTPS')
+          .conflicts(['contentType', 'dnsPort', 'get', 'no-http2', 'tcp', 'udp', 'url'])
       )
+      .option(
+        '-i, --host <serverIP>',
+        'Connect to this server when not using HTTP',
+        DNSoverTLS.server
+      )
+      .addOption(new Option('--tlsServer <serverIP>')
+        .hideHelp()
+        .argParser(v => {
+          throw new InvalidArgumentError(`Use '--host ${v}' instead`);
+        }))
       .option(
         '-p, --tlsPort <number>',
         'Connect to this TCP port for DNS-over-TLS',
         myParseInt,
-        853
+        DNSoverTLS.port
+      )
+      .option(
+        '-P, --dnsPort <number>',
+        'Connect to this UDP or TCP port when not using TLS',
+        myParseInt,
+        DNSoverUDP.port
       )
       .option(
         '-u, --url <URL>',
         'The URL of the DoH service',
         DNSoverHTTPS.defaultURL
+      )
+      .addOption(
+        new Option('-T, --tcp', 'Use plaintext TCP for query')
+          .conflicts(['contentType', 'get', 'no-http2', 'tls', 'tlsPort', 'udp', 'url'])
+      )
+      .addOption(
+        new Option('-U, --udp', 'Use UDP for query')
+          .conflicts(['contentType', 'get', 'no-http2', 'tcp', 'tls', 'tlsPort', 'url'])
       )
       .option(
         '-v, --verbose',
@@ -175,14 +196,29 @@ For more debug information:
     this.argv.name = this.args.shift();
     this.argv.rrtype = this.args.shift();
 
-    this.transport = this.argv.tls ?
-      new DNSoverTLS({
-        host: this.argv.tlsServer,
+    if (this.argv.udp) {
+      this.transport = new DNSoverUDP({
+        host: this.argv.host,
+        port: this.argv.dnsPort,
+        verbose: this.argv.verbose,
+        verboseStream: this.std.err,
+      });
+    } else if (this.argv.tcp) {
+      this.transport = new DNSoverTCP({
+        host: this.argv.host,
+        port: this.argv.dnsPort,
+        verbose: this.argv.verbose,
+        verboseStream: this.std.err,
+      });
+    } else if (this.argv.tls) {
+      this.transport = new DNSoverTLS({
+        host: this.argv.host,
         port: this.argv.tlsPort,
         verbose: this.argv.verbose,
         verboseStream: this.std.err,
-      }) :
-      new DNSoverHTTPS({
+      });
+    } else {
+      this.transport = new DNSoverHTTPS({
         contentType: this.argv.contentType,
         http2: this.argv.http2,
         preferPost: !this.argv.get,
@@ -190,6 +226,7 @@ For more debug information:
         verbose: this.argv.verbose,
         verboseStream: this.std.err,
       });
+    }
     this.transport.verbose(1, 'DnsCli options:', this.argv);
   }
 
@@ -197,7 +234,6 @@ For more debug information:
    * Run the CLI.
    */
   async main() {
-    assert(this.transport);
     try {
       if (this.argv.name) {
         await this.get(this.argv.name, this.argv.rrtype);
@@ -235,6 +271,8 @@ For more debug information:
           opts.rrtype = 'PTR';
         }
       }
+
+      /** @type {GenericPacket|Buffer|string|JSONrr[]|Answer[]} */
       let resp = await this.transport.lookup(opts);
       if (this.argv.decode) {
         if (!this.argv.full) {
