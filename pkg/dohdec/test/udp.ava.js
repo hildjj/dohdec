@@ -1,4 +1,5 @@
 import {DNSoverUDP} from '../lib/udp.js';
+import {hasIPv6} from './utils.js';
 import test from 'ava';
 
 test('udp4', async t => {
@@ -16,6 +17,12 @@ test('udp4', async t => {
 });
 
 test('udp6', async t => {
+  if (!await hasIPv6()) {
+    // TODO: Switch to skipIf() when it is available
+    // eslint-disable-next-line ava/no-conditional-assertion
+    t.truthy(1);
+    return;
+  }
   const udp = new DNSoverUDP({host: '2606:4700:4700::1111'});
   // eslint-disable-next-line ava/assertion-arguments
   udp.on('error', er => t.fail(String(er)));

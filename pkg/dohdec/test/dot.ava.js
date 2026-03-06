@@ -105,7 +105,6 @@ test('bad cert', async t => {
 test('pin cert', async t => {
   if (!crypto.X509Certificate) {
     // X509Certificate added in node 15.6.0
-    t.pass();
     return;
   }
   const dot = create({

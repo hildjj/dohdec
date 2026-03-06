@@ -96,6 +96,7 @@ test('DNSSEC with cd=1', async t => {
 });
 
 test('close', t => {
+  t.plan(1);
   const doh = new DNSoverHTTPS();
 
   // This is a no-op, but let's cover it in case it stops being one.

@@ -1,0 +1,13 @@
+{
+  "name": "Node.js",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "editorconfig.editorconfig"
+      ]
+    }
+  },
+  "postCreateCommand": "sudo npm install -g npm-check-updates"
+}
