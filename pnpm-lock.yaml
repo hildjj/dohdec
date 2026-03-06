@@ -85,7 +85,7 @@ importers:
         specifier: ^14.0.3
         version: 14.0.3
       dohdec:
-        specifier: 7.0.5
+        specifier: 8.0.0
         version: link:../dohdec
     devDependencies:
       '@types/dns-packet':
