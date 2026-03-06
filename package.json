@@ -17,7 +17,7 @@
     "all:types": "pnpm run -C pkg/dohdec types && pnpm run -C pkg/dohdec-cli types",
     "all:install": "pnpm i -r",
     "clean": "rm -rf node_modules coverage pkg/*/node_modules pkg/*/coverage pkg/*/types",
-    "version": "monopub version && pnpm run -r --if-present version"
+    "version": "monopub version && pnpm run -r --if-present version && pnpm i -r && git add pnpm-lock.yaml"
   },
   "keywords": [
     "doh",
