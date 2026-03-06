@@ -104,7 +104,7 @@ const randomBytes = util.promisify(crypto.randomBytes);
  */
 export function stylizeWithColor(str, styleType) {
   const style = util.inspect.styles[styleType];
-  if (style !== undefined) {
+  if (typeof style === 'string') {
     const color = util.inspect.colors[style];
     assert(color, style);
     return `\u001b[${color[0]}m${str}\u001b[${color[1]}m`;
