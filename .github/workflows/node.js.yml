@@ -15,16 +15,17 @@ jobs:
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v6
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'pnpm'
+      - name: Install pnpm
+        uses: pnpm/action-setup@v5
+        with:
+          cache: true
+          run_install: true
       - name: Setup WARP
         uses: fscarmen/warp-on-actions@v1.4
-      - run: pnpm i -r
       - run: npm run lint
       - run: npm run all:types
       - run: npm run test

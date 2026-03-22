@@ -5,8 +5,7 @@ import {Buffer} from 'node:buffer';
 import {DNSoverTCP} from './tcp.js';
 import {NoFilter} from 'nofilter';
 
-/** @import {VerboseOptions, Writable} from './dnsUtils.js' */
-/** @import {TCPoptions} from './tcp.js' */
+/** @import {VerboseOptions} from './dnsUtils.js' */
 
 /**
  * @typedef {object} HashOptions

@@ -10,7 +10,6 @@
   "scripts": {
     "lint": "eslint .",
     "test": "c8 ava",
-    "release": "npm version patch && git push --follow-tags && npm publish",
     "preall:check": "npm run lint && npm run test && npm run all:types && npm run all:docs",
     "all:check": "pnpm run -r --stream check",
     "all:docs": "pnpm run -r docs",
@@ -36,18 +35,18 @@
   },
   "devDependencies": {
     "@cto.af/eslint-config": "^6.2.5",
-    "@cto.af/monopub": "1.2.2",
-    "@eslint/markdown": "7.5.1",
+    "@cto.af/monopub": "1.2.4",
+    "@eslint/markdown": "^7.5.1",
     "ava": "^7.0.0",
-    "eslint": "^10.0.2",
+    "eslint": "^10.1.0",
     "eslint-plugin-ava": "^16.0.0",
-    "eslint-plugin-jsdoc": "^62.7.1",
-    "mock-dns-server": "1.0.3",
-    "package-extract": "3.1.5",
-    "superc8": "12.2.4",
-    "typedoc": "0.28.17"
+    "eslint-plugin-jsdoc": "^62.8.0",
+    "mock-dns-server": "^1.0.3",
+    "package-extract": "^3.1.6",
+    "superc8": "^12.3.1",
+    "typedoc": "^0.28.17"
   },
-  "packageManager": "pnpm@10.30.3",
+  "packageManager": "pnpm@10.32.1",
   "engines": {
     "node": ">=20.3"
   }
