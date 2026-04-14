@@ -6,8 +6,7 @@ const UNDICI_GLOBAL_DISPATCHER = 'undici.globalDispatcher.1';
 const unidiciGlobalDispatcherSymbol = Symbol.for(UNDICI_GLOBAL_DISPATCHER);
 
 // Have to call fetch once to pre-load the undici Agent class.
-// eslint-disable-next-line n/no-top-level-await
-await fetch('').catch(() => {
+globalThis.fetch('').catch(() => {
   // Ignore.
 });
 
