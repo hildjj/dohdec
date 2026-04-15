@@ -28,6 +28,9 @@
     "rfc8484"
   ],
   "author": "Joe Hildebrand <joe-github@cursive.net>",
+  "contributors": [
+    "SukkaW <oss@skk.moe> (https://skk.moe)"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
