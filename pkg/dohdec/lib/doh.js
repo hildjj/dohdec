@@ -4,7 +4,7 @@ import * as tls from 'node:tls';
 import {Agent} from './agent.js';
 import {Buffer} from 'node:buffer';
 import DNSutils from './dnsUtils.js';
-import assert from 'node:assert';
+import assert from 'node:assert/strict';
 import cryptoRandomString from 'crypto-random-string';
 
 const PAD_SIZE = 128;

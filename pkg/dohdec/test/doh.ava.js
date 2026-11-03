@@ -118,6 +118,12 @@ test('doh AbortSignal', async t => {
   const doh = new DNSoverHTTPS({signal: AbortSignal.abort()});
   await t.throwsAsync(() => doh.lookup('ietf.org'));
   doh.opts.signal = AbortSignal.timeout(0);
+
+  // Ensure the timeout fires before real fetch actually starts.
+  doh.opts.customFetch = (...args) => new Promise((resolve, reject) => {
+    setTimeout(() => fetch(...args).then(resolve, reject), 0);
+  });
+
   await t.throwsAsync(() => doh.lookup('ietf.org'));
   doh.timeout = 0;
   await t.throwsAsync(() => doh.lookup('ietf.org'));

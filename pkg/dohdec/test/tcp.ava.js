@@ -3,7 +3,6 @@ import test from 'ava';
 
 test('tcp', async t => {
   const tcp = new DNSoverTCP();
-  // eslint-disable-next-line ava/assertion-arguments
   tcp.on('error', er => t.fail(String(er)));
   const pkt = await tcp.lookup('ietf.org', 'MX');
   t.assert(pkt?.answers);

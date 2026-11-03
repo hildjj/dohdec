@@ -6,7 +6,7 @@ import * as packet from 'dns-packet';
 import * as rcodes from 'dns-packet/rcodes.js';
 import {Buffer} from 'node:buffer';
 import {EventEmitter} from 'node:events';
-import assert from 'node:assert';
+import assert from 'node:assert/strict';
 import ip from 'ip-address';
 import net from 'node:net';
 import url from 'node:url';
@@ -76,8 +76,6 @@ const randomBytes = util.promisify(crypto.randomBytes);
  * @param {Error} error The error that occurred.
  */
 
-/** @import {LookupOptions} from './dnsUtils.js' */
-
 /**
  * @typedef {object} Pending
  * @property {pendingResolve} resolve Callback for success.
@@ -98,7 +96,7 @@ const randomBytes = util.promisify(crypto.randomBytes);
  * Only exported for testing.
  *
  * @param {string} str String to stylize.
- * @param {util.Style} styleType Which style?
+ * @param {util.InspectStyle} styleType Which style?
  * @returns {string} Stylized string.
  * @private
  */
@@ -115,7 +113,7 @@ export function stylizeWithColor(str, styleType) {
 /**
  * @param {Writable} stream Stream to modify.
  * @param {string} str String to stylize.
- * @param {util.Style} styleType Style to use.
+ * @param {util.InspectStyle} styleType Style to use.
  * @private
  */
 function styleStream(stream, str, styleType) {
@@ -165,6 +163,7 @@ export class DNSutils extends EventEmitter {
    * Creates an instance of DNSutils.
    *
    * @param {VerboseOptions} [opts={}] Options.
+   * @throws {Error} Invalid verbose level.
    */
   constructor(opts = {}) {
     super();

@@ -1,7 +1,7 @@
 import {Command, InvalidArgumentError, Option} from 'commander';
 import {DNSError, DNSoverHTTPS, DNSoverTCP, DNSoverTLS, DNSoverUDP, DNSutils} from 'dohdec';
 import {Buffer} from 'node:buffer';
-import assert from 'node:assert';
+import assert from 'node:assert/strict';
 import net from 'node:net';
 import readline from 'node:readline';
 import util from 'node:util';
@@ -65,11 +65,13 @@ function checkAddress(value) {
   return value;
 }
 
+/** @import {Readable, Writable} from 'node:stream' */
+
 /**
  * @typedef {object} Stdio
- * @property {import('stream').Readable} [in] StdIn.
- * @property {import('stream').Writable} [out] StdOut.
- * @property {import('stream').Writable} [err] StdErr.
+ * @property {Readable} [in] StdIn.
+ * @property {Writable} [out] StdOut.
+ * @property {Writable} [err] StdErr.
  */
 
 /**
