@@ -46,7 +46,7 @@
     "superc8": "^12.7.0",
     "typedoc": "^0.28.20"
   },
-  "packageManager": "pnpm@12.16.1",
+  "packageManager": "pnpm@12.17.0",
   "engines": {
     "node": ">=22"
   }
