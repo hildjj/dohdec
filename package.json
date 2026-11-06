@@ -4,9 +4,6 @@
   "description": "DNS over HTTPS and DNS over TLS",
   "private": true,
   "type": "module",
-  "workspaces": [
-    "./pkg/*"
-  ],
   "scripts": {
     "lint": "eslint .",
     "test": "c8 ava",
@@ -37,20 +34,20 @@
     "url": "git+https://github.com/hildjj/dohdec.git"
   },
   "devDependencies": {
-    "@cto.af/eslint-config": "^6.2.5",
-    "@cto.af/monopub": "1.2.4",
-    "@eslint/markdown": "^7.5.1",
-    "ava": "^7.0.0",
-    "eslint": "^10.1.0",
-    "eslint-plugin-ava": "^16.0.0",
-    "eslint-plugin-jsdoc": "^62.8.0",
-    "mock-dns-server": "^1.0.3",
-    "package-extract": "^3.1.6",
-    "superc8": "^12.3.1",
-    "typedoc": "^0.28.17"
+    "@cto.af/eslint-config": "^7.0.4",
+    "@cto.af/monopub": "2.0.2",
+    "@eslint/markdown": "^8.0.3",
+    "ava": "^8.3.0",
+    "eslint": "^10.14.0",
+    "eslint-plugin-ava": "^18.0.0",
+    "eslint-plugin-jsdoc": "^65.4.2",
+    "mock-dns-server": "^2.0.0",
+    "package-extract": "^4.0.2",
+    "superc8": "^12.7.0",
+    "typedoc": "^0.28.20"
   },
-  "packageManager": "pnpm@10.32.1",
+  "packageManager": "pnpm@12.17.0",
   "engines": {
-    "node": ">=20.3"
+    "node": ">=22"
   }
 }

@@ -1,7 +1,7 @@
 import * as net from 'node:net';
 import {DEFAULT_SERVER, DNSutils} from './dnsUtils.js';
 import {NoFilter} from 'nofilter';
-import assert from 'node:assert';
+import assert from 'node:assert/strict';
 
 /** @import {VerboseOptions, Writable} from './dnsUtils.js' */
 
@@ -134,7 +134,9 @@ export class DNSoverTCP extends DNSutils {
           return;
         }
 
-        this.size = this.nof.readUInt16BE();
+        const sz = this.nof.readUInt16BE();
+        assert(typeof sz === 'number');
+        this.size = sz;
       }
       if (this.nof.length < this.size) {
         return;

@@ -33,20 +33,21 @@
   },
   "dependencies": {
     "@relaycorp/dnssec": "~1.12.1",
-    "crypto-random-string": "^5.0.0",
+    "crypto-random-string": "^6.0.0",
     "dns-packet": "^5.6.1",
-    "ip-address": "~10.1.0",
-    "nofilter": "^6.4.1",
-    "undici-types": "~7.24.5"
+    "ip-address": "~10.7.5",
+    "nofilter": "^7.0.0",
+    "undici-types": "~8.12.3"
   },
   "devDependencies": {
     "@types/dns-packet": "^5.6.5",
-    "@types/node": "^25.5.0",
-    "mock-dns-server": "^1.0.3",
-    "nock": "^14.0.11",
-    "typescript": "^5.9.3"
+    "@types/node": "^26.6.6",
+    "@typescript/native": "npm:typescript@^7.0.2",
+    "mock-dns-server": "^2.0.0",
+    "nock": "^15.0.5",
+    "typescript": "npm:@typescript/typescript6@^6.0.2"
   },
   "engines": {
-    "node": ">=20.3"
+    "node": ">=22"
   }
 }

@@ -145,7 +145,11 @@ test('hexDump', t => {
   du.verboseStream = new Buf();
   du.verboseStream.isTTY = true;
   du.hexDump(1, Buffer.from('666f6f7fa2adae'));
-  t.deepEqual(du.verboseStream.read(), Buffer.from(
+  const bufs = [];
+  for (let b = du.verboseStream.read(); b; b = du.verboseStream.read()) {
+    bufs.push(b);
+  }
+  t.deepEqual(Buffer.concat(bufs), Buffer.from(
     '1b5b39306d30303030303030301b5b33396d2020333620333620333620363620' +
     '3336203636203337203636202036312033322036312036342036312036352020' +
     '2020202020207c1b5b33326d361b5b33396d1b5b33326d361b5b33396d1b5b33' +

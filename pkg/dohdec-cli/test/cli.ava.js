@@ -9,8 +9,8 @@ import test from 'ava';
 prepNock(test, nock, import.meta.url);
 let mockServer = null;
 
-test.before(() => {
-  mockServer = createServer({zones: DNS});
+test.before(async () => {
+  mockServer = await createServer({zones: DNS});
 });
 
 test.after.always(() => new Promise((resolve, reject) => {

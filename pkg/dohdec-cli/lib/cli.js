@@ -1,7 +1,7 @@
 import {Command, InvalidArgumentError, Option} from 'commander';
 import {DNSError, DNSoverHTTPS, DNSoverTCP, DNSoverTLS, DNSoverUDP, DNSutils} from 'dohdec';
 import {Buffer} from 'node:buffer';
-import assert from 'node:assert';
+import assert from 'node:assert/strict';
 import net from 'node:net';
 import readline from 'node:readline';
 import util from 'node:util';
@@ -65,11 +65,13 @@ function checkAddress(value) {
   return value;
 }
 
+/** @import {Readable, Writable} from 'node:stream' */
+
 /**
  * @typedef {object} Stdio
- * @property {import('stream').Readable} [in] StdIn.
- * @property {import('stream').Writable} [out] StdOut.
- * @property {import('stream').Writable} [err] StdErr.
+ * @property {Readable} [in] StdIn.
+ * @property {Writable} [out] StdOut.
+ * @property {Writable} [err] StdErr.
  */
 
 /**
@@ -326,7 +328,10 @@ For more debug information:
     // See https://github.com/nodejs/node/issues/58784
     const oclose = rl.close;
     rl.close = (...args) => {
-      setTimeout(() => oclose.apply(rl, args), 50);
+      // I had to up this from 50ms to deal with something new in superc8,
+      // for reasons that I don't understand.
+      // If the CLI tests go orange, this is likely reason.
+      setTimeout(() => oclose.apply(rl, args), 150);
     };
     for await (const line of rl) {
       this.transport.verbose(1, 'LINE', line);
