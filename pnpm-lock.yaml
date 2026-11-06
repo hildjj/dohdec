@@ -251,7 +251,7 @@ importers:
         specifier: ^15.0.0
         version: 15.0.0
       dohdec:
-        specifier: 8.0.0
+        specifier: 9.0.0
         version: link:../dohdec
     devDependencies:
       '@types/dns-packet':
