@@ -3,6 +3,7 @@ import fs from 'node:fs/promises';
 
 let localSet = new Set();
 try {
+  // eslint-disable-next-line n/no-top-level-await
   const deps = await Promise.any([
     fs.readFile('../deps.json', 'utf8'),
     fs.readFile('../../deps.json', 'utf8'),
