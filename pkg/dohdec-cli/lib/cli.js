@@ -328,10 +328,10 @@ For more debug information:
     // See https://github.com/nodejs/node/issues/58784
     const oclose = rl.close;
     rl.close = (...args) => {
-      // I had to up this to 80ms to deal with something new in superc8,
+      // I had to up this from 50ms to deal with something new in superc8,
       // for reasons that I don't understand.
       // If the CLI tests go orange, this is likely reason.
-      setTimeout(() => oclose.apply(rl, args), 80);
+      setTimeout(() => oclose.apply(rl, args), 150);
     };
     for await (const line of rl) {
       this.transport.verbose(1, 'LINE', line);
