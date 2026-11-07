@@ -31,4 +31,7 @@ jobs:
           publish_branch: gh-pages
           destination_dir: docs
       - run: pnpm pkg -r delete devDependencies scripts pnpm
-      - run: pnpm publish -r --no-include-workspace-root --access public --provenance
+      - run: npm publish --access public --provenance
+        working-directory: pkg/dohdec
+      - run: npm publish --access public --provenance
+        working-directory: pkg/dohdec-cli
